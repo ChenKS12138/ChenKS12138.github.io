@@ -23,13 +23,13 @@ function Layout(props: {
 
   const links = useMemo(
     () => [
-      <Link className="link-item" to="/">
+      <Link className="link-item" to="/" key="homepage">
         Home
       </Link>,
-      <Link className="link-item" to="/list">
+      <Link className="link-item" to="/list" key="list">
         Archieves
       </Link>,
-      <Link className="link-item" to="/about">
+      <Link className="link-item" to="/about" key="about">
         About
       </Link>,
     ],

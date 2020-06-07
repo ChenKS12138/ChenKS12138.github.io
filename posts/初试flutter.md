@@ -1,9 +1,6 @@
 ---
 title: 初试flutter
-tags:
-  - Flutter
-  - Dart
-  - 跨端技术
+tags: ["Flutter", "Dart", "跨端技术"]
 date: 2019-09-25 16:59:47
 index_img: ../assets/flutter.jpg
 ---

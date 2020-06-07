@@ -1,8 +1,7 @@
 ---
 title: JavaScript中的闭包
 date: 2019-07-22 15:35:59
-tags:
-  - JavaScript
+tags: ["JavaScript"]
 ---
 
 ## 一道题目

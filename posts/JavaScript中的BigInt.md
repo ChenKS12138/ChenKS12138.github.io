@@ -1,9 +1,8 @@
 ---
 title: JavaScript中的BigInt
 date: 2020-04-11 18:55:59
-tags:
-  - JavaScript
-index_img: https://s1.ax1x.com/2020/04/11/Gbtt2R.png
+tags: ["JavaScript"]
+index_img: ../assets/Gbtt2R.png
 ---
 
 ## JavaScript 中的 BigInt

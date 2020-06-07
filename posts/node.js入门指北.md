@@ -1,8 +1,7 @@
 ---
 title: Node.js入门指北
 date: 2020-01-14 21:14:29
-tags: -JavaScript
-  -Node.js
+tags: ["JavaScript", "Node.js"]
 index_img: ../assets/nodejs_tutorial/2.png
 ---
 

@@ -1,7 +1,6 @@
 ---
 title: JS中的函数节流与函数防抖
-tags:
-  - JavaScript
+tags: ["JavaScript"]
 index_img: ../assets/debounce1.jpg
 date: 2019-08-10 22:42:45
 ---
