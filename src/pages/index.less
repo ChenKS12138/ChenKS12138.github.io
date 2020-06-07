@@ -1,6 +1,7 @@
 .page-index {
   .archieves-empty {
     min-width: 80vw;
+
     .archieves-empty-tip {
       position: absolute;
       top: 50%;
@@ -11,17 +12,20 @@
       font-size: 25px;
     }
   }
+
   .archieves-container {
     display: flex;
     flex-direction: column;
     align-items: center;
+
     .archieve-item {
       display: flex;
       width: 800px;
       justify-content: space-evenly;
       margin: 20px auto;
       padding-bottom: 30px;
-      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+      border-bottom: 1px solid rgba(0, 0, 0, .1);
+
       .archieve-item-image {
         width: 30%;
         height: 160px;
@@ -29,29 +33,34 @@
         background-repeat: no-repeat;
         background-size: auto 100%;
         overflow: hidden;
-        box-shadow: 0 12px 15px 0 rgba(0, 0, 0, 0.24),
-          0 17px 50px 0 rgba(0, 0, 0, 0.19) !important;
+        box-shadow: 0 12px 15px 0 rgba(0, 0, 0, .24), 0 17px 50px 0 rgba(0, 0, 0, .19) !important;
       }
+
       .archieve-item-right {
         width: 65%;
+
         .archieve-item-title {
           color: #3c4858;
           font-weight: 700;
           font-size: 1.5rem;
           line-height: 2;
         }
+
         .archieve-item-intro {
           font-size: 1rem;
           color: #3c4858;
           line-height: 1.5;
         }
+
         .archieve-item-otherinfo {
           margin-top: 10px;
           display: flex;
           align-items: center;
-          .archieve-item-date,
-          .archieve-item-tags {
-            .archieve-item-intro;
+
+          .archieve-item-date, .archieve-item-tags {
+            font-size: 1rem;
+            color: #3c4858;
+            line-height: 1.5;
             margin: 0 5px;
           }
         }
