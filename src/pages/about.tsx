@@ -13,7 +13,7 @@ function About(props: PageProps) {
   const createAbout = useCallback(
     (children: React.ReactElement): React.ReactElement => (
       <Layout backgroundSrc={bg} height="500px">
-        <SEO title="about" />
+        <SEO title="About|ChenKS" />
         <div className="page-about">{children}</div>
       </Layout>
     ),

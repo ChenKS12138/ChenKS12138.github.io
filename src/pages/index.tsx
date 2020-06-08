@@ -26,7 +26,7 @@ export default function Index(props: PageProps) {
           </div>
         }
       >
-        <SEO title="homepage" />
+        <SEO title="HomePage|ChenKS" />
         <div className="page-index">{children}</div>
       </Layout>
     ),
@@ -36,13 +36,13 @@ export default function Index(props: PageProps) {
   // 无文章判断
   if (!(data as any)?.allMarkdownRemark?.nodes?.length)
     return createIndex(
-      <div className="archieves-empty">
-        <div className="archieves-empty-tip">暂无文章</div>
+      <div className="archives-empty">
+        <div className="archives-empty-tip">暂无文章</div>
       </div>
     );
 
   return createIndex(
-    <div className="archieves-container">
+    <div className="archives-container">
       {(data as any).allMarkdownRemark.nodes.map((item: any) => {
         const {
           id,
@@ -51,21 +51,21 @@ export default function Index(props: PageProps) {
         } = item;
         const publicURL = indexImage?.publicURL;
         return (
-          <div className="archieve-item" key={id}>
+          <div className="archive-item" key={id}>
             <Link to={`/detail/${id}`} style={{ textDecoration: "none" }}>
-              <div className="archieve-item-content">
+              <div className="archive-item-content">
                 {publicURL && (
                   <div
-                    className="archieve-item-image"
+                    className="archive-item-image"
                     style={{ backgroundImage: `url("${publicURL}")` }}
                   />
                 )}
-                <div className="archieve-item-right">
-                  <div className="archieve-item-title">{title}</div>
-                  <div className="archieve-item-intro">{excerpt}</div>
-                  <div className="archieve-item-otherinfo">
-                    <div className="archieve-item-date">{date}</div>
-                    <div className="archieve-item-tags">{tags.join(" ")}</div>
+                <div className="archive-item-right">
+                  <div className="archive-item-title">{title}</div>
+                  <div className="archive-item-intro">{excerpt}</div>
+                  <div className="archive-item-otherinfo">
+                    <div className="archive-item-date">{date}</div>
+                    <div className="archive-item-tags">{tags.join(" ")}</div>
                   </div>
                 </div>
               </div>

@@ -30,7 +30,7 @@ function Detail(props: PageProps) {
           </div>
         }
       >
-        <SEO title="Detail" />
+        <SEO title={title + "|ChenKS"} />
         {children}
       </Layout>
     ),
@@ -52,7 +52,14 @@ function Detail(props: PageProps) {
         dangerouslySetInnerHTML={{ __html: html }}
         ref={content}
       ></div>
-      <div className="tag-container">{}</div>
+      <div className="tag-container">
+        {tags &&
+          tags.map((tag: string) => (
+            <span className="tag" key={tag}>
+              {tag}
+            </span>
+          ))}
+      </div>
       <div className="copyright-container">
         本博客所有文章除特别声明外，均采用 CC BY-SA 3.0协议 。转载请注明出处！
       </div>

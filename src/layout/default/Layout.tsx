@@ -33,7 +33,7 @@ function Layout(props: {
         Home
       </Link>,
       <Link className="link-item" to="/list" key="list">
-        Archieves
+        archives
       </Link>,
       <Link className="link-item" to="/about" key="about">
         About
