@@ -1,7 +1,15 @@
+import iconGithub from "@/images/github.png";
+import iconTwitter from "@/images/twitter.png";
+
 interface Link {
   name: string;
   avatar?: string;
   link?: string;
+}
+
+interface Association {
+  icon: string;
+  url: string;
 }
 
 interface Config {
@@ -11,6 +19,7 @@ interface Config {
   github?: string;
   twitter?: string;
   links?: Array<Link>;
+  associations?: Array<Association>;
 }
 
 const config: Config = {
@@ -42,7 +51,7 @@ const config: Config = {
     {
       name: "pikanglong",
       avatar: "https://avatars1.githubusercontent.com/u/26516046?s=400&v=4",
-      link: "https://lab.pikanglong.com/",
+      link: "https://www.pikanglong.com/",
     },
     {
       name: "X3ZvaWQ",
@@ -58,6 +67,16 @@ const config: Config = {
       name: "yiayaz",
       avatar: "https://avatars0.githubusercontent.com/u/44493388?s=460&v=4",
       link: "https://yiayaz.github.io/",
+    },
+  ],
+  associations: [
+    {
+      icon: iconGithub,
+      url: "https://github.com/ChenKS12138",
+    },
+    {
+      icon: iconTwitter,
+      url: "https://twitter.com/ChenKS12138",
     },
   ],
 };

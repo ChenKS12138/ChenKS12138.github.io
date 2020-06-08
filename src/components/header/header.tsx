@@ -41,11 +41,12 @@ function Header(props: {
           <div className="header-navigation-links">{links}</div>
         </div>
       </div>
-      <div
-        className="header-content"
-        style={{ backgroundImage: `url('${backgroundSrc}')` }}
-      >
-        {content}
+      <div className="header-content-container">
+        <div
+          className="header-content-bg"
+          style={{ backgroundImage: `url("${backgroundSrc}")` }}
+        ></div>
+        <div className="header-content-content">{content}</div>
       </div>
     </div>
   );

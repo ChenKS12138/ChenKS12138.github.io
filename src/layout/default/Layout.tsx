@@ -1,11 +1,16 @@
 import React, { ReactElement, useMemo } from "react";
 import propTypes from "prop-types";
 import { useWindowScroll } from "react-use";
+import { Link } from "gatsby";
 
-import "./layout.less";
 import Header from "@/components/header/header";
 import bg from "@/images/rVtDsho.png";
-import { Link } from "gatsby";
+import { useImageColor } from "@/utils/customHooks";
+
+import "./layout.less";
+
+const ANALIZE_URL =
+  "https://busuanzi.ibruce.info/busuanzi?jsonpCallback=BusuanziCallback_476857951214";
 
 const THEME_COLOR = "#563d7c";
 const TITLE = "ChenKS";
@@ -20,7 +25,8 @@ function Layout(props: {
   const { backgroundSrc, content, height, children } = props;
 
   const { y } = useWindowScroll();
-
+  // 主题色根据顶部图片颜色变化
+  const headerColor = useImageColor(backgroundSrc);
   const links = useMemo(
     () => [
       <Link className="link-item" to="/" key="homepage">
@@ -42,7 +48,7 @@ function Layout(props: {
         className="app-header"
         backgroundSrc={backgroundSrc}
         content={content}
-        color={THEME_COLOR}
+        color={headerColor || THEME_COLOR}
         height={height}
         title={TITLE}
         toTop={y < 30}
@@ -51,9 +57,9 @@ function Layout(props: {
       <div className="app-content-container">
         <div className="app-content">{children}</div>
       </div>
-      <div className="app-footer">
-        <div className="app-footer-content">footer</div>
-      </div>
+      {/* <footer className="app-footer">
+        footer
+      </footer> */}
     </div>
   );
 }

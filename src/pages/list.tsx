@@ -2,13 +2,17 @@ import React from "react";
 import { PageProps } from "gatsby";
 
 import Layout from "@/layout/default/Layout";
-import SEO from "@/components/seo/seo";
+import SEO from "@/components/seo/Seo";
+
+import bg from "@/images/OLJxbaR.jpg";
+
+import "./list.less";
 
 function List(props: PageProps) {
   return (
-    <Layout>
+    <Layout backgroundSrc={bg}>
       <SEO title="List" />
-      <div>list</div>
+      <div className="list-container">list</div>
     </Layout>
   );
 }

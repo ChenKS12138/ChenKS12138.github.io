@@ -93,10 +93,8 @@ const generateD = (e, m) => {
 
 ### 参考引用
 
-<div id="refer-1"></div>
 - [1] https://www.binaryconvert.com/result_double.html?decimal=057048048055049057057050053052055052048057057049
-<div id="refer-2"></div>
+
 - [2] https://www.ecma-international.org/ecma-262/6.0/#sec-number.max_safe_integer/
 
-<div id="refer-3"></div>
 - [3] https://www.chosenplaintext.ca/articles/beginners-guide-constant-time-cryptography.html

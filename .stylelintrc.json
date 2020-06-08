@@ -40,7 +40,6 @@
         "no-missing-end-of-source-newline": true,
         "unit-case": "lower",
         "color-hex-case": "lower",
-        "value-keyword-case": "lower",
         "function-name-case": null,
         "property-case": "lower",
         "at-rule-name-case": "lower",

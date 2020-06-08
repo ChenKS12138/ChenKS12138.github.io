@@ -1,24 +1,25 @@
 import React, { useCallback } from "react";
-import { PageProps } from "gatsby";
+import { PageProps, Link } from "gatsby";
 
 import Layout from "@/layout/default/Layout";
-import SEO from "@/components/seo/seo";
+import SEO from "@/components/seo/Seo";
 import config from "@/app.config";
+
+import bg from "@/images/rVtDsho.png";
 
 import "./about.less";
 
 function About(props: PageProps) {
   const createAbout = useCallback(
     (children: React.ReactElement): React.ReactElement => (
-      <Layout>
+      <Layout backgroundSrc={bg} height="500px">
         <SEO title="about" />
         <div className="page-about">{children}</div>
       </Layout>
     ),
     []
   );
-  const { name, avatar, intro } = config;
-  console.log(intro);
+  const { name, avatar, intro, associations, links } = config;
 
   return createAbout(
     <div className="about">
@@ -33,6 +34,32 @@ function About(props: PageProps) {
           </div>
         ))}
       </div>
+      {associations && (
+        <div className="association-container">
+          {associations.map(association => (
+            <a href={association.url} key={association.url}>
+              <img
+                className="association-item"
+                alt={association.url}
+                src={association.icon}
+              />
+            </a>
+          ))}
+        </div>
+      )}
+      {links && (
+        <div className="links-container">
+          <div className="links-container-title">LINKS</div>
+          <div className="links-content">
+            {links.map(link => (
+              <a href={link.link} className="link-item" key={link.link}>
+                <img src={link.avatar} alt="" className="link-item-image" />
+                <div className="link-item-name">{link.name}</div>
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
