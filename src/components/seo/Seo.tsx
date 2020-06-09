@@ -67,13 +67,11 @@ function SEO(props: {
       name: `twitter:description`,
       content: metaDescription,
     },
-  ].concat(meta);
-  if (themeColor && themeColor.length) {
-    metas.push({
+    {
       name: "theme-color",
-      content: themeColor,
-    });
-  }
+      content: themeColor || "#ffffff",
+    },
+  ].concat(meta);
 
   return (
     <Helmet
@@ -82,7 +80,7 @@ function SEO(props: {
       }}
       title={title}
       titleTemplate={`%s | ${site.siteMetadata.title}`}
-      meta={meta}
+      meta={metas}
     />
   );
 }
