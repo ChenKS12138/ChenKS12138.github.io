@@ -18,10 +18,10 @@
     flex-direction: column;
     align-items: center;
     width: 960px;
-    max-width: 90vw;
+    max-width: 100%;
 
     .archive-item {
-      width: 800px;
+      width: 100%;
       margin: 20px auto;
       padding-bottom: 30px;
       border-bottom: 1px solid rgba(0, 0, 0, .1);
@@ -29,44 +29,53 @@
       .archive-item-content {
         display: flex;
         justify-content: space-evenly;
-      }
-
-      .archive-item-image {
-        width: 30%;
-        height: 160px;
-        background-position: center center;
-        background-repeat: no-repeat;
-        background-size: auto 100%;
-        overflow: hidden;
-        box-shadow: 0 12px 15px 0 rgba(0, 0, 0, .24), 0 17px 50px 0 rgba(0, 0, 0, .19) !important;
-      }
-
-      .archive-item-right {
-        width: 65%;
-
-        .archive-item-title {
-          color: #3c4858;
-          font-weight: 700;
-          font-size: 1.5rem;
-          line-height: 2;
+        @media screen and (max-width: 770px) {
+          flex-direction: column;
         }
 
-        .archive-item-intro {
-          font-size: 1rem;
-          color: #3c4858;
-          line-height: 1.5;
+        .archive-item-image {
+          width: 30%;
+          height: 160px;
+          background-position: center center;
+          background-repeat: no-repeat;
+          background-size: cover;
+          overflow: hidden;
+          box-shadow: 0 12px 15px 0 rgba(0, 0, 0, .24), 0 17px 50px 0 rgba(0, 0, 0, .19) !important;
+          @media screen and (max-width: 770px) {
+            width: 100%;
+          }
         }
 
-        .archive-item-otherinfo {
-          margin-top: 10px;
-          display: flex;
-          align-items: center;
+        .archive-item-right {
+          width: 65%;
+          @media screen and (max-width: 770px) {
+            width: 100%;
+          }
 
-          .archive-item-date, .archive-item-tags {
+          .archive-item-title {
+            color: #3c4858;
+            font-weight: 700;
+            font-size: 1.5rem;
+            line-height: 2;
+          }
+
+          .archive-item-intro {
             font-size: 1rem;
             color: #3c4858;
             line-height: 1.5;
-            margin: 0 5px;
+          }
+
+          .archive-item-otherinfo {
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+
+            .archive-item-date, .archive-item-tags {
+              font-size: 1rem;
+              color: #3c4858;
+              line-height: 1.5;
+              margin: 0 5px;
+            }
           }
         }
       }

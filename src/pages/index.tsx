@@ -1,5 +1,5 @@
 import React, { Props, useCallback } from "react";
-import { Link, graphql, PageProps } from "gatsby";
+import { Link, graphql, PageProps, navigate } from "gatsby";
 import useAxios from "axios-hooks";
 
 import Layout from "@/layout/default/Layout";
@@ -52,24 +52,25 @@ export default function Index(props: PageProps) {
         const publicURL = indexImage?.publicURL;
         return (
           <div className="archive-item" key={id}>
-            <Link to={`/detail/${id}`} style={{ textDecoration: "none" }}>
-              <div className="archive-item-content">
-                {publicURL && (
-                  <div
-                    className="archive-item-image"
-                    style={{ backgroundImage: `url("${publicURL}")` }}
-                  />
-                )}
-                <div className="archive-item-right">
-                  <div className="archive-item-title">{title}</div>
-                  <div className="archive-item-intro">{excerpt}</div>
-                  <div className="archive-item-otherinfo">
-                    <div className="archive-item-date">{date}</div>
-                    <div className="archive-item-tags">{tags.join(" ")}</div>
-                  </div>
+            <div
+              className="archive-item-content"
+              onClick={() => navigate(`/detail/${id}`)}
+            >
+              {publicURL && (
+                <div
+                  className="archive-item-image"
+                  style={{ backgroundImage: `url("${publicURL}")` }}
+                />
+              )}
+              <div className="archive-item-right">
+                <div className="archive-item-title">{title}</div>
+                <div className="archive-item-intro">{excerpt}</div>
+                <div className="archive-item-otherinfo">
+                  <div className="archive-item-date">{date}</div>
+                  <div className="archive-item-tags">{tags.join(" ")}</div>
                 </div>
               </div>
-            </Link>
+            </div>
           </div>
         );
       })}
