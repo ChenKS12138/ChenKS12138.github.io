@@ -51,7 +51,7 @@ function Layout(props: {
         className="app-header"
         backgroundSrc={backgroundSrc}
         content={content}
-        color={headerColor || THEME_COLOR}
+        color={headerColor}
         height={height}
         title={TITLE}
         toTop={y < 30}
