@@ -3,7 +3,6 @@ import { PageProps } from "gatsby";
 import hljs from "highlight.js";
 
 import Layout from "@/layout/default/Layout";
-import SEO from "@/components/seo/Seo";
 
 import bg from "@/images/FNwWK1Y.jpg";
 import "./detail.less";
@@ -29,8 +28,8 @@ function Detail(props: PageProps) {
             <div className="detail-header-content-date">{date}</div>
           </div>
         }
+        title={title + "|ChenKS"}
       >
-        <SEO title={title + "|ChenKS"} />
         {children}
       </Layout>
     ),

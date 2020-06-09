@@ -15,8 +15,9 @@ function SEO(props: {
   lang: string;
   meta: Array<any>;
   title: string;
+  themeColor: string;
 }) {
-  const { description, lang, meta, title } = props;
+  const { description, lang, meta, title, themeColor } = props;
   const { site } = useStaticQuery(
     graphql`
       query {
@@ -73,6 +74,10 @@ function SEO(props: {
           name: `twitter:description`,
           content: metaDescription,
         },
+        {
+          name: "theme-color",
+          content: themeColor,
+        },
       ].concat(meta)}
     />
   );
@@ -82,6 +87,7 @@ SEO.defaultProps = {
   lang: `en`,
   meta: [],
   description: ``,
+  themeColor: "#ffffff",
 };
 
 SEO.propTypes = {
@@ -89,6 +95,7 @@ SEO.propTypes = {
   lang: PropTypes.string,
   meta: PropTypes.arrayOf(PropTypes.object),
   title: PropTypes.string.isRequired,
+  themeColor: PropTypes.string,
 };
 
 export default SEO;

@@ -2,7 +2,6 @@ import React, { useMemo, useState } from "react";
 import { PageProps, graphql, navigateTo, navigate } from "gatsby";
 
 import Layout from "@/layout/default/Layout";
-import SEO from "@/components/seo/Seo";
 
 import bg from "@/images/OLJxbaR.jpg";
 
@@ -68,8 +67,8 @@ function List(props: PageProps) {
       backgroundSrc={bg}
       height="500px"
       content={<div className="list-header-content">Archive</div>}
+      title="Archives|ChenKS"
     >
-      <SEO title="Archives|ChenKS" />
       <div className="list-container">
         <div className="tags-container">
           {tags.map(tag => (

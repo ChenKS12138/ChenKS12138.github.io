@@ -8,6 +8,7 @@ import bg from "@/images/rVtDsho.png";
 import { useImageColor } from "@/utils/customHooks";
 
 import "./layout.less";
+import SEO from "@/components/seo/Seo";
 
 const ANALIZE_URL =
   "https://busuanzi.ibruce.info/busuanzi?jsonpCallback=BusuanziCallback_476857951214";
@@ -21,8 +22,9 @@ function Layout(props: {
   content: React.ReactElement;
   height: string;
   children: React.ReactElement | Array<ReactElement>;
+  title: string;
 }): React.ReactElement {
-  const { backgroundSrc, content, height, children } = props;
+  const { backgroundSrc, content, height, children, title } = props;
 
   const { y } = useWindowScroll();
   // 主题色根据顶部图片颜色变化
@@ -44,6 +46,7 @@ function Layout(props: {
 
   return (
     <div id="app">
+      <SEO title={title} themeColor={headerColor || THEME_COLOR} />
       <Header
         className="app-header"
         backgroundSrc={backgroundSrc}
@@ -69,6 +72,7 @@ Layout.defaultProps = {
   content: null,
   height: "600px",
   children: null,
+  title: "ChenKS",
 };
 
 Layout.propTypes = {
@@ -79,6 +83,7 @@ Layout.propTypes = {
     propTypes.element,
     propTypes.arrayOf(propTypes.element),
   ]),
+  title: propTypes.string,
 };
 
 export default Layout;

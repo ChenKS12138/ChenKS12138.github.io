@@ -2,7 +2,6 @@ import React, { useCallback } from "react";
 import { PageProps, Link } from "gatsby";
 
 import Layout from "@/layout/default/Layout";
-import SEO from "@/components/seo/Seo";
 import config from "@/app.config";
 
 import bg from "@/images/rVtDsho.png";
@@ -12,8 +11,7 @@ import "./about.less";
 function About(props: PageProps) {
   const createAbout = useCallback(
     (children: React.ReactElement): React.ReactElement => (
-      <Layout backgroundSrc={bg} height="500px">
-        <SEO title="About|ChenKS" />
+      <Layout backgroundSrc={bg} height="500px" title="About|ChenKS">
         <div className="page-about">{children}</div>
       </Layout>
     ),

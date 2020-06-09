@@ -1,9 +1,8 @@
 import React, { Props, useCallback } from "react";
-import { Link, graphql, PageProps, navigate } from "gatsby";
+import { graphql, PageProps, navigate } from "gatsby";
 import useAxios from "axios-hooks";
 
 import Layout from "@/layout/default/Layout";
-import SEO from "@/components/seo/Seo";
 
 import "./index.less";
 
@@ -25,8 +24,8 @@ export default function Index(props: PageProps) {
             {responseData?.images[0]?.copyright || error || "loading..."}
           </div>
         }
+        title="HomePage|ChenKS"
       >
-        <SEO title="HomePage|ChenKS" />
         <div className="page-index">{children}</div>
       </Layout>
     ),
