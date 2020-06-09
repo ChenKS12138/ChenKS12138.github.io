@@ -24,7 +24,7 @@ export default function Index(props: PageProps) {
             {responseData?.images[0]?.copyright || error || "loading..."}
           </div>
         }
-        title="HomePage|ChenKS"
+        title="HomePage"
       >
         <div className="page-index">{children}</div>
       </Layout>

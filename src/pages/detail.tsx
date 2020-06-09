@@ -28,7 +28,7 @@ function Detail(props: PageProps) {
             <div className="detail-header-content-date">{date}</div>
           </div>
         }
-        title={title + "|ChenKS"}
+        title={title}
       >
         {children}
       </Layout>

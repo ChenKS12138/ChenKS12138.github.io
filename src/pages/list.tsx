@@ -67,7 +67,7 @@ function List(props: PageProps) {
       backgroundSrc={bg}
       height="500px"
       content={<div className="list-header-content">Archive</div>}
-      title="Archives|ChenKS"
+      title="Archives"
     >
       <div className="list-container">
         <div className="tags-container">

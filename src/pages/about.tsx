@@ -11,7 +11,7 @@ import "./about.less";
 function About(props: PageProps) {
   const createAbout = useCallback(
     (children: React.ReactElement): React.ReactElement => (
-      <Layout backgroundSrc={bg} height="500px" title="About|ChenKS">
+      <Layout backgroundSrc={bg} height="500px" title="About">
         <div className="page-about">{children}</div>
       </Layout>
     ),
