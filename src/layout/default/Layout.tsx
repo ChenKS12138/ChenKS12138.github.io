@@ -46,7 +46,7 @@ function Layout(props: {
 
   return (
     <div id="app">
-      <SEO title={title} themeColor={headerColor || THEME_COLOR} />
+      <SEO title={title} themeColor={headerColor} />
       <Header
         className="app-header"
         backgroundSrc={backgroundSrc}
