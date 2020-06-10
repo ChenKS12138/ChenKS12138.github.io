@@ -1,2 +1,1 @@
 (window.webpackJsonp=window.webpackJsonp||[]).push([[3],{"i6+/":function(e,t,n){"use strict";n.r(t);var a=n("q1tI"),l=n.n(a),i=n("Z+rF"),c=n("PzNL");t.default=function(){return l.a.createElement(i.a,null,l.a.createElement(c.a,{title:"404: Not found"}),l.a.createElement("div",{style:{width:"960px",maxWidth:"80vw",display:"flex",flexDirection:"column",alignItems:"center"}},l.a.createElement("h1",null,"糟糕~没有找到这个页面 :("),l.a.createElement("p",null,"似乎不能理解输入的路径，请点击回到主页查看更多的文章")))}}}]);
-//# sourceMappingURL=component---src-pages-404-tsx-a2c0afb5a972a166a82a.js.map
