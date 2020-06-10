@@ -10,6 +10,17 @@ import PropTypes from "prop-types";
 import { Helmet } from "react-helmet";
 import { useStaticQuery, graphql } from "gatsby";
 
+import appConfig from "@/app.config";
+
+// 需要preload的image
+const imagesToPreload = [
+  appConfig.headerImages.home,
+  appConfig.headerImages.about,
+  appConfig.headerImages.archives,
+  appConfig.headerImages.detail,
+  appConfig.avatar,
+];
+
 function SEO(props: {
   description: string;
   lang: string;
@@ -73,6 +84,12 @@ function SEO(props: {
     },
   ].concat(meta);
 
+  const links = imagesToPreload.map(image => ({
+    href: image,
+    rel: "preload",
+    as: "image",
+  }));
+
   return (
     <Helmet
       htmlAttributes={{
@@ -81,6 +98,7 @@ function SEO(props: {
       title={title}
       titleTemplate={`%s | ${site.siteMetadata.title}`}
       meta={metas}
+      link={links}
     />
   );
 }
