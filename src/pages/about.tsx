@@ -1,17 +1,21 @@
 import React, { useCallback } from "react";
-import { PageProps, Link } from "gatsby";
+import { PageProps } from "gatsby";
 
 import Layout from "@/layout/default/Layout";
 import config from "@/app.config";
 
-import bg from "@/images/rVtDsho.png";
+import appConfig from "@/app.config";
 
 import "./about.less";
 
 function About(props: PageProps) {
   const createAbout = useCallback(
     (children: React.ReactElement): React.ReactElement => (
-      <Layout backgroundSrc={bg} height="500px" title="About">
+      <Layout
+        backgroundSrc={appConfig.headerImages.about}
+        height="500px"
+        title="About"
+      >
         <div className="page-about">{children}</div>
       </Layout>
     ),

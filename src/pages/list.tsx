@@ -3,7 +3,7 @@ import { PageProps, graphql, navigateTo, navigate } from "gatsby";
 
 import Layout from "@/layout/default/Layout";
 
-import bg from "@/images/OLJxbaR.jpg";
+import appConfig from "@/app.config";
 
 import "./list.less";
 
@@ -64,7 +64,7 @@ function List(props: PageProps) {
 
   return (
     <Layout
-      backgroundSrc={bg}
+      backgroundSrc={appConfig.headerImages.archives}
       height="500px"
       content={<div className="list-header-content">Archive</div>}
       title="Archives"

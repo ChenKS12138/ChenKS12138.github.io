@@ -4,7 +4,7 @@ import hljs from "highlight.js";
 
 import Layout from "@/layout/default/Layout";
 
-import bg from "@/images/FNwWK1Y.jpg";
+import appConfig from "@/app.config";
 import "./detail.less";
 
 // 配置post主题
@@ -20,7 +20,7 @@ function Detail(props: PageProps) {
   const createDetail = useCallback(
     (children: React.ReactElement): React.ReactElement => (
       <Layout
-        backgroundSrc={bg}
+        backgroundSrc={appConfig.headerImages.detail}
         height="400px"
         content={
           <div className="detail-header-content">

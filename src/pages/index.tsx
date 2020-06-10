@@ -6,7 +6,7 @@ import Layout from "@/layout/default/Layout";
 
 import "./index.less";
 
-const BACKGROUND_BING = "https://open.saintic.com/api/bingPic/";
+import appConfig from "@/app.config";
 
 const BACKGROUND_BING_INFO =
   "https://jsonp.afeld.me/?url=http%3A%2F%2Fcn.bing.com%2FHPImageArchive.aspx%3Fformat%3Djs%26idx%3D0%26n%3D1";
@@ -18,7 +18,7 @@ export default function Index(props: PageProps) {
   const createIndex = useCallback(
     (children: React.ReactElement): React.ReactElement => (
       <Layout
-        backgroundSrc={BACKGROUND_BING}
+        backgroundSrc={appConfig.headerImages.home}
         content={
           <div className="index-header-content">
             {responseData?.images[0]?.copyright || error || "loading..."}

@@ -4,18 +4,19 @@ import { useWindowScroll } from "react-use";
 import { Link } from "gatsby";
 
 import Header from "@/components/header/header";
-import bg from "@/images/rVtDsho.png";
 import { useImageColor } from "@/utils/customHooks";
 
 import "./layout.less";
 import SEO from "@/components/seo/Seo";
+
+import appConfig from "@/app.config";
 
 const ANALIZE_URL =
   "https://busuanzi.ibruce.info/busuanzi?jsonpCallback=BusuanziCallback_476857951214";
 
 const THEME_COLOR = "#563d7c";
 const TITLE = "ChenKS";
-const DEFAULT_BACKGROUND_SRC = bg;
+const DEFAULT_BACKGROUND_SRC = appConfig.headerImages.about;
 
 function Layout(props: {
   backgroundSrc: string;

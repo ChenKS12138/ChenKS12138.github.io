@@ -1,16 +1,10 @@
 import iconGithub from "@/images/github.png";
 import iconTwitter from "@/images/twitter.png";
 
-interface Link {
-  name: string;
-  avatar?: string;
-  link?: string;
-}
-
-interface Association {
-  icon: string;
-  url: string;
-}
+import ARCHIVES_HEADER_IMAGE from "@/images/OLJxbaR.jpg";
+import DETAIL_HEADER_IMAGE from "@/images/FNwWK1Y.jpg";
+import ABOUT_HEADER_IMAGE from "@/images/rVtDsho.png";
+const HOME_HEADER_IMAGE = "https://open.saintic.com/api/bingPic/";
 
 interface Config {
   name: string;
@@ -18,8 +12,21 @@ interface Config {
   intro?: Array<string>;
   github?: string;
   twitter?: string;
-  links?: Array<Link>;
-  associations?: Array<Association>;
+  links?: Array<{
+    name: string;
+    avatar?: string;
+    link?: string;
+  }>;
+  associations?: Array<{
+    icon: string;
+    url: string;
+  }>;
+  headerImages?: {
+    home?: string;
+    archives?: string;
+    detail?: string;
+    about?: string;
+  };
 }
 
 const config: Config = {
@@ -79,6 +86,12 @@ const config: Config = {
       url: "https://twitter.com/ChenKS12138",
     },
   ],
+  headerImages: {
+    home: HOME_HEADER_IMAGE,
+    about: ABOUT_HEADER_IMAGE,
+    archives: ARCHIVES_HEADER_IMAGE,
+    detail: DETAIL_HEADER_IMAGE,
+  },
 };
 
 export default config;
