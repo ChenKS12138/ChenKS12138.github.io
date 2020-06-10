@@ -6,6 +6,8 @@ import { Link } from "gatsby";
 import Header from "@/components/header/header";
 import { useImageColor } from "@/utils/customHooks";
 
+import "normalize.css";
+
 import "./layout.less";
 import SEO from "@/components/seo/Seo";
 

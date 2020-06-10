@@ -9,6 +9,11 @@ module.exports = {
         },
       },
     });
+    if (stage === "build-javascript") {
+      actions.setWebpackConfig({
+        devtool: false,
+      });
+    }
   },
   async createPages({ graphql, actions, reporter }) {
     const { createPage } = actions;
