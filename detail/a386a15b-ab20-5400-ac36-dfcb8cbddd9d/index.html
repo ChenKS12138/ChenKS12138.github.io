@@ -61,15 +61,47 @@
   </a>
     </span></p>
 <p>在这个装饰页面，以前也有见过类似的场景，是在<code>你头像真棒</code>小程序里。通过点击底下的图片，来更换画布中的背景图。但是不同于上一个场景，上一个场景加载的图片资源大多是一些头像挂件，体积都不大且数量不多，这里的图片资源数量比较多，除了体积大不的挂件，更多的是体积比较大的背景图。虽然图片资源都有进行了一定程度的压缩，但是总体的体积还是很大，加载完这个页面的资源需要<code>20+M</code>的流量，这个加载时长是不能接受的，而且这也会造成加载时滑动的卡顿。</p>
-<p>此外，还有一点对象存储OSS的计费和图片的请求次数有关系，因此如果更降低图片的请求次数也是对加载的优化。</p>
-<p>最后的方案是，对原先的高清图进行有损压缩并利用的小程序的<code>分包加载</code>能力，小程序的每个分包大小不超过2M。将该页面所有缩略图控制在2M内，并作为缓存放进小程序的分包中。由于高清图资源的地址需要通过接口获取，因此需要建立高清图的URL和分包中对应的缩略图的地址的映射关系来进行优化。</p>
+<p>此外，还有一点对象存储 OSS 的计费和图片的请求次数有关系，因此如果更降低图片的请求次数也是对加载的优化。</p>
+<p><span
+      class="gatsby-resp-image-wrapper"
+      style="position: relative; display: block; margin-left: auto; margin-right: auto; max-width: 590px; "
+    >
+      <a
+    class="gatsby-resp-image-link"
+    href="/static/04e4e31646aa01793c8712768dd385cc/d0ab7/subPackage.png"
+    style="display: block"
+    target="_blank"
+    rel="noopener"
+  >
+    <span
+    class="gatsby-resp-image-background-image"
+    style="padding-bottom: 38.513513513513516%; position: relative; bottom: 0; left: 0; background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAICAYAAAD5nd/tAAAACXBIWXMAAAsSAAALEgHS3X78AAAA4ElEQVQoz4VSjQqGIAz0/d+yf/qxLCsjtX3dYCERfMLhds7bLVN939OyLHRdF3nvCQu5tZZj8MB7CSfnArWuK19GEkJ4BMdxpHme79gSasAB27bRNE3MxxgZaUNljOEicYgdXNM0VFUVlWXJcVEUlGUZc13XsSiaYk/dKhy2bcvEeZ4sigYoBvZ9Z+fgBbgIZ+BlqkdQxhFBFCAv8vx2U9MwDOSco+M4WByQiVIhyVVd1zxK6tDalfRomEudCMTl+8HYIb4BxhYxjz1EcsdJ/9bX6yutNYuJQ4m/fok3vkR/mNxxUwEVrisAAAAASUVORK5CYII='); background-size: cover; display: block;"
+  ></span>
+  <img
+        class="gatsby-resp-image-image"
+        alt="subPackage"
+        title="subPackage"
+        src="/static/04e4e31646aa01793c8712768dd385cc/fcda8/subPackage.png"
+        srcset="/static/04e4e31646aa01793c8712768dd385cc/12f09/subPackage.png 148w,
+/static/04e4e31646aa01793c8712768dd385cc/e4a3f/subPackage.png 295w,
+/static/04e4e31646aa01793c8712768dd385cc/fcda8/subPackage.png 590w,
+/static/04e4e31646aa01793c8712768dd385cc/efc66/subPackage.png 885w,
+/static/04e4e31646aa01793c8712768dd385cc/c83ae/subPackage.png 1180w,
+/static/04e4e31646aa01793c8712768dd385cc/d0ab7/subPackage.png 1532w"
+        sizes="(max-width: 590px) 100vw, 590px"
+        style="width:100%;height:100%;margin:0;vertical-align:middle;position:absolute;top:0;left:0;"
+        loading="lazy"
+      />
+  </a>
+    </span></p>
+<p>最后的方案是，对原先的高清图进行有损压缩并利用的小程序的<code>分包加载</code>能力，小程序的每个分包大小不超过 2M。将该页面所有缩略图控制在 2M 内，并作为缓存放进小程序的分包中。由于高清图资源的地址需要通过接口获取，因此需要建立高清图的 URL 和分包中对应的缩略图的地址的映射关系来进行优化。</p>
 <pre><code class="language-jsx">// thumbnail.js
 const thumbnailMap = new Map(
   [
     [
       "https://graphbed.example.com/graduate/sdfovhidsf1",
       "/subPackage/package1/assets/1.png"
-    ],   
+    ],
     [
       "https://graphbed.example.com/graduate/67sdf87sd6f",
       "/subPackage/package1/assets/2.png"
@@ -84,6 +116,6 @@ render(){
   return &#x3C;Image src={thumbnailMap.get(src) || src} >
 }
 </code></pre>
-<p>这样当后端的高清图发生更新添加了新的高清图时，缓存未命中，可以fallback直接请求高清图的地址。同时，也需要前端在小程序包中添加新的缩略图，发布新的版本，在此期间不会影响小程序的使用。</p>
+<p>这样当后端的高清图发生更新添加了新的高清图时，缓存未命中，可以 fallback 直接请求高清图的地址。同时，也需要前端在小程序包中添加新的缩略图，发布新的版本，在此期间不会影响小程序的使用。</p>
 <h2>画布处理上</h2>
-<p>在画布处理上，我将另一个项目中的原生的画布组件封装成了Taro组件，并修改了一部分的props。不过该组件是一个canvas，不同于普通的组件。框架并不能直接替我计算出需要帮我增加/提换/删除页面的什么节点，因此需要我在特定的生命周期，比对props的变化，操作canvas context的api，重新进行渲染。因此要求传入的props的<code>graphArray</code>的每一个元素都应该有一个<code>key</code>，便于我追踪每一个graph的具体变化。</p></div><div class="tag-container"><span class="tag">Taro</span><span class="tag">JavaScript</span><span class="tag">小程序</span></div><div class="copyright-container">本博客所有文章除特别声明外，均采用 CC BY-SA 3.0协议 。转载请注明出处！</div></div></div></div></div></div><div id="gatsby-announcer" style="position:absolute;top:0;width:1px;height:1px;padding:0;overflow:hidden;clip:rect(0, 0, 0, 0);white-space:nowrap;border:0" aria-live="assertive" aria-atomic="true"></div></div><script id="gatsby-script-loader">/*<![CDATA[*/window.pagePath="/detail/a386a15b-ab20-5400-ac36-dfcb8cbddd9d";/*]]>*/</script><script id="gatsby-chunk-mapping">/*<![CDATA[*/window.___chunkMapping={"app":["/app-a9fa4def5af585e6f5f6.js"],"component---src-pages-404-tsx":["/component---src-pages-404-tsx-408b6bcd21563e00fdb1.js"],"component---src-pages-about-tsx":["/component---src-pages-about-tsx-df3b972dadfe2746134c.js"],"component---src-pages-detail-tsx":["/component---src-pages-detail-tsx-8934943c1877d5892451.js"],"component---src-pages-index-tsx":["/component---src-pages-index-tsx-a81fd291111e7439fdfa.js"],"component---src-pages-list-tsx":["/component---src-pages-list-tsx-a872baba29ec6a48f048.js"]};/*]]>*/</script><script src="/component---src-pages-detail-tsx-8934943c1877d5892451.js" async=""></script><script src="/commons-cbd8ec86de5eeab5cca3.js" async=""></script><script src="/styles-9b6f388623a2ec93d35f.js" async=""></script><script src="/app-a9fa4def5af585e6f5f6.js" async=""></script><script src="/framework-75da9754c2a76bbaf08a.js" async=""></script><script src="/webpack-runtime-1549c277081ab59a468b.js" async=""></script></body></html>
+<p>在画布处理上，我将另一个项目中的原生的画布组件封装成了 Taro 组件，并修改了一部分的 props。不过该组件是一个 canvas，不同于普通的组件。框架并不能直接替我计算出需要帮我增加/提换/删除页面的什么节点，因此需要我在特定的生命周期，比对 props 的变化，操作 canvas context 的 api，重新进行渲染。因此要求传入的 props 的<code>graphArray</code>的每一个元素都应该有一个<code>key</code>，便于我追踪每一个 graph 的具体变化。</p></div><div class="tag-container"><span class="tag">Taro</span><span class="tag">JavaScript</span><span class="tag">小程序</span></div><div class="copyright-container">本博客所有文章除特别声明外，均采用 CC BY-SA 3.0协议 。转载请注明出处！</div></div></div></div></div></div><div id="gatsby-announcer" style="position:absolute;top:0;width:1px;height:1px;padding:0;overflow:hidden;clip:rect(0, 0, 0, 0);white-space:nowrap;border:0" aria-live="assertive" aria-atomic="true"></div></div><script id="gatsby-script-loader">/*<![CDATA[*/window.pagePath="/detail/a386a15b-ab20-5400-ac36-dfcb8cbddd9d";/*]]>*/</script><script id="gatsby-chunk-mapping">/*<![CDATA[*/window.___chunkMapping={"app":["/app-a9fa4def5af585e6f5f6.js"],"component---src-pages-404-tsx":["/component---src-pages-404-tsx-408b6bcd21563e00fdb1.js"],"component---src-pages-about-tsx":["/component---src-pages-about-tsx-df3b972dadfe2746134c.js"],"component---src-pages-detail-tsx":["/component---src-pages-detail-tsx-8934943c1877d5892451.js"],"component---src-pages-index-tsx":["/component---src-pages-index-tsx-a81fd291111e7439fdfa.js"],"component---src-pages-list-tsx":["/component---src-pages-list-tsx-a872baba29ec6a48f048.js"]};/*]]>*/</script><script src="/component---src-pages-detail-tsx-8934943c1877d5892451.js" async=""></script><script src="/commons-cbd8ec86de5eeab5cca3.js" async=""></script><script src="/styles-9b6f388623a2ec93d35f.js" async=""></script><script src="/app-a9fa4def5af585e6f5f6.js" async=""></script><script src="/framework-75da9754c2a76bbaf08a.js" async=""></script><script src="/webpack-runtime-1549c277081ab59a468b.js" async=""></script></body></html>
