@@ -63,5 +63,7 @@ module.exports = {
         allExtensions: true, // defaults to false
       },
     },
+    `gatsby-plugin-purgecss`,
+    `gatsby-plugin-split-css`,
   ],
 };
