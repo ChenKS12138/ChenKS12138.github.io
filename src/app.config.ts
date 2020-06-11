@@ -75,6 +75,18 @@ const config: Config = {
       avatar: "https://avatars0.githubusercontent.com/u/44493388?s=460&v=4",
       link: "https://yiayaz.github.io/",
     },
+    {
+      name: "Brethland",
+      avatar:
+        "https://avatars0.githubusercontent.com/u/44054691?s=400&u=9dcfe768ad2ce2b45a06e809dd283b36fd7a7b47&v=4",
+      link: "http://www.yuki.systems/",
+    },
+    {
+      name: "SleepDevil",
+      avatar:
+        "https://avatars1.githubusercontent.com/u/55879038?s=400&u=2066c672a2b2751cf3f546c15cfbca1cf760fb70&v=4",
+      link: "https://github.com/SleepDevil",
+    },
   ],
   associations: [
     {
