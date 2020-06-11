@@ -1,4 +1,5 @@
 module.exports = {
+  assetPrefix: `https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/`,
   siteMetadata: {
     title: `ChenKS`,
     description: `Homepage|ChenKS`,
