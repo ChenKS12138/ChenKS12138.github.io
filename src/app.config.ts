@@ -4,6 +4,8 @@ import iconTwitter from "@/images/twitter.png";
 import ARCHIVES_HEADER_IMAGE from "@/images/OLJxbaR.jpg";
 import DETAIL_HEADER_IMAGE from "@/images/FNwWK1Y.jpg";
 import ABOUT_HEADER_IMAGE from "@/images/rVtDsho.png";
+import USER_AVATAR from "@/images/avatar.png";
+
 const HOME_HEADER_IMAGE = "https://open.saintic.com/api/bingPic/";
 
 interface Config {
@@ -31,7 +33,7 @@ interface Config {
 
 const config: Config = {
   name: "ChenKS",
-  avatar: "https://avatars0.githubusercontent.com/u/42082890?s=460&v=4",
+  avatar: USER_AVATAR,
   intro: [
     "一个热爱技术的大学生，青柚工作室成员，南邮校科协成员。",
     "Enjoy JavaScript/TypeScript/Dart.",
