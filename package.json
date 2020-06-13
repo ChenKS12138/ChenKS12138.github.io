@@ -30,9 +30,13 @@
   "devDependencies": {
     "@types/highlight.js": "^9.12.4",
     "@types/react-helmet": "^6.0.0",
+    "chalk": "^4.1.0",
+    "fs-extra": "^9.0.1",
     "gatsby-cli": "^2.12.44",
     "gatsby-remark-images": "^3.3.9",
+    "inquirer": "^7.1.0",
     "less": "^3.11.3",
+    "moment": "^2.26.0",
     "prettier": "2.0.5",
     "stylelint": "^13.6.0",
     "typescript": "^3.9.5"
@@ -49,7 +53,8 @@
     "start": "npm run develop",
     "serve": "gatsby serve",
     "clean": "gatsby clean",
-    "stylelint": "stylelint src/**/**.less"
+    "stylelint": "stylelint src/**/**.less",
+    "post": "node ./cli/createPost.js"
   },
   "repository": {
     "type": "git",

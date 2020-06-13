@@ -32,7 +32,12 @@ function List(props: PageProps) {
       Array.from(
         new Set(
           nodes.reduce(
-            (prev, current) => prev.concat(current.frontmatter.tags),
+            (prev, current) =>
+              prev.concat(
+                Array.isArray(current?.frontmatter?.tags)
+                  ? current?.frontmatter?.tags
+                  : []
+              ),
             [TAG_ALL]
           )
         )

@@ -52,7 +52,7 @@ function Detail(props: PageProps) {
         ref={content}
       ></div>
       <div className="tag-container">
-        {tags &&
+        {Array.isArray(tags) &&
           tags.map((tag: string) => (
             <span className="tag" key={tag}>
               {tag}

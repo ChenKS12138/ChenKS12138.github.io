@@ -66,7 +66,9 @@ export default function Index(props: PageProps) {
                 <div className="archive-item-intro">{excerpt}</div>
                 <div className="archive-item-otherinfo">
                   <div className="archive-item-date">{date}</div>
-                  <div className="archive-item-tags">{tags.join(" ")}</div>
+                  <div className="archive-item-tags">
+                    {Array.isArray(tags) ? tags.join(" ") : ""}
+                  </div>
                 </div>
               </div>
             </div>
