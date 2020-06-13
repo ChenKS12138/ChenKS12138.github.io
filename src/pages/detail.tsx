@@ -8,7 +8,7 @@ import appConfig from "@/app.config";
 import "./detail.less";
 
 // 配置post主题
-import "@/theme/useTheme.less";
+import "@/theme/index.less";
 
 // 代码高亮主题
 import "highlight.js/styles/androidstudio.css";
