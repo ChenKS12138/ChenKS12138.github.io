@@ -1,4 +1,4 @@
-import React, { Props, useCallback } from "react";
+import React, { useCallback } from "react";
 import { graphql, PageProps, navigate } from "gatsby";
 import useAxios from "axios-hooks";
 
