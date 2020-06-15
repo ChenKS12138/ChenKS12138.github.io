@@ -31,6 +31,64 @@ for (const book of bookShelf) {
 // book2
 // book3
 </code></pre>
+<h2>使用 Generator Function 处理异步函数</h2>
+<p>ES2017 的<code>async</code>,<code>await</code>给我们提供了一种比较直观的方式处理异步函数，但我们也可以通过<code>Promise</code>加上<code>Generator Function</code>达到和<code>async</code>,<code>await</code>类似一样的效果。并且后者更利于进行测试，这也是<code>redux-saga</code>处理副作用的方式。可以通过调用 Generator Function 产生一个 Iterator，对其进行迭代，确保每次迭代的结果符合预期，即测试成功。</p>
+<pre><code class="language-javascript">/**
+ * @param {number} second
+ */
+const sleep = second =>
+  new Promise((resolve, reject) => {
+    if (second &#x3C; 0) {
+      reject("second less than 0");
+      return;
+    }
+    setTimeout(() => {
+      resolve(`Sleep ${second}ms`);
+    }, second);
+  });
+
+/**
+ * @param {GeneratorFunction} generatorFunc
+ */
+const asyncWrapper = generatorFunc => {
+  const iterator = generatorFunc();
+  /**
+   * @param {Iterator} iterator
+   * @param {IteratorReturnResult} current
+   */
+  const handleIterate = (iterator, current) => {
+    if (current &#x26;&#x26; current.done) {
+      return;
+    } else if (current === undefined) {
+      handleIterate(iterator, iterator.next());
+    } else if (current.value instanceof Promise) {
+      current.value.then(
+        result => handleIterate(iterator, iterator.next(result)),
+        reason => handleIterate(iterator, iterator.throw(reason))
+      );
+    }
+  };
+  handleIterate(iterator);
+};
+
+asyncWrapper(function* () {
+  console.log("sleep start");
+  const str1 = yield sleep(1000);
+  console.log(str1);
+  try {
+    const str2 = yield sleep(-1000);
+    console.log(str2);
+  } catch (error) {
+    console.log(`sleep error: ${error}`);
+  }
+  console.log("sleep end");
+});
+// sleep start
+// Sleep 1000ms
+// sleep error: second less than 0
+// sleep end
+</code></pre>
 <h2>关于 redux-saga</h2>
 <p>redux-saga 使得副作用更容易被管理。对于一些异步函数的调用，并不是在 Generator 函数内部执行，而是类似通过 yield 一个 Promise 的方式，在外部调用后，外部通过 next 方法，让 yield 左边得到返回值。这使得异步函数的调用更容易被测试。</p>
-<p>待补充。。。</p></div><div class="tag-container"><span class="tag">JavaScript</span><span class="tag">随笔</span></div><div class="copyright-container">本博客所有文章除特别声明外，均采用 CC BY-SA 3.0协议 。转载请注明出处！</div></div></div></div></div></div><div id="gatsby-announcer" style="position:absolute;top:0;width:1px;height:1px;padding:0;overflow:hidden;clip:rect(0, 0, 0, 0);white-space:nowrap;border:0" aria-live="assertive" aria-atomic="true"></div></div><script id="gatsby-script-loader">/*<![CDATA[*/window.pagePath="/detail/83d58e1f-2f8a-5bdb-969a-d6b5c995b20a";/*]]>*/</script><script id="gatsby-chunk-mapping">/*<![CDATA[*/window.___chunkMapping={"app":["/app-0dfa5e4d351e84f5ef9c.js"],"component---src-pages-404-tsx":["/component---src-pages-404-tsx-6169e0acebd7d624c3a3.js"],"component---src-pages-about-tsx":["/component---src-pages-about-tsx.65f128c73c495b9e20ce.css","/component---src-pages-about-tsx-a6daf03e8206e4f22ac9.js"],"component---src-pages-detail-tsx":["/component---src-pages-detail-tsx.7f840c6568ca4b0d8e4b.css","/component---src-pages-detail-tsx-e41932965bb790d6d8d2.js"],"component---src-pages-index-tsx":["/component---src-pages-index-tsx.8d5f9f53689916c12b9b.css","/component---src-pages-index-tsx-d934c9621f0b76621989.js"],"component---src-pages-list-tsx":["/component---src-pages-list-tsx.f11d66f5eff94283cece.css","/component---src-pages-list-tsx-c4454c73452cfc20afd6.js"]};/*]]>*/</script><script src="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/component---src-pages-detail-tsx-e41932965bb790d6d8d2.js" async=""></script><script src="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/commons-1237e09770db01046d98.js" async=""></script><script src="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/app-0dfa5e4d351e84f5ef9c.js" async=""></script><script src="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/framework-d54fcf3f0204b459cf2d.js" async=""></script><script src="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/webpack-runtime-0b1d52598bd995c86705.js" async=""></script></body></html>
+<p><code>redux-saga</code>中的几个概念。<code>saga辅助函数</code>，用于当特定的 action（或者是使用<code>*</code>同配所有的 action）被 dispatch 到 store 时派发任务，使用一定的 saga 处理。<code>saga</code>，一个可以多次 yield effect 的 Generator Function，通过 yield effect，处理异步逻辑。<code>effect</code>，可以通过<code>redux-saga/effects</code>的内置函数像<code>call</code>,<code>apply</code>,<code>cps</code>,<code>put</code>创建，也可以是一个普通的 Promise 对象，此时 yield 的左值就是 Promise 的 resolve 的 value，甚至可以是一个普通的 JavaScript 对象。</p>
+<p>更新中...</p></div><div class="tag-container"><span class="tag">JavaScript</span><span class="tag">随笔</span></div><div class="copyright-container">本博客所有文章除特别声明外，均采用 CC BY-SA 3.0协议 。转载请注明出处！</div></div></div></div></div></div><div id="gatsby-announcer" style="position:absolute;top:0;width:1px;height:1px;padding:0;overflow:hidden;clip:rect(0, 0, 0, 0);white-space:nowrap;border:0" aria-live="assertive" aria-atomic="true"></div></div><script id="gatsby-script-loader">/*<![CDATA[*/window.pagePath="/detail/83d58e1f-2f8a-5bdb-969a-d6b5c995b20a";/*]]>*/</script><script id="gatsby-chunk-mapping">/*<![CDATA[*/window.___chunkMapping={"app":["/app-0dfa5e4d351e84f5ef9c.js"],"component---src-pages-404-tsx":["/component---src-pages-404-tsx-6169e0acebd7d624c3a3.js"],"component---src-pages-about-tsx":["/component---src-pages-about-tsx.65f128c73c495b9e20ce.css","/component---src-pages-about-tsx-a6daf03e8206e4f22ac9.js"],"component---src-pages-detail-tsx":["/component---src-pages-detail-tsx.7f840c6568ca4b0d8e4b.css","/component---src-pages-detail-tsx-e41932965bb790d6d8d2.js"],"component---src-pages-index-tsx":["/component---src-pages-index-tsx.8d5f9f53689916c12b9b.css","/component---src-pages-index-tsx-d934c9621f0b76621989.js"],"component---src-pages-list-tsx":["/component---src-pages-list-tsx.f11d66f5eff94283cece.css","/component---src-pages-list-tsx-c4454c73452cfc20afd6.js"]};/*]]>*/</script><script src="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/component---src-pages-detail-tsx-e41932965bb790d6d8d2.js" async=""></script><script src="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/commons-1237e09770db01046d98.js" async=""></script><script src="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/app-0dfa5e4d351e84f5ef9c.js" async=""></script><script src="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/framework-d54fcf3f0204b459cf2d.js" async=""></script><script src="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/webpack-runtime-0b1d52598bd995c86705.js" async=""></script></body></html>
