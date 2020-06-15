@@ -42,8 +42,71 @@ for (const book of bookShelf) {
 // book3
 ```
 
+## 使用 Generator Function 处理异步函数
+
+ES2017 的`async`,`await`给我们提供了一种同步的写法来编写异步逻辑的函数，但我们也可以通过`Promise`加上`Generator Function`达到和`async`,`await`类似一样的效果。并且后者更利于进行测试，这也是`redux-saga`处理副作用的方式。可以通过调用 Generator Function 产生一个 Iterator，对其进行迭代，确保每次迭代的结果符合预期，即测试成功。
+
+```javascript
+/**
+ * @param {number} second
+ */
+const sleep = second =>
+  new Promise((resolve, reject) => {
+    if (second < 0) {
+      reject("second less than 0");
+      return;
+    }
+    setTimeout(() => {
+      resolve(`Sleep ${second}ms`);
+    }, second);
+  });
+
+/**
+ * @param {GeneratorFunction} generatorFunc
+ */
+const asyncWrapper = generatorFunc => {
+  const iterator = generatorFunc();
+  /**
+   * @param {Iterator} iterator
+   * @param {IteratorReturnResult} current
+   */
+  const handleIterate = (iterator, current) => {
+    if (current && current.done) {
+      return;
+    } else if (current === undefined) {
+      handleIterate(iterator, iterator.next());
+    } else if (current.value instanceof Promise) {
+      current.value.then(
+        result => handleIterate(iterator, iterator.next(result)),
+        reason => handleIterate(iterator, iterator.throw(reason))
+      );
+    }
+  };
+  handleIterate(iterator);
+};
+
+asyncWrapper(function* () {
+  console.log("sleep start");
+  const str1 = yield sleep(1000);
+  console.log(str1);
+  try {
+    const str2 = yield sleep(-1000);
+    console.log(str2);
+  } catch (error) {
+    console.log(`sleep error: ${error}`);
+  }
+  console.log("sleep end");
+});
+// sleep start
+// Sleep 1000ms
+// sleep error: second less than 0
+// sleep end
+```
+
 ## 关于 redux-saga
 
 redux-saga 使得副作用更容易被管理。对于一些异步函数的调用，并不是在 Generator 函数内部执行，而是类似通过 yield 一个 Promise 的方式，在外部调用后，外部通过 next 方法，让 yield 左边得到返回值。这使得异步函数的调用更容易被测试。
 
-待补充。。。
+`redux-saga`中的几个概念。`saga辅助函数`，用于当特定的 action（或者是使用`*`同配所有的 action）被 dispatch 到 store 时派发任务，使用一定的 saga 处理。`saga`，一个可以多次 yield effect 的 Generator Function，通过 yield effect，处理异步逻辑。`effect`，可以通过`redux-saga/effects`的内置函数像`call`,`apply`,`cps`,`put`创建，也可以是一个普通的 Promise 对象，此时 yield 的左值就是 Promise 的 resolve 的 value，甚至可以是一个普通的 JavaScript 对象。
+
+更新中...
