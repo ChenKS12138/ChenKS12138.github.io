@@ -32,7 +32,7 @@ for (const book of bookShelf) {
 // book3
 </code></pre>
 <h2>使用 Generator Function 处理异步函数</h2>
-<p>ES2017 的<code>async</code>,<code>await</code>给我们提供了一种比较直观的方式处理异步函数，但我们也可以通过<code>Promise</code>加上<code>Generator Function</code>达到和<code>async</code>,<code>await</code>类似一样的效果。并且后者更利于进行测试，这也是<code>redux-saga</code>处理副作用的方式。可以通过调用 Generator Function 产生一个 Iterator，对其进行迭代，确保每次迭代的结果符合预期，即测试成功。</p>
+<p>ES2017 的<code>async</code>,<code>await</code>给我们提供了一种同步的写法来编写异步逻辑的函数，但我们也可以通过<code>Promise</code>加上<code>Generator Function</code>达到和<code>async</code>,<code>await</code>类似一样的效果。并且后者更利于进行测试，这也是<code>redux-saga</code>处理副作用的方式。可以通过调用 Generator Function 产生一个 Iterator，对其进行迭代，确保每次迭代的结果符合预期，即测试成功。</p>
 <pre><code class="language-javascript">/**
  * @param {number} second
  */
