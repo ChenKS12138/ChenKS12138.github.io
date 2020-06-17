@@ -17,16 +17,16 @@ index_img: ../assets/redux-saga.png
 class BookShelf {
   constructor() {
     this.books = [];
-    this[Symbol.iterator] = function* () {
-      let index = 0;
-      while (index < this.books.length) {
-        yield this.books[index++];
-      }
-      return;
-    };
   }
   add(bookName) {
     this.books.push(bookName);
+  }
+  *[Symbol.iterator]() {
+    let index = 0;
+    while (index < this.books.length) {
+      yield this.books[index++];
+    }
+    return;
   }
 }
 const bookShelf = new BookShelf();
@@ -105,8 +105,8 @@ asyncWrapper(function* () {
 
 ## 关于 redux-saga
 
-redux-saga 使得副作用更容易被管理。对于一些异步函数的调用，并不是在 Generator 函数内部执行，而是类似通过 yield 一个 Promise 的方式，在外部调用后，外部通过 next 方法，让 yield 左边得到返回值。这使得异步函数的调用更容易被测试。
+redux-saga 使得副作用更容易被管理。对于一些异步函数的调用，并不是在 Generator 函数内部执行，而是类似通过 yield 一个 Promise 的方式，在外部调用后，外部通过 next 方法，让 yield 左边得到返回值。这使得生成器中的异步逻辑完全可以被测试。
 
-`redux-saga`中的几个概念。`saga辅助函数`，用于当特定的 action（或者是使用`*`同配所有的 action）被 dispatch 到 store 时派发任务，使用一定的 saga 处理。`saga`，一个可以多次 yield effect 的 Generator Function，通过 yield effect，处理异步逻辑。`effect`，可以通过`redux-saga/effects`的内置函数像`call`,`apply`,`cps`,`put`创建，也可以是一个普通的 Promise 对象，此时 yield 的左值就是 Promise 的 resolve 的 value，甚至可以是一个普通的 JavaScript 对象。
+`redux-saga`中的几个概念。`saga辅助函数`，用于当特定的 action（或者是使用`*`同配所有的 action）被 dispatch 到 store 时派发任务，使用一定的 saga 处理。`saga`，一个可以多次 yield effect 的 Generator Function，通过 yield effect，处理异步逻辑。`effect`，可以通过`redux-saga/effects`的内置函数像`call`,`apply`,`cps`,`put`创建，也可以是一个普通的 Promise 对象，此时 yield 的左值就是 Promise 的 resolve 的 value，甚至可以 yield 一个普通的 JavaScript 对象。
 
 更新中...
