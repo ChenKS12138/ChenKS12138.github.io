@@ -89,6 +89,11 @@ const config: Config = {
         "https://avatars1.githubusercontent.com/u/55879038?s=400&u=2066c672a2b2751cf3f546c15cfbca1cf760fb70&v=4",
       link: "https://github.com/SleepDevil",
     },
+    {
+      name: "xjzsq",
+      avatar: "https://avatars0.githubusercontent.com/u/13806783?s=460&v=4",
+      link: "http://xjzsq.ren/",
+    },
   ],
   associations: [
     {

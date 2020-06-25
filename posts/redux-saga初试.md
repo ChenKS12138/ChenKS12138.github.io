@@ -109,4 +109,20 @@ redux-saga 使得副作用更容易被管理。对于一些异步函数的调用
 
 `redux-saga`中的几个概念。`saga辅助函数`，用于当特定的 action（或者是使用`*`同配所有的 action）被 dispatch 到 store 时派发任务，使用一定的 saga 处理。`saga`，一个可以多次 yield effect 的 Generator Function，通过 yield effect，处理异步逻辑。`effect`，可以通过`redux-saga/effects`的内置函数像`call`,`apply`,`cps`,`put`创建，也可以是一个普通的 Promise 对象，此时 yield 的左值就是 Promise 的 resolve 的 value，甚至可以 yield 一个普通的 JavaScript 对象。
 
-更新中...
+## 关于 redux-thunk
+
+`redux-thunk`也是`redux`里常用的一个中间件，它允许我们通过 dispatch 一个函数来处理异步逻辑，函数的第一/二个参数分别是`dispatch`，`getState`。核心代码很少，只有 20 行不到。
+
+```javascript
+function createThunkMiddleware(extraArgument) {
+  return ({ dispatch, getState }) => next => action => {
+    if (typeof action === "function") {
+      return action(dispatch, getState, extraArgument);
+    }
+
+    return next(action);
+  };
+}
+```
+
+作为中间件会被`redux`依次调用
