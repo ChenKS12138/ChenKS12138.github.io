@@ -88,5 +88,3 @@ class Home2 extends React.PureComponent {
   }
 }
 ```
-
-更新中。。。
