@@ -18,17 +18,23 @@ import (
 )
 
 func main(){
-    bigArray1 := createBigArray(100000000);
-    stop1 := createTimer();
-    result1 := sum1(bigArray1);
-    duration1 := stop1();
-    stop2 :=createTimer();
-    result2 := sum2(bigArray1);
-    duration2 := stop2();
-    fmt.Println("sum1",result1,duration1);
-    fmt.Println("sum2",result2,duration2);
+    for i:=1000;i&#x3C;10000000000;i*=2 {
+        duration1,duration2,result1,result2 := runBenchmark(i);
+        fmt.Println(i,duration1,duration2,result1,result2)
+    }
 }
 
+
+func runBenchmark(amout int) (int64,int64,int64,int64) {
+    bigArray :=createBigArray(amout);
+    stop1 := createTimer();
+    result1 := sum1(bigArray);
+    duration1 := stop1();
+    stop2 :=createTimer();
+    result2 := sum2(bigArray);
+    duration2 := stop2();
+    return duration1,duration2,result1,result2;
+}
 
 func createBigArray(size int)[]int{
     rand.Seed(time.Now().Unix());
@@ -46,23 +52,23 @@ func createTimer() func () int64 {
     }
 }
 
-func sum1(bigArray []int) int {
-    sum := 0
+func sum1(bigArray []int) int64 {
+    sum := int64(0)
     for _,value := range(bigArray){
-        sum += value;
+        sum += int64(value);
     }
     return sum;
 }
 
-func sum2(bigArray []int)int {
-    const SmallArraySize = 10000;
-    sum:=0;
+func sum2(bigArray []int)int64 {
+    SmallArraySize := len(bigArray)/100;
+    sum:=int64(0);
     chanGroupSize := len(bigArray)/SmallArraySize;
-    sumChan := make(chan int,chanGroupSize);
+    sumChan := make(chan int64,chanGroupSize+1);
     waitGroup := new(sync.WaitGroup);
     for i:=0;i&#x3C;chanGroupSize;i++{
-        go sumRoutine(bigArray[i*SmallArraySize:(i+1)*SmallArraySize], sumChan, waitGroup)
         waitGroup.Add(1);
+        go sumRoutine(bigArray[i*SmallArraySize:(i+1)*SmallArraySize], sumChan, waitGroup)
     }
     waitGroup.Wait()
     for i:=0;i&#x3C;chanGroupSize;i++ {
@@ -71,13 +77,13 @@ func sum2(bigArray []int)int {
     return sum;
 }
 
-func sumRoutine(smallArray []int,ch chan int,wg *sync.WaitGroup){
-    sum :=0;
+func sumRoutine(smallArray []int,ch chan int64,wg *sync.WaitGroup){
+    defer wg.Done()
+    sum :=int64(0);
     for _,value := range(smallArray){
-        sum +=value;
+        sum +=int64(value);
     }
     ch &#x3C;- sum;
-    wg.Done()
 }
 </code></pre>
 <h2>进行测试</h2>
