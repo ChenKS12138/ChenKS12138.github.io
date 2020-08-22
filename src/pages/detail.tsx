@@ -1,6 +1,7 @@
 import React, { useCallback, useRef, useEffect } from "react";
 import { PageProps } from "gatsby";
-import hljs from "highlight.js";
+
+import { defineCustomElements as deckDeckGoHighlightElement } from "@deckdeckgo/highlight-code/dist/loader";
 
 import Layout from "@/layout/default/Layout";
 
@@ -10,8 +11,7 @@ import "./detail.less";
 // 配置post主题
 import "@/theme/index.less";
 
-// 代码高亮主题
-import "highlight.js/styles/androidstudio.css";
+deckDeckGoHighlightElement();
 
 function Detail(props: PageProps) {
   const { pageContext } = props;
