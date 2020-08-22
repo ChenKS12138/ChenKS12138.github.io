@@ -20,15 +20,21 @@ const THEME_COLOR = "#563d7c";
 const TITLE = "ChenKS";
 const DEFAULT_BACKGROUND_SRC = appConfig.headerImages.about;
 
-function Layout(props: {
+interface ILayout {
   backgroundSrc: string;
   content: React.ReactElement;
   height: string;
   children: React.ReactElement | Array<ReactElement>;
   title: string;
-}): React.ReactElement {
-  const { backgroundSrc, content, height, children, title } = props;
+}
 
+function Layout({
+  backgroundSrc,
+  content,
+  height,
+  children,
+  title,
+}: ILayout): React.ReactElement {
   const { y } = useWindowScroll();
   // 主题色根据顶部图片颜色变化
   const headerColor = useImageColor(backgroundSrc);
@@ -77,16 +83,4 @@ Layout.defaultProps = {
   children: null,
   title: "ChenKS",
 };
-
-Layout.propTypes = {
-  backgroundSrc: propTypes.string,
-  content: propTypes.element,
-  height: propTypes.string,
-  children: propTypes.oneOfType([
-    propTypes.element,
-    propTypes.arrayOf(propTypes.element),
-  ]),
-  title: propTypes.string,
-};
-
 export default Layout;

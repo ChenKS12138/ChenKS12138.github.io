@@ -6,7 +6,6 @@
  */
 
 import React from "react";
-import PropTypes from "prop-types";
 import { Helmet } from "react-helmet";
 import { useStaticQuery, graphql } from "gatsby";
 
@@ -21,14 +20,15 @@ const imagesToPreload = [
   appConfig.avatar,
 ];
 
-function SEO(props: {
-  description: string;
-  lang: string;
-  meta: Array<any>;
+interface ISeo {
   title: string;
-  themeColor: string;
-}) {
-  const { description, lang, meta, title, themeColor } = props;
+  description?: string;
+  lang?: string;
+  meta?: Array<any>;
+  themeColor?: string;
+}
+
+function SEO({ description, lang, meta, themeColor, title }: ISeo) {
   const { site } = useStaticQuery(
     graphql`
       query {
@@ -82,7 +82,7 @@ function SEO(props: {
       name: "theme-color",
       content: themeColor || "#ffffff",
     },
-  ].concat(meta);
+  ].concat(meta ?? []);
 
   const links = imagesToPreload.map(image => ({
     href: image,
@@ -93,7 +93,7 @@ function SEO(props: {
   return (
     <Helmet
       htmlAttributes={{
-        lang,
+        lang: lang ?? "zh",
       }}
       title={title}
       titleTemplate={`%s | ${site.siteMetadata.title}`}
@@ -109,13 +109,4 @@ SEO.defaultProps = {
   description: ``,
   themeColor: "#ffffff",
 };
-
-SEO.propTypes = {
-  description: PropTypes.string,
-  lang: PropTypes.string,
-  meta: PropTypes.arrayOf(PropTypes.object),
-  title: PropTypes.string.isRequired,
-  themeColor: PropTypes.string,
-};
-
 export default SEO;

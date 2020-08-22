@@ -1,10 +1,9 @@
 import React from "react";
-import propTypes from "prop-types";
 import { Link } from "gatsby";
 
 import "./header.less";
 
-function Header(props: {
+interface IHeader {
   height: string;
   toTop: boolean;
   color: string;
@@ -13,18 +12,18 @@ function Header(props: {
   backgroundSrc: string;
   content: React.ReactElement;
   className: string;
-}) {
-  const {
-    height,
-    toTop,
-    color,
-    title,
-    links,
-    backgroundSrc,
-    content,
-    className,
-  } = props;
+}
 
+function Header({
+  height,
+  toTop,
+  color,
+  title,
+  links,
+  backgroundSrc,
+  content,
+  className,
+}: IHeader) {
   return (
     <div className={"header " + className} style={{ height }}>
       <div
@@ -62,16 +61,4 @@ Header.defaultProps = {
   content: null,
   className: "",
 };
-
-Header.propTypes = {
-  toTop: propTypes.bool,
-  color: propTypes.string,
-  height: propTypes.string,
-  backgroundSrc: propTypes.string,
-  title: propTypes.string,
-  links: propTypes.arrayOf(propTypes.element),
-  content: propTypes.element,
-  className: propTypes.string,
-};
-
 export default Header;

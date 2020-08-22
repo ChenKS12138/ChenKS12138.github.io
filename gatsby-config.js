@@ -10,6 +10,12 @@ module.exports = {
     "gatsby-plugin-cname",
     `gatsby-plugin-react-helmet`,
     {
+      resolve: `gatsby-plugin-styled-components`,
+      options: {
+        // Add any options here
+      },
+    },
+    {
       resolve: `gatsby-source-filesystem`,
       options: {
         name: `images`,
