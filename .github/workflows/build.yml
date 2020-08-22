@@ -5,28 +5,22 @@ on:
       - source-code
 
 jobs:
-  # build-and-deploy:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Checkout 🛎️
-  #       uses: actions/checkout@v2
-  #       with:
-  #         persist-credentials: false
-
-  #     - name: Install and Build 🔧
-  #       run: |
-  #         npm install
-  #         npm run build:cdn
-
-  #     - name: Deploy
-  #       uses: JamesIves/github-pages-deploy-action@releases/v3
-  #       with:
-  #         GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-  #         BRANCH: master
-  #         FOLDER: public
-  trigger-netlify:
+  build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Trigger
+      - name: Checkout 🛎️
+        uses: actions/checkout@v2
+        with:
+          persist-credentials: false
+
+      - name: Install and Build 🔧
         run: |
-          curl -X POST -d {} "https://api.netlify.com/build_hooks/5f4136e5442f8ee3bdc9c416?trigger_branch=$GITHUB_REF&trigger_title=$GITHUB_SHA"
+          npm install
+          npm run build:cdn
+
+      - name: Deploy
+        uses: JamesIves/github-pages-deploy-action@releases/v3
+        with:
+          GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+          BRANCH: master
+          FOLDER: public
