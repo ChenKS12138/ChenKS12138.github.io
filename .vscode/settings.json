@@ -1,0 +1,7 @@
+{
+  "typescript.validate.enable": true,
+  "eslint.enable": true,
+  "editor.formatOnSave": true,
+  "tslint.enable": true,
+  "typescript.implementationsCodeLens.enabled": true
+}

@@ -1,9 +1,9 @@
 {
-  "name": "gatsby-starter-default",
+  "name": "chenks12138-blog",
   "private": true,
-  "description": "A simple starter to get up and developing quickly with Gatsby",
-  "version": "0.1.0",
-  "author": "Kyle Mathews <mathews.kyle@gmail.com>",
+  "description": "ChenKS12138 blog",
+  "version": "1.0.0",
+  "author": "ChenKS12138 <749923710@qq.com>",
   "dependencies": {
     "axios-hooks": "^1.10.0",
     "gatsby": "^2.22.15",
@@ -29,7 +29,9 @@
     "react-use": "^15.1.1"
   },
   "devDependencies": {
+    "@types/fs-extra": "^9.0.1",
     "@types/highlight.js": "^9.12.4",
+    "@types/inquirer": "^7.3.1",
     "@types/react-helmet": "^6.0.0",
     "chalk": "^4.1.0",
     "fs-extra": "^9.0.1",
@@ -42,12 +44,13 @@
     "moment": "^2.26.0",
     "prettier": "2.0.5",
     "stylelint": "^13.6.0",
+    "ts-node": "^9.0.0",
     "typescript": "^3.9.5"
   },
   "keywords": [
     "gatsby"
   ],
-  "license": "MIT",
+  "license": "NOLICENSE",
   "scripts": {
     "build:cdn": "gatsby build --prefix-paths",
     "build": "gatsby build",
@@ -57,7 +60,7 @@
     "serve": "gatsby serve",
     "clean": "gatsby clean",
     "stylelint": "stylelint src/**/**.less",
-    "post": "node ./cli/createPost.js"
+    "post": "ts-node ./cli/createPost.ts"
   },
   "lint-staged": {
     "**/*.{js,jsx,json,md,ts,tsx}": [
@@ -72,12 +75,5 @@
       "pre-commit": "lint-staged",
       "pre-push": "yarn build"
     }
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/gatsbyjs/gatsby-starter-default"
-  },
-  "bugs": {
-    "url": "https://github.com/gatsbyjs/gatsby/issues"
   }
 }

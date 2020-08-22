@@ -1,18 +1,24 @@
-const path = require("path");
-const inquire = require("inquirer");
-const chalk = require("chalk");
-const moment = require("moment");
-const fse = require("fs-extra");
+import * as path from "path";
+import * as inquire from "inquirer";
+import * as chalk from "chalk";
+import * as moment from "moment";
+import * as fse from "fs-extra";
 
 const now = moment();
 
-const createPostText = (title, date, tags, indexImage) => `
+const createPostText = (
+  title: string,
+  date: string,
+  tags: string,
+  indexImage: string
+) => `
 ---
 title: ${title}
 date: ${date}
 tags: ${tags}
 index_img: ${indexImage}
 ---
+
 `;
 
 inquire
@@ -36,7 +42,7 @@ inquire
       message: "Input IndexImg",
     },
   ])
-  .then(answers => {
+  .then((answers: { title: string; tags: string; indexImage: string }) => {
     const { title, tags, indexImage } = answers;
     const date = now.format("YYYY-MM-DD HH:mm:ss");
     const postText = createPostText(
