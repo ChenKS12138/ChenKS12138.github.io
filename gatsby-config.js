@@ -4,8 +4,10 @@ module.exports = {
     title: `ChenKS`,
     description: `Homepage|ChenKS`,
     author: `@ChenKS12138`,
+    siteUrl: "https://blog.cattchen.top",
   },
   plugins: [
+    "gatsby-plugin-cname",
     `gatsby-plugin-react-helmet`,
     {
       resolve: `gatsby-source-filesystem`,

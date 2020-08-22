@@ -7027,6 +7027,11 @@ gatsby-page-utils@^0.2.8:
     lodash "^4.17.15"
     micromatch "^3.1.10"
 
+gatsby-plugin-cname@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.npm.taobao.org/gatsby-plugin-cname/download/gatsby-plugin-cname-1.0.0.tgz#5752d006c476a3c7897fca5c307901df5501747a"
+  integrity sha1-V1LQBsR2o8eJf8pcMHkB31UBdHo=
+
 gatsby-plugin-less@^3.2.3:
   version "3.2.3"
   resolved "https://registry.npmjs.org/gatsby-plugin-less/-/gatsby-plugin-less-3.2.3.tgz#c8589bd6ddb900bad2c2a64050944f15052b0b1d"
