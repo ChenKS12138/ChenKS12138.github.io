@@ -1,5 +1,4 @@
 import React, { ReactElement, useMemo } from "react";
-import propTypes from "prop-types";
 import { useWindowScroll } from "react-use";
 import { Link } from "gatsby";
 
