@@ -2,7 +2,7 @@ import React, { useCallback, useRef, useEffect } from "react";
 import { PageProps } from "gatsby";
 import styled from "styled-components";
 
-import Layout from "@/components/Layout";
+import { Layout } from "@/components/index";
 
 // 配置post主题
 import DefaultTheme from "@/theme/DefaultTheme";

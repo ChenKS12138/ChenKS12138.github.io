@@ -1,42 +1,6 @@
 import React from "react";
 import { createGlobalStyle } from "styled-components";
 export default createGlobalStyle`
-  html, body, header, .view {
-    height: 100%;
-    /* word-break:break-all;  */
-    overflow-wrap: break-word;
-  }
-
-  body {
-    background-color: #eee;
-    color: #3c4858;
-  }
-
-  body a {
-    color: #3c4858;
-  }
-
-  body a:hover {
-    color: #061931;
-  }
-
-  .main {
-    position: relative;
-    margin-top: -3rem;
-    background-color: #fff;
-    border-radius: 8px;
-    z-index: 3;
-  }
-
-  .post-thumbnails {
-    display: block;
-    width: 100%;
-    height: 160px;
-    background-repeat: no-repeat;
-    background-size: cover;
-    background-position: center;
-  }
-
   .post-content {
     padding: 0 4rem;
     color: #3c4858;

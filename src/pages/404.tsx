@@ -1,8 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 
-import Layout from "@/components/Layout";
-import SEO from "@/components/Seo";
+import { GlobalStyle, SEO, Layout } from "@/components/index";
 
 function NotFoundPage() {
   return (

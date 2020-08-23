@@ -2,7 +2,7 @@ import React, { useMemo, useState } from "react";
 import { PageProps, graphql, navigateTo, navigate } from "gatsby";
 import styled from "styled-components";
 
-import Layout from "@/components/Layout";
+import { Layout } from "@/components/index";
 
 import appConfig from "@/app.config";
 

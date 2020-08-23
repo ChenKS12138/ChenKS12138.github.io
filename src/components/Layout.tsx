@@ -3,13 +3,10 @@ import { useWindowScroll } from "react-use";
 import { Link } from "gatsby";
 import styled from "styled-components";
 
-import Header from "@/components/Header";
-import { useImageColor } from "@/utils/customHooks";
+import { Header, SEO, GlobalStyle } from "@/components/index";
+import { useImageColor } from "@/utils/index";
 
 import "normalize.css";
-
-import SEO from "@/components/Seo";
-import GlobalStyle from "@/components/GlobalStyle";
 
 import appConfig from "@/app.config";
 
