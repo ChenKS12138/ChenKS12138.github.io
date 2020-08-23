@@ -1,26 +1,27 @@
 import React from "react";
+import styled from "styled-components";
 
-import Layout from "@/layout/default/Layout";
-import SEO from "@/components/seo/Seo";
+import Layout from "@/components/Layout";
+import SEO from "@/components/Seo";
 
 function NotFoundPage() {
   return (
     <Layout>
       <SEO title="404: Not found" />
-      <div
-        style={{
-          width: "960px",
-          maxWidth: "80vw",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-        }}
-      >
+      <NotFoundTextWrapper>
         <h1>糟糕~没有找到这个页面 :(</h1>
         <p>似乎不能理解输入的路径，请点击回到主页查看更多的文章</p>
-      </div>
+      </NotFoundTextWrapper>
     </Layout>
   );
 }
+
+const NotFoundTextWrapper = styled.div`
+  width: 960px;
+  max-width: 80vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
 
 export default NotFoundPage;

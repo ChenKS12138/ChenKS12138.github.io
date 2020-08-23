@@ -36,6 +36,7 @@
     "@types/highlight.js": "^9.12.4",
     "@types/inquirer": "^7.3.1",
     "@types/react-helmet": "^6.0.0",
+    "@types/styled-components": "^5.1.2",
     "chalk": "^4.1.0",
     "fs-extra": "^9.0.1",
     "gatsby-cli": "^2.12.44",

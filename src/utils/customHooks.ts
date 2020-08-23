@@ -5,7 +5,7 @@ import React, { useState, useEffect } from "react";
  * @param src {string}
  */
 export function useImageColor(src: string): string {
-  const [color, setColor] = useState("#000000");
+  const [color, setColor] = useState("rgba(0,0,0,0.5)");
   const [url] = useNetworkImageData(src);
   useEffect(() => {
     if (!url) return;

@@ -7,8 +7,8 @@ module.exports = {
     siteUrl: "https://blog.cattchen.top",
   },
   plugins: [
-    "gatsby-plugin-cname",
     `gatsby-plugin-react-helmet`,
+    "gatsby-plugin-cname",
     {
       resolve: `gatsby-plugin-styled-components`,
       options: {

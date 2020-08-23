@@ -1,11 +1,10 @@
 import React, { useMemo, useState } from "react";
 import { PageProps, graphql, navigateTo, navigate } from "gatsby";
+import styled from "styled-components";
 
-import Layout from "@/layout/default/Layout";
+import Layout from "@/components/Layout";
 
 import appConfig from "@/app.config";
-
-import "./list.less";
 
 interface FrontMatter {
   date: string;
@@ -71,25 +70,30 @@ function List(props: PageProps) {
     <Layout
       backgroundSrc={appConfig.headerImages.archives}
       height="500px"
-      content={<div className="list-header-content">Archive</div>}
+      content={<HeaderContent>Archive</HeaderContent>}
       title="Archives"
     >
-      <div className="list-container">
-        <div className="tags-container">
-          {tags.map(tag => (
-            <div
-              className={`tag ${tag === currentTag ? "tag-selected" : ""}`}
-              key={tag}
-              onClick={() => setCurrentTag(tag)}
-            >
-              {tag}
-            </div>
-          ))}
-        </div>
+      <ListContainer>
+        <TagsContainer>
+          {tags.map(tag =>
+            tag === currentTag ? (
+              <TagSelected key={tag}>{tag}</TagSelected>
+            ) : (
+              <Tag
+                key={tag}
+                onClick={() => {
+                  setCurrentTag(tag);
+                }}
+              >
+                {tag}
+              </Tag>
+            )
+          )}
+        </TagsContainer>
         {currentTag === TAG_ALL && (
-          <div className="total-count-container">Total:{totalCount}</div>
+          <TotalCountContainer>Total:{totalCount}</TotalCountContainer>
         )}
-        <div className="group-container">
+        <GroupContainer>
           {groups.map(
             (group: {
               year: string;
@@ -100,30 +104,112 @@ function List(props: PageProps) {
                 MMDD: string;
               }>;
             }) => (
-              <div className="group" key={group.year}>
-                <div className="group-year">{group.year}</div>
-                <div className="group-nodes-container">
+              <Group key={group.year}>
+                <GroupYear>{group.year}</GroupYear>
+                <GroupNodesContainer>
                   {group.nodes.map(node => (
-                    <div
-                      className="node"
+                    <Node
                       onClick={() => navigate(`/detail/${node.id}`)}
                       key={node.id}
                     >
-                      <div className="node-title">{node.title}</div>
-                      <div className="node-date">{node.MMDD}</div>
-                    </div>
+                      <div>{node.title}</div>
+                      <div>{node.MMDD}</div>
+                    </Node>
                   ))}
-                </div>
-              </div>
+                </GroupNodesContainer>
+              </Group>
             )
           )}
-        </div>
-      </div>
+        </GroupContainer>
+      </ListContainer>
     </Layout>
   );
 }
 
 export default List;
+
+const ListContainer = styled.div`
+  box-sizing: border-box;
+  width: 960px;
+  max-width: 90%;
+  margin: 0 auto;
+`;
+
+const TagsContainer = styled.div`
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  flex-wrap: wrap;
+`;
+
+const Tag = styled.div`
+  color: #3c4858;
+  font-size: 1rem;
+  line-height: 1.5;
+  font-weight: 300;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+`;
+
+const TagSelected = styled.div`
+  background-color: #ff4f5e;
+  color: #ffffff;
+  border-radius: 0.25rem;
+  padding: 0.5rem 1rem;
+  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
+`;
+
+const TotalCountContainer = styled.div`
+  margin-top: 1rem;
+  font-weight: 300;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+`;
+
+const GroupContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+`;
+
+const Group = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin: 20px auto;
+`;
+
+const GroupYear = styled.div`
+  font-size: 1.25rem;
+  font-weight: 500;
+  line-height: 1.2;
+  color: #3c4858;
+`;
+
+const GroupNodesContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+`;
+
+const Node = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  color: #495057;
+  cursor: pointer;
+  padding: 0.75rem 1.25rem;
+  font-weight: 300;
+  font-size: 1rem;
+`;
+
+const HeaderContent = styled.div`
+  font-size: 2rem;
+  font-weight: 500;
+  line-height: 1.2;
+  color: #ffffff;
+`;
 
 export const query = graphql`
   {

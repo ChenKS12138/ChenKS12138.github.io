@@ -1,14 +1,15 @@
 import React, { ReactElement, useMemo } from "react";
 import { useWindowScroll } from "react-use";
 import { Link } from "gatsby";
+import styled from "styled-components";
 
-import Header from "@/components/header/header";
+import Header from "@/components/Header";
 import { useImageColor } from "@/utils/customHooks";
 
 import "normalize.css";
 
-import "./layout.less";
-import SEO from "@/components/seo/Seo";
+import SEO from "@/components/Seo";
+import GlobalStyle from "@/components/GlobalStyle";
 
 import appConfig from "@/app.config";
 
@@ -39,24 +40,24 @@ function Layout({
   const headerColor = useImageColor(backgroundSrc);
   const links = useMemo(
     () => [
-      <Link className="link-item" to="/" key="homepage">
+      <AppLinkItem to="/" key="homepage">
         Home
-      </Link>,
-      <Link className="link-item" to="/list" key="list">
+      </AppLinkItem>,
+      <AppLinkItem to="/list" key="list">
         Archives
-      </Link>,
-      <Link className="link-item" to="/about" key="about">
+      </AppLinkItem>,
+      <AppLinkItem to="/about" key="about">
         About
-      </Link>,
+      </AppLinkItem>,
     ],
     []
   );
 
   return (
-    <div id="app">
+    <AppWrapper>
+      <GlobalStyle />
       <SEO title={title} themeColor={headerColor} />
-      <Header
-        className="app-header"
+      <AppHeader
         backgroundSrc={backgroundSrc}
         content={content}
         color={headerColor}
@@ -65,15 +66,54 @@ function Layout({
         toTop={y < 30}
         links={links}
       />
-      <div className="app-content-container">
-        <div className="app-content">{children}</div>
-      </div>
+      <AppContentContainer>
+        <AppContent>{children}</AppContent>
+      </AppContentContainer>
       {/* <footer className="app-footer">
         footer
       </footer> */}
-    </div>
+    </AppWrapper>
   );
 }
+
+const AppWrapper = styled.div`
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: rgb(235, 235, 235);
+`;
+
+const AppHeader = styled(Header)`
+  width: 100%;
+`;
+
+const AppContentContainer = styled.div`
+  position: relative;
+  top: -50px;
+  max-width: 90%;
+  z-index: 4;
+  margin: 0 auto;
+  border-radius: 8px;
+  background-color: rgb(255, 255, 255);
+  box-shadow: 0 12px 15px 0 rgba(0, 0, 0, 0.24),
+    0 17px 50px 0 rgba(0, 0, 0, 0.19);
+`;
+
+const AppContent = styled.div`
+  max-width: 100%;
+  min-height: 500px;
+  padding: 20px;
+  position: relative;
+`;
+
+const AppLinkItem = styled(Link)`
+  user-select: none;
+  color: white;
+  font-size: 14px;
+  text-decoration: none;
+  margin: 0 5px;
+`;
 
 Layout.defaultProps = {
   backgroundSrc: DEFAULT_BACKGROUND_SRC,
