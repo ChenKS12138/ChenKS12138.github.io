@@ -3,7 +3,7 @@ import { graphql, PageProps, navigate } from "gatsby";
 import useAxios from "axios-hooks";
 import styled from "styled-components";
 
-import { Layout } from "@/components/index";
+import { Layout } from "@/components";
 
 import appConfig from "@/app.config";
 

@@ -1,8 +1,14 @@
 import React, { useCallback } from "react";
-import { PageProps } from "gatsby";
-import styled from "styled-components";
+import { PageProps, Link } from "gatsby";
 
-import { Layout } from "@/components/index";
+import {
+  Layout,
+  Text,
+  Space,
+  Avatar,
+  DevideLine,
+  BoxContainer,
+} from "@/components";
 import config from "@/app.config";
 
 function About(props: PageProps) {
@@ -13,7 +19,11 @@ function About(props: PageProps) {
         height="500px"
         title="About"
       >
-        <PageAboutWrapper>{children}</PageAboutWrapper>
+        <BoxContainer>
+          <BoxContainer marginTop="-20px">
+            <Space>{children}</Space>
+          </BoxContainer>
+        </BoxContainer>
       </Layout>
     ),
     []
@@ -21,140 +31,93 @@ function About(props: PageProps) {
   const { name, avatar, intro, associations, links } = config;
 
   return createAbout(
-    <AboutWrapper>
-      <AvatarContainer>
-        <Avatar src={avatar} alt="avatar" />
-      </AvatarContainer>
-      <NameContainer>{name}</NameContainer>
-      <IntroContainer>
-        {intro.map(introItem => (
-          <IntroItem key={introItem}>{introItem}</IntroItem>
-        ))}
-      </IntroContainer>
-      {associations && (
-        <AssociationContainer>
-          {associations.map(association => (
-            <a target="_blank" href={association.url} key={association.url}>
-              <AssociationItem alt={association.url} src={association.icon} />
-            </a>
-          ))}
-        </AssociationContainer>
-      )}
-      {links && (
-        <LinkContainer>
-          <LinkContainerTitle>LINKS</LinkContainerTitle>
-          <LinkContent>
-            {links.map(link => (
-              <LinkItem target="_blank" href={link.link} key={link.link}>
-                <LinkItemImage src={link.avatar} alt="" />
-                <LinkItemName>{link.name}</LinkItemName>
-              </LinkItem>
+    <BoxContainer marginTop="-100px" width="960px" maxWidth="90%">
+      <Space direction="vertical" align="center">
+        <Avatar width="160px" height="160px" src={avatar} alt="avatar" />
+        <BoxContainer marginTop="10px">
+          <Text fontSize="1.75rem" color="#3c4858" fontWeight="600">
+            {name}
+          </Text>
+        </BoxContainer>
+        <BoxContainer marginTop="20px">
+          <Space direction="vertical" align="center">
+            {intro.map(introItem => (
+              <Text
+                key={introItem}
+                color="#3c4858"
+                fontSize="1rem"
+                lineHeight="2.5"
+                fontWeight="300"
+              >
+                {introItem}
+              </Text>
             ))}
-          </LinkContent>
-        </LinkContainer>
-      )}
-    </AboutWrapper>
+          </Space>
+        </BoxContainer>
+        {associations && (
+          <Space>
+            {associations.map(association => (
+              <Link target="_blank" to={association.url} key={association.url}>
+                <BoxContainer margin="0 5px">
+                  <Avatar
+                    width="25px"
+                    height="25px"
+                    alt={association.url}
+                    src={association.icon}
+                  />
+                </BoxContainer>
+              </Link>
+            ))}
+          </Space>
+        )}
+        {links && (
+          <>
+            <DevideLine
+              lineColor="#808080"
+              lineStyle="solid"
+              lineWidth="2px"
+              width="100%"
+            />
+            <BoxContainer marginTop="15px">
+              <Space direction="vertical" align="center">
+                <BoxContainer marginBottom="20px">
+                  <Text fontSize="20px" fontWeight="800" color="#3c4858">
+                    LINKS
+                  </Text>
+                </BoxContainer>
+                <Space align="center" wrap>
+                  {links.map(link => (
+                    <BoxContainer margin="5px 5px">
+                      <Link
+                        style={{ textDecoration: "none" }}
+                        target="_blank"
+                        to={link.link}
+                        key={link.link}
+                      >
+                        <Space direction="horizontal" align="center">
+                          <BoxContainer marginRight="3px">
+                            <Avatar
+                              width="30px"
+                              height="30px"
+                              src={link.avatar}
+                              alt=""
+                            />
+                          </BoxContainer>
+                          <Text fontSize="1rem" color="#3c4858">
+                            {link.name}
+                          </Text>
+                        </Space>
+                      </Link>
+                    </BoxContainer>
+                  ))}
+                </Space>
+              </Space>
+            </BoxContainer>
+          </>
+        )}
+      </Space>
+    </BoxContainer>
   );
 }
-
-const PageAboutWrapper = styled.div`
-  margin-top: -20px;
-`;
-
-const AboutWrapper = styled.div`
-  width: 960px;
-  max-width: 90%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin: 0 auto;
-  margin-top: -100px;
-`;
-
-const AvatarContainer = styled.div`
-  width: 160px;
-  height: 160px;
-`;
-
-const Avatar = styled.img`
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12) !important;
-`;
-
-const NameContainer = styled.div`
-  font-size: 1.75rem;
-  color: #3c4858;
-  line-height: 1.2;
-  font-weight: 600;
-  margin-top: 10px;
-`;
-
-const IntroContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  margin-top: 20px;
-`;
-
-const IntroItem = styled.div`
-  color: #3c4858;
-  font-size: 1rem;
-  line-height: 2.5;
-  text-align: center;
-  font-weight: 300;
-`;
-
-const AssociationContainer = styled.div`
-  display: flex;
-  margin-top: 30px;
-`;
-
-const AssociationItem = styled.img`
-  width: 25px;
-  height: 25px;
-  margin: 0 5px;
-`;
-
-const LinkContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  border-top: solid 2px #808080;
-  margin-top: 30px;
-  padding-top: 30px;
-`;
-
-const LinkContainerTitle = styled.div`
-  font-size: 20px;
-  font-weight: 800;
-  color: #3c4858;
-  margin-bottom: 20px;
-`;
-
-const LinkContent = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-`;
-
-const LinkItem = styled.a`
-  text-decoration: none;
-  display: flex;
-  align-items: center;
-  margin: 5px 5px;
-`;
-
-const LinkItemImage = styled.img`
-  width: 30px;
-  height: 30px;
-  border-radius: 15px;
-  margin-right: 3px;
-`;
-
-const LinkItemName = styled.div`
-  font-size: 1rem;
-  color: #3c4858;
-`;
 
 export default About;

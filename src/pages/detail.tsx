@@ -2,7 +2,7 @@ import React, { useCallback, useRef, useEffect } from "react";
 import { PageProps } from "gatsby";
 import styled from "styled-components";
 
-import { Layout } from "@/components/index";
+import { Layout, Text, BoxContainer } from "@/components";
 
 // 配置post主题
 import DefaultTheme from "@/theme/DefaultTheme";
@@ -21,7 +21,11 @@ function Detail(props: PageProps) {
         content={
           <DetailHeaderContent>
             <div>{title}</div>
-            <DetailHeaderContentDate>{date}</DetailHeaderContentDate>
+            <BoxContainer marginTop="30px">
+              <Text fontWeight="400" fontSize="18px">
+                {date}
+              </Text>
+            </BoxContainer>
           </DetailHeaderContent>
         }
         title={title}
@@ -107,12 +111,6 @@ const DetailHeaderContent = styled.div`
   max-width: 80vw;
   width: 600px;
   font-weight: 600;
-`;
-
-const DetailHeaderContentDate = styled.div`
-  ont-weight: 400;
-  font-size: 18px;
-  margin-top: 30px;
 `;
 
 export default Detail;

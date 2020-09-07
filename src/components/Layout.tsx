@@ -3,8 +3,8 @@ import { useWindowScroll } from "react-use";
 import { Link } from "gatsby";
 import styled from "styled-components";
 
-import { Header, SEO, GlobalStyle } from "@/components/index";
-import { useImageColor } from "@/utils/index";
+import { Header, SEO, GlobalStyle } from "@/components";
+import { useImageColor } from "@/utils";
 
 import "normalize.css";
 
