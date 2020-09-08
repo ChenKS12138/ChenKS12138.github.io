@@ -85,7 +85,7 @@ function About(props: PageProps) {
                     LINKS
                   </Text>
                 </BoxContainer>
-                <Space align="center" wrap>
+                <Space align="center" flexWrap>
                   {links.map(link => (
                     <BoxContainer margin="5px 5px">
                       <Link

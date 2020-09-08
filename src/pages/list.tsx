@@ -201,7 +201,7 @@ const TagSelected = styled.div`
 
 export const query = graphql`
   {
-    allMarkdownRemark {
+    allMarkdownRemark(sort: { fields: frontmatter___date, order: DESC }) {
       totalCount
       nodes {
         id
