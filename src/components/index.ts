@@ -8,4 +8,5 @@ export { default as Text } from "./Text";
 export { default as Avatar } from "./Avatar";
 export { default as DevideLine } from "./DevideLine";
 export { default as BoxContainer } from "./BoxContainer";
+export { default as ExternalLink } from "./ExternalLink";
 export * as Flex from "./Flex";

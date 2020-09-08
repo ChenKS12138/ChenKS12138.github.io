@@ -1,5 +1,5 @@
 import React, { useCallback } from "react";
-import { PageProps, Link } from "gatsby";
+import { PageProps } from "gatsby";
 
 import {
   Layout,
@@ -8,6 +8,7 @@ import {
   Avatar,
   DevideLine,
   BoxContainer,
+  ExternalLink,
 } from "@/components";
 import config from "@/app.config";
 
@@ -57,7 +58,11 @@ function About(props: PageProps) {
         {associations && (
           <Space>
             {associations.map(association => (
-              <Link target="_blank" to={association.url} key={association.url}>
+              <ExternalLink
+                target="_blank"
+                href={association.url}
+                key={association.url}
+              >
                 <BoxContainer margin="0 5px">
                   <Avatar
                     width="25px"
@@ -66,7 +71,7 @@ function About(props: PageProps) {
                     src={association.icon}
                   />
                 </BoxContainer>
-              </Link>
+              </ExternalLink>
             ))}
           </Space>
         )}
@@ -87,11 +92,10 @@ function About(props: PageProps) {
                 </BoxContainer>
                 <Space align="center" flexWrap>
                   {links.map(link => (
-                    <BoxContainer margin="5px 5px">
-                      <Link
-                        style={{ textDecoration: "none" }}
+                    <BoxContainer key={link.link} margin="5px 5px">
+                      <ExternalLink
                         target="_blank"
-                        to={link.link}
+                        href={link.link}
                         key={link.link}
                       >
                         <Space direction="horizontal" align="center">
@@ -107,7 +111,7 @@ function About(props: PageProps) {
                             {link.name}
                           </Text>
                         </Space>
-                      </Link>
+                      </ExternalLink>
                     </BoxContainer>
                   ))}
                 </Space>

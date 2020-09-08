@@ -49,3 +49,30 @@ export function useNetworkImageData(src: string) {
   }, [src]);
   return [blob];
 }
+
+/**
+ * @param key {string}
+ * @param defaultValue
+ */
+export function useLocalStorage<T = any>(
+  key: string,
+  defaultValue?: T
+): [T, Function] {
+  const [value, setValue] = useState(localStorage.getItem(key));
+  useEffect(() => {
+    let stringifiedValue = value;
+    try {
+      stringifiedValue = JSON.stringify(value);
+    } catch (e) {
+      stringifiedValue = value;
+    }
+    localStorage.setItem(key, stringifiedValue);
+  }, [value]);
+  let parsedValue: T = value as any;
+  try {
+    parsedValue = JSON.parse(value);
+  } catch (e) {
+    parsedValue = value as any;
+  }
+  return [parsedValue ?? defaultValue, setValue];
+}
