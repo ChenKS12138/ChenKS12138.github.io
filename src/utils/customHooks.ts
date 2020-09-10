@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 
 /**
  * 获取图片的平均颜色
@@ -6,7 +6,31 @@ import React, { useState, useEffect } from "react";
  */
 export function useImageColor(src: string): string {
   const [color, setColor] = useState("rgba(0,0,0,0.5)");
-  const [url] = useNetworkImageData(src);
+  const [url, responseURL] = useNetworkImageData(src);
+  const [colorCache, setColorCache] = useLocalStorage<
+    { src: string; color: string }[]
+  >("COLOR_CACHE", []);
+
+  useEffect(() => {
+    if (responseURL && !colorCache?.find?.(one => one.color === color)) {
+      if (colorCache.length > 20) {
+        colorCache.shift();
+      }
+      setColorCache(
+        colorCache.concat({
+          src: responseURL,
+          color,
+        })
+      );
+    }
+  }, [color]);
+
+  useEffect(() => {
+    if (!(colorCache instanceof Array)) {
+      setColorCache([]);
+    }
+  }, [colorCache]);
+
   useEffect(() => {
     if (!url) return;
     const img = new Image();
@@ -29,7 +53,7 @@ export function useImageColor(src: string): string {
       setColor(`rgb(${r},${g},${b})`);
     };
   }, [url]);
-  return color;
+  return color || colorCache.find?.(one => one.src === responseURL)?.color;
 }
 
 /**
@@ -37,17 +61,23 @@ export function useImageColor(src: string): string {
  */
 export function useNetworkImageData(src: string) {
   const [blob, setBlob] = useState(null);
+  const [responseURL, setResponseURL] = useState(null);
   useEffect(() => {
     const xhr = new XMLHttpRequest();
     xhr.onload = function () {
       const url = URL.createObjectURL(this.response);
       setBlob(url);
     };
+    xhr.onreadystatechange = function () {
+      if (this.readyState === this.DONE) {
+        setResponseURL(this.responseURL);
+      }
+    };
     xhr.open("GET", src, true);
     xhr.responseType = "blob";
     xhr.send();
   }, [src]);
-  return [blob];
+  return [blob, responseURL];
 }
 
 /**
@@ -58,21 +88,27 @@ export function useLocalStorage<T = any>(
   key: string,
   defaultValue?: T
 ): [T, Function] {
-  const [value, setValue] = useState(localStorage.getItem(key));
+  const [storageValue, setStorageValue] = useState(null);
   useEffect(() => {
-    let stringifiedValue = value;
+    setStorageValue(window.localStorage.getItem(key));
+  }, []);
+
+  const setValue = useCallback((value: T) => {
+    let stringifiedValue: string = value as any;
     try {
       stringifiedValue = JSON.stringify(value);
     } catch (e) {
-      stringifiedValue = value;
+      stringifiedValue = value as any;
     }
-    localStorage.setItem(key, stringifiedValue);
-  }, [value]);
-  let parsedValue: T = value as any;
+    setStorageValue(stringifiedValue);
+    window.localStorage.setItem(key, stringifiedValue);
+  }, []);
+
+  let parsedValue: T = storageValue as any;
   try {
-    parsedValue = JSON.parse(value);
+    parsedValue = JSON.parse(storageValue);
   } catch (e) {
-    parsedValue = value as any;
+    parsedValue = storageValue as any;
   }
   return [parsedValue ?? defaultValue, setValue];
 }
