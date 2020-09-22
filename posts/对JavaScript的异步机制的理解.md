@@ -23,35 +23,35 @@ index_img: ../assets/runtime.jpeg
 
 ```javascript
 // 回调函数
-function func1(){
-  $.ajax("https://example.com/login",function(reason,res){
-    if(reason){
-      console.log("fail")
+function func1() {
+  $.ajax("https://example.com/login", function (reason, res) {
+    if (reason) {
+      console.log("fail");
     } else {
-			console.log("success");
+      console.log("success");
     }
-  })
+  });
 }
 
 // 使用Promise
-function func2(){
- 	fetch("https://example.com/login").then(
-  	function(response){
+function func2() {
+  fetch("https://example.com/login").then(
+    function (response) {
       console.log("success");
     },
-    function(reason){
+    function (reason) {
       console.log("fail");
     }
-  )
+  );
 }
 
 // 使用async await
-function func3(){
-  try{
+async function func3() {
+  try {
     const response = await fetch("https://example.com/login");
     console.log("success");
-  } catch(reason) {
-    console.log("fail")
+  } catch (reason) {
+    console.log("fail");
   }
 }
 ```
