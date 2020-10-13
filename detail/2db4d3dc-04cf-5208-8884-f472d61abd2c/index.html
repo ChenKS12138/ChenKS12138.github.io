@@ -1,0 +1,260 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="x-ua-compatible" content="ie=edge"/><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/><style data-href="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/commons.848eed5ecfa31c1f4ecf.css">/*! normalize.css v8.0.1 | MIT License | github.com/necolas/normalize.css */html{line-height:1.15;-webkit-text-size-adjust:100%}body{margin:0}h1{font-size:2em;margin:.67em 0}a{background-color:transparent}b{font-weight:bolder}code{font-family:monospace,monospace;font-size:1em}img{border-style:none}[type=number]::-webkit-inner-spin-button,[type=number]::-webkit-outer-spin-button{height:auto}summary{display:list-item}[hidden]{display:none}</style><meta name="generator" content="Gatsby 2.24.47"/><title data-react-helmet="true">web应用加载优化相关 | ChenKS</title><link data-react-helmet="true" href="https://open.saintic.com/api/bingPic/" rel="preload" as="image"/><link data-react-helmet="true" href="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/rVtDsho-9960518f2858389fe355212f7f03fc73.png" rel="preload" as="image"/><link data-react-helmet="true" href="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/OLJxbaR-618cc9142c7c6658b36a4075edaef4e2.jpg" rel="preload" as="image"/><link data-react-helmet="true" href="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/FNwWK1Y-2534b9a096802b6c01cc272d60f1da17.jpg" rel="preload" as="image"/><link data-react-helmet="true" href="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/avatar-9ebf78a88f69fda4a3b437a4f389bb51.png" rel="preload" as="image"/><meta data-react-helmet="true" name="description" content="Homepage|ChenKS"/><meta data-react-helmet="true" property="og:title" content="web应用加载优化相关"/><meta data-react-helmet="true" property="og:description" content="Homepage|ChenKS"/><meta data-react-helmet="true" property="og:type" content="website"/><meta data-react-helmet="true" name="twitter:card" content="summary"/><meta data-react-helmet="true" name="twitter:creator" content="@ChenKS12138"/><meta data-react-helmet="true" name="twitter:title" content="web应用加载优化相关"/><meta data-react-helmet="true" name="twitter:description" content="Homepage|ChenKS"/><meta data-react-helmet="true" name="theme-color" content="rgba(0,0,0,0.5)"/><style data-styled="" data-styled-version="5.1.1">.bCDzTw{width:100%;position:relative;}/*!sc*/
+data-styled.g1[id="Header__HeaderWrapper-sc-1hkgguv-0"]{content:"bCDzTw,"}/*!sc*/
+.cEKZWc{position:fixed;top:0;left:0;width:100%;-webkit-transition:all 0.5s ease-in-out;transition:all 0.5s ease-in-out;z-index:999;box-shadow:0 2px 5px 0 rgba(0,0,0,0.16),0 2px 10px 0 rgba(0,0,0,0.12);display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-align-items:center;-webkit-box-align:center;-ms-flex-align:center;align-items:center;}/*!sc*/
+data-styled.g2[id="Header__HeaderNavigation-sc-1hkgguv-1"]{content:"cEKZWc,"}/*!sc*/
+.fAByzK{min-width:80%;max-width:850px;margin:0 auto;display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-align-items:center;-webkit-box-align:center;-ms-flex-align:center;align-items:center;-webkit-box-pack:justify;-webkit-justify-content:space-between;-ms-flex-pack:justify;justify-content:space-between;}/*!sc*/
+data-styled.g3[id="Header__HeaderNavigationContent-sc-1hkgguv-2"]{content:"fAByzK,"}/*!sc*/
+.cGShrS{color:#ffffff;-webkit-text-decoration:none;text-decoration:none;font-weight:600;font-size:20px;}/*!sc*/
+data-styled.g4[id="Header__HeaderNavigationTitle-sc-1hkgguv-3"]{content:"cGShrS,"}/*!sc*/
+.cWZPQS{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;}/*!sc*/
+data-styled.g5[id="Header__HeaderNavigationLinks-sc-1hkgguv-4"]{content:"cWZPQS,"}/*!sc*/
+.dganzo{width:100%;height:100%;position:relative;}/*!sc*/
+data-styled.g6[id="Header__HeaderContentContainer-sc-1hkgguv-5"]{content:"dganzo,"}/*!sc*/
+.lnBJjV{width:100%;height:100%;background-position:center center;background-size:cover;background-repeat:no-repeat;}/*!sc*/
+.lnBJjV::before{position:absolute;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,0.3);z-index:2;content:"";}/*!sc*/
+data-styled.g7[id="Header__HeaderContentBg-sc-1hkgguv-6"]{content:"lnBJjV,"}/*!sc*/
+.gaOFBs{position:absolute;top:50%;left:50%;-webkit-transform:translate(-50%,-50%);-ms-transform:translate(-50%,-50%);transform:translate(-50%,-50%);z-index:4;}/*!sc*/
+data-styled.g8[id="Header__HeaderContentContent-sc-1hkgguv-7"]{content:"gaOFBs,"}/*!sc*/
+.ecLWfB{width:100%;min-height:100vh;display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-flex-direction:column;-ms-flex-direction:column;flex-direction:column;background-color:rgb(235,235,235);}/*!sc*/
+data-styled.g9[id="Layout__AppWrapper-rhcszr-0"]{content:"ecLWfB,"}/*!sc*/
+.hqmxBg{width:100%;}/*!sc*/
+data-styled.g10[id="Layout__AppHeader-rhcszr-1"]{content:"hqmxBg,"}/*!sc*/
+.cVLhKa{position:relative;top:-50px;max-width:90%;z-index:4;margin:0 auto;border-radius:8px;background-color:rgb(255,255,255);box-shadow:0 12px 15px 0 rgba(0,0,0,0.24),0 17px 50px 0 rgba(0,0,0,0.19);}/*!sc*/
+data-styled.g11[id="Layout__AppContentContainer-rhcszr-2"]{content:"cVLhKa,"}/*!sc*/
+.cXpEuw{max-width:100%;min-height:500px;padding:20px;position:relative;}/*!sc*/
+data-styled.g12[id="Layout__AppContent-rhcszr-3"]{content:"cXpEuw,"}/*!sc*/
+.cLNmcv{-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;color:white;font-size:14px;-webkit-text-decoration:none;text-decoration:none;margin:0 5px;}/*!sc*/
+data-styled.g13[id="Layout__AppLinkItem-rhcszr-4"]{content:"cLNmcv,"}/*!sc*/
+.feClsi{color:#ffffff;font-weight:600;font-size:30px;}/*!sc*/
+.fAfiju{color:#ffffff;font-weight:400;font-size:18px;}/*!sc*/
+.dkZhrJ{font-weight:800;font-size:0.9rem;}/*!sc*/
+.kMIhOF{color:#3c4858;font-size:20px;line-height:30px;}/*!sc*/
+data-styled.g16[id="Text-sc-16tux7c-0"]{content:"feClsi,fAfiju,dkZhrJ,kMIhOF,"}/*!sc*/
+.dSLATf{position:relative;margin-top:30px;}/*!sc*/
+.cdLiVv{position:relative;width:960px;max-width:100%;}/*!sc*/
+data-styled.g19[id="BoxContainer-sc-1cp1x4f-0"]{content:"dSLATf,cdLiVv,"}/*!sc*/
+.iokEtQ{max-width:100%;margin:0 4rem;padding:10px;margin-top:50px;background-color:#faf4e0;border-left-color:rgb(194,164,66);border-left-width:6px;border-left-style:solid;border-radius:5px;}/*!sc*/
+@media screen and (max-width:770px){.iokEtQ{margin:40px 10px;}}/*!sc*/
+data-styled.g23[id="detail__CopyrightContainer-sc-18ilojt-0"]{content:"iokEtQ,"}/*!sc*/
+.dxLtSq{padding:40px 4rem;border-top:solid 1px rgba(0,0,0,0.1);}/*!sc*/
+@media screen and (max-width:770px){.dxLtSq{padding:40px 10px;}}/*!sc*/
+data-styled.g24[id="detail__TagContainer-sc-18ilojt-1"]{content:"dxLtSq,"}/*!sc*/
+.zXZbW{background-color:#e0e0e0;font-weight:800;padding:0.25em 0.4em;border-radius:0.125rem;margin:0 5px;box-shadow:0 2px 5px 0 rgba(0,0,0,0.16),0 2px 10px 0 rgba(0,0,0,0.12);}/*!sc*/
+.zXZbW::before{content:"# ";}/*!sc*/
+data-styled.g25[id="detail__Tag-sc-18ilojt-2"]{content:"zXZbW,"}/*!sc*/
+.iuXEFu{position:absolute;top:50%;left:50%;-webkit-transform:translate(-50%,-50%);-ms-transform:translate(-50%,-50%);transform:translate(-50%,-50%);text-align:center;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;max-width:80vw;width:600px;}/*!sc*/
+data-styled.g26[id="detail__DetailHeaderContent-sc-18ilojt-3"]{content:"iuXEFu,"}/*!sc*/
+body{background-color:rgb(235,235,235);}/*!sc*/
+data-styled.g40[id="sc-global-lirfga1"]{content:"sc-global-lirfga1,"}/*!sc*/
+.post-content{padding:0 4rem;color:#3c4858;}/*!sc*/
+@media screen and (max-width:770px){.post-content{padding:0 0;}}/*!sc*/
+.post-content a{color:#34495e;font-weight:550;-webkit-text-decoration:underline;text-decoration:underline;}/*!sc*/
+.post-content p{font-size:20px;line-height:30px;}/*!sc*/
+@media only screen and (max-width:990px){.post-content{padding:0 .8rem;}}/*!sc*/
+.post-content img{max-width:100%;}/*!sc*/
+.post-content h1,h2,h3,h4,h5,h6{font-weight:600;padding-top:50px;margin-top:-50px;}/*!sc*/
+.post-content h1{margin-top:20px;}/*!sc*/
+.post-content h2{margin-top:15px;text-emphasis:5px;}/*!sc*/
+.post-content h3{margin-top:12px;text-indent:15px;}/*!sc*/
+.post-content h4{margin-top:8px;text-indent:23px;}/*!sc*/
+.post-content h5{margin-top:4px;text-indent:28px;}/*!sc*/
+.post-content h6{text-indent:31px;}/*!sc*/
+.post-content h1::before,h2::before,h3::before,h4::before,h5::before,h6::before{content:"# ";color:#0e5796;}/*!sc*/
+p code{font-size:87.5%;color:#e83e8c;word-break:break-word;}/*!sc*/
+li{line-height:2;}/*!sc*/
+data-styled.g41[id="sc-global-knzkob1"]{content:"sc-global-knzkob1,"}/*!sc*/
+</style><link rel="icon" href="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/favicon-32x32.png?v=5932f08b280e1537764aebecd3aa637a" type="image/png"/><link rel="manifest" href="/manifest.webmanifest"/><link rel="apple-touch-icon" sizes="48x48" href="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/icons/icon-48x48.png?v=5932f08b280e1537764aebecd3aa637a"/><link rel="apple-touch-icon" sizes="72x72" href="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/icons/icon-72x72.png?v=5932f08b280e1537764aebecd3aa637a"/><link rel="apple-touch-icon" sizes="96x96" href="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/icons/icon-96x96.png?v=5932f08b280e1537764aebecd3aa637a"/><link rel="apple-touch-icon" sizes="144x144" href="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/icons/icon-144x144.png?v=5932f08b280e1537764aebecd3aa637a"/><link rel="apple-touch-icon" sizes="192x192" href="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/icons/icon-192x192.png?v=5932f08b280e1537764aebecd3aa637a"/><link rel="apple-touch-icon" sizes="256x256" href="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/icons/icon-256x256.png?v=5932f08b280e1537764aebecd3aa637a"/><link rel="apple-touch-icon" sizes="384x384" href="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/icons/icon-384x384.png?v=5932f08b280e1537764aebecd3aa637a"/><link rel="apple-touch-icon" sizes="512x512" href="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/icons/icon-512x512.png?v=5932f08b280e1537764aebecd3aa637a"/><link as="script" rel="preload" href="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/component---src-pages-detail-tsx-7f542bfcd69dda2165d5.js"/><link as="script" rel="preload" href="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/commons-853d134af15749f673ea.js"/><link as="script" rel="preload" href="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/app-1602585408646.js"/><link as="script" rel="preload" href="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/framework-b5b229d58c3c710d5429.js"/><link as="script" rel="preload" href="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/webpack-runtime-5f279b058b5ec663536e.js"/><link as="fetch" rel="preload" href="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/page-data/detail/2db4d3dc-04cf-5208-8884-f472d61abd2c/page-data.1602585408646.json" crossorigin="anonymous"/><link as="fetch" rel="preload" href="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/page-data/sq/d/63159454.json" crossorigin="anonymous"/><link as="fetch" rel="preload" href="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/page-data/app-data.json" crossorigin="anonymous"/></head><body><div id="___gatsby"><div style="outline:none" tabindex="-1" id="gatsby-focus-wrapper"><div class="Layout__AppWrapper-rhcszr-0 ecLWfB"><div class="Header__HeaderWrapper-sc-1hkgguv-0 bCDzTw Layout__AppHeader-rhcszr-1 hqmxBg" style="height:400px"><div style="height:64px;background-color:transparent" class="Header__HeaderNavigation-sc-1hkgguv-1 cEKZWc"><div class="Header__HeaderNavigationContent-sc-1hkgguv-2 fAByzK"><a class="Header__HeaderNavigationTitle-sc-1hkgguv-3 cGShrS" href="/">ChenKS</a><div class="Header__HeaderNavigationLinks-sc-1hkgguv-4 cWZPQS"><a class="Layout__AppLinkItem-rhcszr-4 cLNmcv" href="/">Home</a><a class="Layout__AppLinkItem-rhcszr-4 cLNmcv" href="/list">Archives</a><a class="Layout__AppLinkItem-rhcszr-4 cLNmcv" href="/about">About</a></div></div></div><div class="Header__HeaderContentContainer-sc-1hkgguv-5 dganzo"><div style="background-image:url(&quot;https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/FNwWK1Y-2534b9a096802b6c01cc272d60f1da17.jpg&quot;)" class="Header__HeaderContentBg-sc-1hkgguv-6 lnBJjV"></div><div class="Header__HeaderContentContent-sc-1hkgguv-7 gaOFBs"><div class="detail__DetailHeaderContent-sc-18ilojt-3 iuXEFu"><span font-size="30px" color="#ffffff" font-weight="600" class="Text-sc-16tux7c-0 feClsi">web应用加载优化相关</span><div class="BoxContainer-sc-1cp1x4f-0 dSLATf"><span font-weight="400" font-size="18px" color="#ffffff" class="Text-sc-16tux7c-0 fAfiju">Saturday, October 10, 2020 4:50 PM</span></div></div></div></div></div><div class="Layout__AppContentContainer-rhcszr-2 cVLhKa"><div class="Layout__AppContent-rhcszr-3 cXpEuw"><div width="960px" style="overflow-wrap:break-word" class="BoxContainer-sc-1cp1x4f-0 cdLiVv"><div class="post-content"><h2>前言</h2>
+<p><span
+      class="gatsby-resp-image-wrapper"
+      style="position: relative; display: block; margin-left: auto; margin-right: auto; max-width: 590px; "
+    >
+      <a
+    class="gatsby-resp-image-link"
+    href="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/be3f95ccdabff64059aad799a05d5fa4/af192/collect-homework-first-version.png"
+    style="display: block"
+    target="_blank"
+    rel="noopener"
+  >
+    <span
+    class="gatsby-resp-image-background-image"
+    style="padding-bottom: 22.2972972972973%; position: relative; bottom: 0; left: 0; background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAECAYAAACOXx+WAAAACXBIWXMAAAsSAAALEgHS3X78AAAA2klEQVQY0z2Py27CMBBF8wmlBBJiOzbYIcRYSSAR5dlSdpW66bISC/7/J27Hrsji6NyxNA9HKWcQc4VFoQlJmYPlhOQQKkNGmStCZsGCmGYCr9Mc4yQni+DJTCFOJaLDuUO9cbC1xflji/7N4Xo74nLdET32p57ed3j/PKLtKsKiXNcwqwbFyrumReUwNJLaIWEGumzgmgOWtqOGjuoWRbUN2ePaPV2mCYOUG8yEtw5O2CJcFwZ+ff/g9/7AvFhD6QrKWPoGHxhN/nmJWWiK0zzgLxpT7f0c5v0H2pFxQ7bhQyQAAAAASUVORK5CYII='); background-size: cover; display: block;"
+  ></span>
+  <img
+        class="gatsby-resp-image-image"
+        alt="first-version"
+        title="first-version"
+        src="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/be3f95ccdabff64059aad799a05d5fa4/fcda8/collect-homework-first-version.png"
+        srcset="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/be3f95ccdabff64059aad799a05d5fa4/12f09/collect-homework-first-version.png 148w,
+https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/be3f95ccdabff64059aad799a05d5fa4/e4a3f/collect-homework-first-version.png 295w,
+https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/be3f95ccdabff64059aad799a05d5fa4/fcda8/collect-homework-first-version.png 590w,
+https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/be3f95ccdabff64059aad799a05d5fa4/af192/collect-homework-first-version.png 645w"
+        sizes="(max-width: 590px) 100vw, 590px"
+        style="width:100%;height:100%;margin:0;vertical-align:middle;position:absolute;top:0;left:0;"
+        loading="lazy"
+      />
+  </a>
+    </span></p>
+<p>大一上时刚学会点 php，然后自己是学习委员，作为学习委员需要经常收电子版的实验报告，从 QQ 上将实验报告一份一份下载很麻烦，为了提高效率就萌生了写一个提交作业的网站的想法。在这里我第一个使用 mysql+php+python 搭建了一个项目，现在回头看，之前写的代码确实不怎么好。没有一个管理后台，每次有需要收新的实验报告时都要改代码。不够安全，由于不清楚如何使用 php 发起 smtp 邮件请求，就采用了使用 exec 函数调用 python 程序发送邮件的方案。</p>
+<p><span
+      class="gatsby-resp-image-wrapper"
+      style="position: relative; display: block; margin-left: auto; margin-right: auto; max-width: 590px; "
+    >
+      <a
+    class="gatsby-resp-image-link"
+    href="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/baace0e05a907ca0832ecb5b4d47b30d/29114/collect-homework-2.png"
+    style="display: block"
+    target="_blank"
+    rel="noopener"
+  >
+    <span
+    class="gatsby-resp-image-background-image"
+    style="padding-bottom: 54.05405405405405%; position: relative; bottom: 0; left: 0; background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAALCAYAAAB/Ca1DAAAACXBIWXMAAAsSAAALEgHS3X78AAABdUlEQVQoz4WSy07CUBCGuzQaLyEs3BoXPpICgoAbb3HrxnfQF1DeQSARQpSNMYQVujBuKF3UnYlgKbSn7e/MKUeKUp3kz7n988309GjJ4j4S+SIShSJWszks7qRDZXaxlMtj4+AQW0fHSOYLWMntYY32ljPZqS+VxsJ2CuvE2Tw5hXbT7UKprHdR0XWUDQOVTgflRgOleh3XzXtcNZu4rFZxUauh1G6j0uuRXw/9pCqviaEhLoIAGI0Aawj99QWtu1v030zAcQDPi03TPN+HkojOCeiTgfXYfsD5WQGmacgkL5j6ZuYkLWwmoKJhVSE8ufbp0OFuKEyzh+enFgb9DwQMJC+Lfa4QcmTJDhVQ0AGbpqMH13UhZLIfdkZFGMBnUb+aS6AiqypRMcAh82g8hjOBu5PO5mkGOC8YqD5d+XgvLof3tbjuvoGT+2TJO44A53YYV0klcwyHNt77A/lDfgJ/PZu/gNyhbduw6C1+WlZ4+f8AvwBvcyswWZT/tAAAAABJRU5ErkJggg=='); background-size: cover; display: block;"
+  ></span>
+  <img
+        class="gatsby-resp-image-image"
+        alt="collect-homework-second-version"
+        title="collect-homework-second-version"
+        src="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/baace0e05a907ca0832ecb5b4d47b30d/fcda8/collect-homework-2.png"
+        srcset="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/baace0e05a907ca0832ecb5b4d47b30d/12f09/collect-homework-2.png 148w,
+https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/baace0e05a907ca0832ecb5b4d47b30d/e4a3f/collect-homework-2.png 295w,
+https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/baace0e05a907ca0832ecb5b4d47b30d/fcda8/collect-homework-2.png 590w,
+https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/baace0e05a907ca0832ecb5b4d47b30d/efc66/collect-homework-2.png 885w,
+https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/baace0e05a907ca0832ecb5b4d47b30d/c83ae/collect-homework-2.png 1180w,
+https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/baace0e05a907ca0832ecb5b4d47b30d/29114/collect-homework-2.png 1920w"
+        sizes="(max-width: 590px) 100vw, 590px"
+        style="width:100%;height:100%;margin:0;vertical-align:middle;position:absolute;top:0;left:0;"
+        loading="lazy"
+      />
+  </a>
+    </span></p>
+<p>后来大一下学会了点 Vue.js Node.js ，进行了重写了，使用了 ElementUI 这个组件库，解决了上一版的两个主要问题，了解到了 session、cookie、可以使用 gzip 这类压缩算法压缩 HTTP 响应，加快响应。</p>
+<p><span
+      class="gatsby-resp-image-wrapper"
+      style="position: relative; display: block; margin-left: auto; margin-right: auto; max-width: 590px; "
+    >
+      <a
+    class="gatsby-resp-image-link"
+    href="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/62bcc98332908d59c5383ebfa13360f0/29114/collect-homework-3.png"
+    style="display: block"
+    target="_blank"
+    rel="noopener"
+  >
+    <span
+    class="gatsby-resp-image-background-image"
+    style="padding-bottom: 54.05405405405405%; position: relative; bottom: 0; left: 0; background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAALCAYAAAB/Ca1DAAAACXBIWXMAAAsSAAALEgHS3X78AAABeklEQVQoz41P2UoDQRCcj/AC8UwQVDwConnxJf/ro2BUSBDFC1ERvPXZhGz2mJ2dSXaSsrc3S0ww4kPR3dXVNTVibqWImeVtzFKdzG1ifGGdsMGYyhcwkSsgX9jF6k4JkzQzt7gxoBubX8P0chFLWyWIy9tHZLi+e8L1fYqru0ccnVzg4LCKY0K1copyuYJy5QznNw+keSbNDz3NF+QhdCsGw8SITJur7tVAKihl8PH2isP9PQR+mHJRq6cbvDHkI5qehNP04Aep2HF97huOiyb1SrdRq9fx8vKEkMyDMGKd66d33HsB3yRewqVXIx2h07FAtwtjDPUdri0CkbBxDGsta7q065LO2hhGa95/Ohat2EKGCsILFCdJv2L4pVBpmkNGwnFy/oXkXQJJSRNtFGm81zQ8qWlWacLENKlNgjuEjEs1amiveC9lnxOZWVL/QqoZ1vUfyjjh/pLqJzKzUfMwxP+SKfgywn9+I/4yyo7rDRdfdWcg4ai7b0OqE8HsQjSbAAAAAElFTkSuQmCC'); background-size: cover; display: block;"
+  ></span>
+  <img
+        class="gatsby-resp-image-image"
+        alt="collect-homework-3"
+        title="collect-homework-3"
+        src="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/62bcc98332908d59c5383ebfa13360f0/fcda8/collect-homework-3.png"
+        srcset="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/62bcc98332908d59c5383ebfa13360f0/12f09/collect-homework-3.png 148w,
+https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/62bcc98332908d59c5383ebfa13360f0/e4a3f/collect-homework-3.png 295w,
+https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/62bcc98332908d59c5383ebfa13360f0/fcda8/collect-homework-3.png 590w,
+https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/62bcc98332908d59c5383ebfa13360f0/efc66/collect-homework-3.png 885w,
+https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/62bcc98332908d59c5383ebfa13360f0/c83ae/collect-homework-3.png 1180w,
+https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/62bcc98332908d59c5383ebfa13360f0/29114/collect-homework-3.png 1920w"
+        sizes="(max-width: 590px) 100vw, 590px"
+        style="width:100%;height:100%;margin:0;vertical-align:middle;position:absolute;top:0;left:0;"
+        loading="lazy"
+      />
+  </a>
+    </span></p>
+<p>现在大三了，国庆期间又重写了代码，后端部分的代码试水了 golang，postgres，golang 有 python 的开发效率，有接近 C++的性能。我觉得这门语言设计者是个十足的偏执狂，golang 在代码格式的要求上要求很严格，<code>else if</code>是不换行的，代码格式不正确，编译不通过。前端部分，使用的技术栈是<code>react</code>+<code>redux</code>+<code>redux-saga</code>+<code>saga-duck</code>+<code>antd</code>，在实习期间了解到了<code>saga-duck</code>这个库，和<code>dvajs</code>有点类似，但是在与 typescript 的契合上更优，duck 间不仅有继承关系，还有组合关系。saga-duck 是使用了 ducks 模式管理了 redux 相关的一些代码，避免代码过于分散。在使用时，我没有使用官方的<code>duckRuntime</code>连接<code>redux</code>，我自己写了一个<code>useSagaDuckState</code>的 hook 函数，我认为并没有必要把所有页面组件级别的<code>state</code>都放在<code>store</code>中，使用<code>saga-duck</code>更多的是希望管理好当前页面的<code>state</code>，因此使用一个通过调用<code>useReducer</code>创建页面组件级别的<code>store</code>的<code>useSagaDuckState</code>的 hook 函数可能会更加符合场景需求。</p>
+<p>期间我也了解了 jwt、HTTP 缓存、webpack、docker 这些技术，尽管使用了一台带宽更小的服务器（1Mbps），但是加载效果依然不错。</p>
+<h2>服务端的配置优化</h2>
+<p>这部分的优化主要是在服务端的 nginx 中，通过配置资源类请求的响应头，来实现缓存。可以通过增加 <code>expire</code> <code>cache-control</code>这类响应头字段来使客户端对资源进行缓存，减轻服务端压力。<code>expire</code>可以规定资源的到期时间，在到期时间前，会直接使用缓存。使用<code>cache-control</code>响应头可以规定资源的缓存时间长度。同时，通过浏览器可以通过资源请求响应的 e-tag，和服务器端确认资源的新鲜程度。</p>
+<p><span
+      class="gatsby-resp-image-wrapper"
+      style="position: relative; display: block; margin-left: auto; margin-right: auto; max-width: 590px; "
+    >
+      <a
+    class="gatsby-resp-image-link"
+    href="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/91f77c97ce37310d2d39b5b1fd1e4e44/47ff6/collect-homework-http-cache.png"
+    style="display: block"
+    target="_blank"
+    rel="noopener"
+  >
+    <span
+    class="gatsby-resp-image-background-image"
+    style="padding-bottom: 117.56756756756756%; position: relative; bottom: 0; left: 0; background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAYCAYAAAD6S912AAAACXBIWXMAAAsSAAALEgHS3X78AAACjUlEQVQ4y+1VyXLTQBDVD1AcOEKCtY32xZK1WpJjlFiyqcohkHDkyIEjP8AX8AN87OPNgCEYDlRuVOXQ1cuoX/e8sbu1ZLlC128RRQmE46IqCgz9Bk3bo67X6GmvVhWqqkVR1mjbDvmqRJYVKlaWjcpN05yxFbQsLxFGKcIgxGbYYrocMe8m7Haz8ptmjW49UHoClyiLGn23IVCNbJmzQI81z3PiJEkGrWhqjNOMJCthuQGyklWbHm4QI0yYQNCQ1f14iba/QEZAjw0UTYeSYH4Yq84adu66PrSFY8AKfIgwgeEFsPwQNsEMHpr0BROk1h0ftrR5vhCesqUsLBtuGMH1XNiWBc0RLoQl4NgU4SDi1ZdpCpd8+q6HOIoYF4iYlCaJ0nEUwzIt9W1NLkNy6LABP4igjeMl+ZowbC7geT6JL8lbC0Fw6e8Pr8lXxYdYYSO/8X2EBB0GPly/RjBv4PGGgbGAyLbQrq+vcXf3Dm9vbzHPM0luSXAOyzLJiYN5vycAO6lrTNME0zQI6mE/H7De1njy+SOefvqKZx++4Pmr99AOhwOurq7YRQmf1VfsRIppmsofhkHZVVXh5uYNfx6pKjiOIx+igVnF0Lsd9P6AFyMBHceBruswDEOJ9KVYJNi2bV5dKFvGQskntSwgtUuOhW5CvDyDWJzhPBmhHROPIv37saMttQS676tvZEE+qE3Oz7P5d8B/se+L7N62xc/z82x6OKCMPQI+Av4XgKcJDwL8G9gfyUqLH/rkrydOAI9TRk4c+ec/tS1q29QphhI5J2Vcnn/v8NcNzuRwqOtWTWg5geVWU1uuk1us4KbrEHHEm3kHuxhgZZzQXFwdN14Sp2opyakutRQRlfgGl5DPduYV1bUAAAAASUVORK5CYII='); background-size: cover; display: block;"
+  ></span>
+  <img
+        class="gatsby-resp-image-image"
+        alt="collect-homework-http-cache.png"
+        title="collect-homework-http-cache.png"
+        src="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/91f77c97ce37310d2d39b5b1fd1e4e44/fcda8/collect-homework-http-cache.png"
+        srcset="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/91f77c97ce37310d2d39b5b1fd1e4e44/12f09/collect-homework-http-cache.png 148w,
+https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/91f77c97ce37310d2d39b5b1fd1e4e44/e4a3f/collect-homework-http-cache.png 295w,
+https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/91f77c97ce37310d2d39b5b1fd1e4e44/fcda8/collect-homework-http-cache.png 590w,
+https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/91f77c97ce37310d2d39b5b1fd1e4e44/47ff6/collect-homework-http-cache.png 852w"
+        sizes="(max-width: 590px) 100vw, 590px"
+        style="width:100%;height:100%;margin:0;vertical-align:middle;position:absolute;top:0;left:0;"
+        loading="lazy"
+      />
+  </a>
+    </span></p>
+<p>通过开启<code>gzip</code>这类压缩算法，可以优先降低实际传输的资源的大小</p>
+<p>HTTP2 提供了多路复用的功能，可以提高多个并发连接时的性能。</p>
+<h2>webpack 打包优化</h2>
+<h3>使用代码分割</h3>
+<p>这个是 webapck4 中新增的功能，我们可以将多个 chunk 中的共同的部分提取出来，减少重复的代码，从总体上减少传输量。同时对于 vendor_chunk 我们也可以对其进行拆分，将不怎么变动的依赖像 react、redux、antd 之类的，单独放在一个 js 文件中，以达到更好的利用 HTTP 缓存的目的。最初将多个 js 文件合并打包到一个文件里是为了减少 HTTP 连接数，但是现在 HTTP2 多个请求可同时在一个连接上并行执行，或许将这类的依赖拆分出来可以提升缓存效果。</p>
+<h3>使用懒加载</h3>
+<p>懒加载是 webpack 提供的一项能力，可以配合 React16 中的 Suspense 和 lazy 使用。从我的这个项目场景分析看，大部分的用户都是只访问主页的，只有少数用户会访问其他页面，因此这里有必要将其他页面代码分离出来，当需要进入其他页面时再进行加载。</p>
+<deckgo-highlight-code language="jsx"  >
+          <code slot="code">const loadingElement = &lt;Loading /&gt;;
+
+const AuthPage = loadable({
+  loader: () =&gt;
+    import(
+      /*webpackChunkName: &#39;auth_page&#39; */
+      &quot;@/containers/AuthPage/AuthPage&quot;
+    ),
+  loading: loadingElement,
+  minDuration: 500,
+});
+const HelpPage = loadable({
+  loader: () =&gt;
+    import(
+      /*webpackChunkName: &#39;help_page&#39; */
+      &quot;@/containers/HelpPage/HelpPage&quot;
+    ),
+  loading: loadingElement,
+  minDuration: 500,
+});
+const AdminPage = loadable({
+  loader: () =&gt;
+    import(
+      /*webpackChunkName: &#39;admin_page&#39; */
+      &quot;@/containers/AdminPage/AdminPage&quot;
+    ),
+  loading: loadingElement,
+  minDuration: 500,
+});
+
+function App() {
+  return (
+    &lt;AppWrapper&gt;
+      &lt;Router&gt;
+        &lt;Route path={[&quot;/&quot;, &quot;/detail/:id&quot;]}&gt;
+          &lt;ListPage /&gt;
+        &lt;/Route&gt;
+        &lt;Route path={[&quot;/auth&quot;, &quot;/auth/registry&quot;]}&gt;
+          &lt;AuthPage /&gt;
+        &lt;/Route&gt;
+        &lt;Route path={[&quot;/admin&quot;, &quot;/admin/create&quot;]}&gt;
+          &lt;AdminPage /&gt;
+        &lt;/Route&gt;
+        &lt;Route path={[&quot;/help&quot;]}&gt;
+          &lt;HelpPage /&gt;
+        &lt;/Route&gt;
+      &lt;/Router&gt;
+      &lt;GlobalStyle /&gt;
+    &lt;/AppWrapper&gt;
+  );
+}</code>
+        </deckgo-highlight-code>
+<h3>分析打包结果</h3>
+<p>使用 webpack-bundle-analyzer 分析体积较大的 vendor，一些依赖可能体积很大，但是只需要使用少数的 api，就可以考虑自己实现一下相关的函数</p>
+<h2>加载效果优化</h2>
+<p>SPA 应用令人诟病的一点就是页面的加载白屏时间长，浏览器加载 html 文件后，还需要加载相关的 css、js 文件，我们可以在 React 在页面 mount 的标签中放上 loading，当相关文件加载完后，loading 会被自动替换。</p></div><div class="detail__TagContainer-sc-18ilojt-1 dxLtSq"><span class="detail__Tag-sc-18ilojt-2 zXZbW"><span font-weight="800" font-size="0.9rem" class="Text-sc-16tux7c-0 dkZhrJ">随笔</span></span></div><div class="detail__CopyrightContainer-sc-18ilojt-0 iokEtQ"><span color="#3c4858" font-size="20px" class="Text-sc-16tux7c-0 kMIhOF">本博客所有文章除特别声明外，均采用 CC BY-SA 3.0协议 。转载请注明出处！</span></div></div></div></div></div></div><div id="gatsby-announcer" style="position:absolute;top:0;width:1px;height:1px;padding:0;overflow:hidden;clip:rect(0, 0, 0, 0);white-space:nowrap;border:0" aria-live="assertive" aria-atomic="true"></div></div><script id="gatsby-script-loader">/*<![CDATA[*/window.pagePath="/detail/2db4d3dc-04cf-5208-8884-f472d61abd2c";/*]]>*/</script><script id="gatsby-chunk-mapping">/*<![CDATA[*/window.___chunkMapping={"polyfill":["/polyfill-1008a80e41310ed18520.js"],"app":["/app-1602585408646.js"],"polyfills-dom":["/polyfills-dom-3649e20d1440358fa5be.js"],"polyfills-core-js":["/polyfills-core-js-cd8ce62f5d20cabafea8.js"],"polyfills-css-shim":["/polyfills-css-shim-0aa62ae61acb18c47d25.js"],"component---src-pages-404-tsx":["/component---src-pages-404-tsx-c60f39c685a67d2a3154.js"],"component---src-pages-about-tsx":["/component---src-pages-about-tsx-33b8d320bc0c112962e8.js"],"component---src-pages-detail-tsx":["/component---src-pages-detail-tsx-7f542bfcd69dda2165d5.js"],"component---src-pages-index-tsx":["/component---src-pages-index-tsx-afe616318dd3319023ad.js"],"component---src-pages-list-tsx":["/component---src-pages-list-tsx-37209d5703ef02ec4284.js"]};/*]]>*/</script><script src="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/polyfill-1008a80e41310ed18520.js" nomodule=""></script><script src="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/webpack-runtime-5f279b058b5ec663536e.js" async=""></script><script src="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/framework-b5b229d58c3c710d5429.js" async=""></script><script src="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/app-1602585408646.js" async=""></script><script src="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/commons-853d134af15749f673ea.js" async=""></script><script src="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/component---src-pages-detail-tsx-7f542bfcd69dda2165d5.js" async=""></script></body></html>
