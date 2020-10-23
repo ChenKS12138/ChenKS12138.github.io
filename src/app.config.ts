@@ -2,7 +2,7 @@ import iconGithub from "@/images/github.png";
 import iconTwitter from "@/images/twitter.png";
 
 import ARCHIVES_HEADER_IMAGE from "@/images/OLJxbaR.jpg";
-import DETAIL_HEADER_IMAGE from "@/images/FNwWK1Y.jpg";
+import DETAIL_HEADER_IMAGE from "@/images/FSwWKYB.jpg";
 import ABOUT_HEADER_IMAGE from "@/images/rVtDsho.png";
 import USER_AVATAR from "@/images/avatar.png";
 

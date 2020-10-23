@@ -72,6 +72,14 @@ export default function Index(props: PageProps) {
           </ArchiveItem>
         );
       })}
+      <ArchiveItemMeta
+        onClick={() => {
+          navigate("/list");
+        }}
+        style={{ cursor: "pointer" }}
+      >
+        查看全部
+      </ArchiveItemMeta>
     </ArchivesContainer>
   );
 }
@@ -176,7 +184,10 @@ const HeaderContent = styled.div`
 
 export const query = graphql`
   {
-    allMarkdownRemark(sort: { order: DESC, fields: frontmatter___date }) {
+    allMarkdownRemark(
+      sort: { order: DESC, fields: frontmatter___date }
+      limit: 5
+    ) {
       nodes {
         id
         excerpt(pruneLength: 150, truncate: true)
