@@ -36,7 +36,7 @@ const config: Config = {
   avatar: USER_AVATAR,
   intro: [
     "一个热爱技术的大学生，青柚工作室成员，南邮校科协成员。",
-    "Enjoy JavaScript/TypeScript/Dart.",
+    "Enjoy JavaScript/TypeScript/Dart/Golang.",
     "Enjoy Coding.",
   ],
   github: "https://github.com/ChenKS12138",
