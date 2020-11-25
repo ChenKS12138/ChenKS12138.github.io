@@ -94,6 +94,12 @@ const config: Config = {
       avatar: "https://avatars0.githubusercontent.com/u/13806783?s=460&v=4",
       link: "http://xjzsq.ren/",
     },
+    {
+      name: "baiyecha404",
+      avatar:
+        "https://avatars2.githubusercontent.com/u/43843620?s=460&u=abdb1e7400fc7415c5208530e2c4ebe4ab8a2bba&v=4",
+      link: "https://bycsec.top",
+    },
   ],
   associations: [
     {
