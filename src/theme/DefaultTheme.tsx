@@ -79,4 +79,9 @@ export default createGlobalStyle`
   li {
     line-height: 2;
   }
+  pre {
+    background: rgb(224 223 218);
+    padding: 14px;
+    border-radius: 4px
+  }
 `;
