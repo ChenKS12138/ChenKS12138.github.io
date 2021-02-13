@@ -1,0 +1,289 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="x-ua-compatible" content="ie=edge"/><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/><style data-href="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/commons.98afcbf2f4f7df408da2.css">/*! normalize.css v8.0.1 | MIT License | github.com/necolas/normalize.css */html{line-height:1.15;-webkit-text-size-adjust:100%}body{margin:0}h1{font-size:2em;margin:.67em 0}pre{font-family:monospace,monospace;font-size:1em}a{background-color:transparent}b{font-weight:bolder}code{font-family:monospace,monospace;font-size:1em}img{border-style:none}[type=number]::-webkit-inner-spin-button,[type=number]::-webkit-outer-spin-button{height:auto}summary{display:list-item}[hidden]{display:none}</style><meta name="generator" content="Gatsby 2.24.47"/><title data-react-helmet="true">搭建一个基于同构渲染的NYR | ChenKS</title><link data-react-helmet="true" href="https://open.saintic.com/api/bingPic/" rel="preload" as="image"/><link data-react-helmet="true" href="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/rVtDsho-9960518f2858389fe355212f7f03fc73.png" rel="preload" as="image"/><link data-react-helmet="true" href="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/OLJxbaR-618cc9142c7c6658b36a4075edaef4e2.jpg" rel="preload" as="image"/><link data-react-helmet="true" href="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/FSwWKYB-0f500022d38d2a73e4a2b57e50337d05.jpg" rel="preload" as="image"/><link data-react-helmet="true" href="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/avatar-9ebf78a88f69fda4a3b437a4f389bb51.png" rel="preload" as="image"/><meta data-react-helmet="true" name="description" content="Homepage|ChenKS"/><meta data-react-helmet="true" property="og:title" content="搭建一个基于同构渲染的NYR"/><meta data-react-helmet="true" property="og:description" content="Homepage|ChenKS"/><meta data-react-helmet="true" property="og:type" content="website"/><meta data-react-helmet="true" name="twitter:card" content="summary"/><meta data-react-helmet="true" name="twitter:creator" content="@ChenKS12138"/><meta data-react-helmet="true" name="twitter:title" content="搭建一个基于同构渲染的NYR"/><meta data-react-helmet="true" name="twitter:description" content="Homepage|ChenKS"/><meta data-react-helmet="true" name="theme-color" content="rgba(0,0,0,0.5)"/><style data-styled="" data-styled-version="5.1.1">.bCDzTw{width:100%;position:relative;}/*!sc*/
+data-styled.g1[id="Header__HeaderWrapper-sc-1hkgguv-0"]{content:"bCDzTw,"}/*!sc*/
+.cEKZWc{position:fixed;top:0;left:0;width:100%;-webkit-transition:all 0.5s ease-in-out;transition:all 0.5s ease-in-out;z-index:999;box-shadow:0 2px 5px 0 rgba(0,0,0,0.16),0 2px 10px 0 rgba(0,0,0,0.12);display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-align-items:center;-webkit-box-align:center;-ms-flex-align:center;align-items:center;}/*!sc*/
+data-styled.g2[id="Header__HeaderNavigation-sc-1hkgguv-1"]{content:"cEKZWc,"}/*!sc*/
+.fAByzK{min-width:80%;max-width:850px;margin:0 auto;display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-align-items:center;-webkit-box-align:center;-ms-flex-align:center;align-items:center;-webkit-box-pack:justify;-webkit-justify-content:space-between;-ms-flex-pack:justify;justify-content:space-between;}/*!sc*/
+data-styled.g3[id="Header__HeaderNavigationContent-sc-1hkgguv-2"]{content:"fAByzK,"}/*!sc*/
+.cGShrS{color:#ffffff;-webkit-text-decoration:none;text-decoration:none;font-weight:600;font-size:20px;}/*!sc*/
+data-styled.g4[id="Header__HeaderNavigationTitle-sc-1hkgguv-3"]{content:"cGShrS,"}/*!sc*/
+.cWZPQS{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;}/*!sc*/
+data-styled.g5[id="Header__HeaderNavigationLinks-sc-1hkgguv-4"]{content:"cWZPQS,"}/*!sc*/
+.dganzo{width:100%;height:100%;position:relative;}/*!sc*/
+data-styled.g6[id="Header__HeaderContentContainer-sc-1hkgguv-5"]{content:"dganzo,"}/*!sc*/
+.lnBJjV{width:100%;height:100%;background-position:center center;background-size:cover;background-repeat:no-repeat;}/*!sc*/
+.lnBJjV::before{position:absolute;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,0.3);z-index:2;content:"";}/*!sc*/
+data-styled.g7[id="Header__HeaderContentBg-sc-1hkgguv-6"]{content:"lnBJjV,"}/*!sc*/
+.gaOFBs{position:absolute;top:50%;left:50%;-webkit-transform:translate(-50%,-50%);-ms-transform:translate(-50%,-50%);transform:translate(-50%,-50%);z-index:4;}/*!sc*/
+data-styled.g8[id="Header__HeaderContentContent-sc-1hkgguv-7"]{content:"gaOFBs,"}/*!sc*/
+.ecLWfB{width:100%;min-height:100vh;display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-flex-direction:column;-ms-flex-direction:column;flex-direction:column;background-color:rgb(235,235,235);}/*!sc*/
+data-styled.g9[id="Layout__AppWrapper-rhcszr-0"]{content:"ecLWfB,"}/*!sc*/
+.hqmxBg{width:100%;}/*!sc*/
+data-styled.g10[id="Layout__AppHeader-rhcszr-1"]{content:"hqmxBg,"}/*!sc*/
+.cVLhKa{position:relative;top:-50px;max-width:90%;z-index:4;margin:0 auto;border-radius:8px;background-color:rgb(255,255,255);box-shadow:0 12px 15px 0 rgba(0,0,0,0.24),0 17px 50px 0 rgba(0,0,0,0.19);}/*!sc*/
+data-styled.g11[id="Layout__AppContentContainer-rhcszr-2"]{content:"cVLhKa,"}/*!sc*/
+.cXpEuw{max-width:100%;min-height:500px;padding:20px;position:relative;}/*!sc*/
+data-styled.g12[id="Layout__AppContent-rhcszr-3"]{content:"cXpEuw,"}/*!sc*/
+.cLNmcv{-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;color:white;font-size:14px;-webkit-text-decoration:none;text-decoration:none;margin:0 5px;}/*!sc*/
+data-styled.g13[id="Layout__AppLinkItem-rhcszr-4"]{content:"cLNmcv,"}/*!sc*/
+.feClsi{color:#ffffff;font-weight:600;font-size:30px;}/*!sc*/
+.fAfiju{color:#ffffff;font-weight:400;font-size:18px;}/*!sc*/
+.dkZhrJ{font-weight:800;font-size:0.9rem;}/*!sc*/
+.kMIhOF{color:#3c4858;font-size:20px;line-height:30px;}/*!sc*/
+data-styled.g16[id="Text-sc-16tux7c-0"]{content:"feClsi,fAfiju,dkZhrJ,kMIhOF,"}/*!sc*/
+.dSLATf{position:relative;margin-top:30px;}/*!sc*/
+.cdLiVv{position:relative;width:960px;max-width:100%;}/*!sc*/
+data-styled.g19[id="BoxContainer-sc-1cp1x4f-0"]{content:"dSLATf,cdLiVv,"}/*!sc*/
+.iokEtQ{max-width:100%;margin:0 4rem;padding:10px;margin-top:50px;background-color:#faf4e0;border-left-color:rgb(194,164,66);border-left-width:6px;border-left-style:solid;border-radius:5px;}/*!sc*/
+@media screen and (max-width:770px){.iokEtQ{margin:40px 10px;}}/*!sc*/
+data-styled.g23[id="detail__CopyrightContainer-sc-18ilojt-0"]{content:"iokEtQ,"}/*!sc*/
+.dxLtSq{padding:40px 4rem;border-top:solid 1px rgba(0,0,0,0.1);}/*!sc*/
+@media screen and (max-width:770px){.dxLtSq{padding:40px 10px;}}/*!sc*/
+data-styled.g24[id="detail__TagContainer-sc-18ilojt-1"]{content:"dxLtSq,"}/*!sc*/
+.zXZbW{background-color:#e0e0e0;font-weight:800;padding:0.25em 0.4em;border-radius:0.125rem;margin:0 5px;box-shadow:0 2px 5px 0 rgba(0,0,0,0.16),0 2px 10px 0 rgba(0,0,0,0.12);}/*!sc*/
+.zXZbW::before{content:"# ";}/*!sc*/
+data-styled.g25[id="detail__Tag-sc-18ilojt-2"]{content:"zXZbW,"}/*!sc*/
+.iuXEFu{position:absolute;top:50%;left:50%;-webkit-transform:translate(-50%,-50%);-ms-transform:translate(-50%,-50%);transform:translate(-50%,-50%);text-align:center;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;max-width:80vw;width:600px;}/*!sc*/
+data-styled.g26[id="detail__DetailHeaderContent-sc-18ilojt-3"]{content:"iuXEFu,"}/*!sc*/
+body{background-color:rgb(235,235,235);}/*!sc*/
+data-styled.g40[id="sc-global-lirfga1"]{content:"sc-global-lirfga1,"}/*!sc*/
+.post-content{padding:0 4rem;color:#3c4858;}/*!sc*/
+@media screen and (max-width:770px){.post-content{padding:0 0;}}/*!sc*/
+.post-content a{color:#34495e;font-weight:550;-webkit-text-decoration:underline;text-decoration:underline;}/*!sc*/
+.post-content p{font-size:20px;line-height:30px;}/*!sc*/
+@media only screen and (max-width:990px){.post-content{padding:0 .8rem;}}/*!sc*/
+.post-content img{max-width:100%;}/*!sc*/
+.post-content h1,h2,h3,h4,h5,h6{font-weight:600;padding-top:50px;margin-top:-50px;}/*!sc*/
+.post-content h1{margin-top:20px;}/*!sc*/
+.post-content h2{margin-top:15px;text-emphasis:5px;}/*!sc*/
+.post-content h3{margin-top:12px;text-indent:15px;}/*!sc*/
+.post-content h4{margin-top:8px;text-indent:23px;}/*!sc*/
+.post-content h5{margin-top:4px;text-indent:28px;}/*!sc*/
+.post-content h6{text-indent:31px;}/*!sc*/
+.post-content h1::before,h2::before,h3::before,h4::before,h5::before,h6::before{content:"# ";color:#0e5796;}/*!sc*/
+p code{font-size:87.5%;color:#e83e8c;word-break:break-word;}/*!sc*/
+li{line-height:2;}/*!sc*/
+pre{background:rgb(224 223 218);padding:14px;border-radius:4px;}/*!sc*/
+data-styled.g41[id="sc-global-euIIVb1"]{content:"sc-global-euIIVb1,"}/*!sc*/
+</style><link rel="icon" href="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/favicon-32x32.png?v=5932f08b280e1537764aebecd3aa637a" type="image/png"/><link rel="manifest" href="/manifest.webmanifest"/><link rel="apple-touch-icon" sizes="48x48" href="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/icons/icon-48x48.png?v=5932f08b280e1537764aebecd3aa637a"/><link rel="apple-touch-icon" sizes="72x72" href="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/icons/icon-72x72.png?v=5932f08b280e1537764aebecd3aa637a"/><link rel="apple-touch-icon" sizes="96x96" href="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/icons/icon-96x96.png?v=5932f08b280e1537764aebecd3aa637a"/><link rel="apple-touch-icon" sizes="144x144" href="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/icons/icon-144x144.png?v=5932f08b280e1537764aebecd3aa637a"/><link rel="apple-touch-icon" sizes="192x192" href="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/icons/icon-192x192.png?v=5932f08b280e1537764aebecd3aa637a"/><link rel="apple-touch-icon" sizes="256x256" href="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/icons/icon-256x256.png?v=5932f08b280e1537764aebecd3aa637a"/><link rel="apple-touch-icon" sizes="384x384" href="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/icons/icon-384x384.png?v=5932f08b280e1537764aebecd3aa637a"/><link rel="apple-touch-icon" sizes="512x512" href="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/icons/icon-512x512.png?v=5932f08b280e1537764aebecd3aa637a"/><link as="script" rel="preload" href="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/component---src-pages-detail-tsx-afee9d0c9194a8b81f8d.js"/><link as="script" rel="preload" href="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/commons-922720e11ebbf3e755ae.js"/><link as="script" rel="preload" href="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/app-1613184315499.js"/><link as="script" rel="preload" href="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/framework-b5b229d58c3c710d5429.js"/><link as="script" rel="preload" href="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/webpack-runtime-2f77efe4d2c4c5d2a3e7.js"/><link as="fetch" rel="preload" href="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/page-data/detail/f4c66827-7fc5-5f69-9f15-ba2281de820c/page-data.1613184315499.json" crossorigin="anonymous"/><link as="fetch" rel="preload" href="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/page-data/sq/d/63159454.json" crossorigin="anonymous"/><link as="fetch" rel="preload" href="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/page-data/app-data.json" crossorigin="anonymous"/></head><body><div id="___gatsby"><div style="outline:none" tabindex="-1" id="gatsby-focus-wrapper"><div class="Layout__AppWrapper-rhcszr-0 ecLWfB"><div class="Header__HeaderWrapper-sc-1hkgguv-0 bCDzTw Layout__AppHeader-rhcszr-1 hqmxBg" style="height:400px"><div style="height:64px;background-color:transparent" class="Header__HeaderNavigation-sc-1hkgguv-1 cEKZWc"><div class="Header__HeaderNavigationContent-sc-1hkgguv-2 fAByzK"><a class="Header__HeaderNavigationTitle-sc-1hkgguv-3 cGShrS" href="/">ChenKS</a><div class="Header__HeaderNavigationLinks-sc-1hkgguv-4 cWZPQS"><a class="Layout__AppLinkItem-rhcszr-4 cLNmcv" href="/">Home</a><a class="Layout__AppLinkItem-rhcszr-4 cLNmcv" href="/list">Archives</a><a class="Layout__AppLinkItem-rhcszr-4 cLNmcv" href="/about">About</a></div></div></div><div class="Header__HeaderContentContainer-sc-1hkgguv-5 dganzo"><div style="background-image:url(&quot;https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/FSwWKYB-0f500022d38d2a73e4a2b57e50337d05.jpg&quot;)" class="Header__HeaderContentBg-sc-1hkgguv-6 lnBJjV"></div><div class="Header__HeaderContentContent-sc-1hkgguv-7 gaOFBs"><div class="detail__DetailHeaderContent-sc-18ilojt-3 iuXEFu"><span font-size="30px" color="#ffffff" font-weight="600" class="Text-sc-16tux7c-0 feClsi">搭建一个基于同构渲染的NYR</span><div class="BoxContainer-sc-1cp1x4f-0 dSLATf"><span font-weight="400" font-size="18px" color="#ffffff" class="Text-sc-16tux7c-0 fAfiju">Friday, February 12, 2021 3:57 PM</span></div></div></div></div></div><div class="Layout__AppContentContainer-rhcszr-2 cVLhKa"><div class="Layout__AppContent-rhcszr-3 cXpEuw"><div width="960px" style="overflow-wrap:break-word" class="BoxContainer-sc-1cp1x4f-0 cdLiVv"><div class="post-content"><p><span
+      class="gatsby-resp-image-wrapper"
+      style="position: relative; display: block; margin-left: auto; margin-right: auto; max-width: 590px; "
+    >
+      <a
+    class="gatsby-resp-image-link"
+    href="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/81565c4b134625dde6eb15769b72eb1b/9c7c2/isomorphic-rendering-nyr-1.jpg"
+    style="display: block"
+    target="_blank"
+    rel="noopener"
+  >
+    <span
+    class="gatsby-resp-image-background-image"
+    style="padding-bottom: 75%; position: relative; bottom: 0; left: 0; background-image: url('data:image/jpeg;base64,/9j/2wBDABALDA4MChAODQ4SERATGCgaGBYWGDEjJR0oOjM9PDkzODdASFxOQERXRTc4UG1RV19iZ2hnPk1xeXBkeFxlZ2P/2wBDARESEhgVGC8aGi9jQjhCY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2P/wgARCAAPABQDASIAAhEBAxEB/8QAFwABAQEBAAAAAAAAAAAAAAAAAAQCBf/EABQBAQAAAAAAAAAAAAAAAAAAAAD/2gAMAwEAAhADEAAAAeji8TqB/8QAHBAAAQMFAAAAAAAAAAAAAAAAAQACEQMEEBIU/9oACAEBAAEFAjbSeUJlLQSpGP/EABQRAQAAAAAAAAAAAAAAAAAAABD/2gAIAQMBAT8BP//EABQRAQAAAAAAAAAAAAAAAAAAABD/2gAIAQIBAT8BP//EAB4QAAAEBwAAAAAAAAAAAAAAAAABA5ECERITIDNx/9oACAEBAAY/AjO4o42qOJVxH3D/xAAZEAEAAwEBAAAAAAAAAAAAAAARAAEhEDH/2gAIAQEAAT8hqNm0qWnwmp1BXJfJ/9oADAMBAAIAAwAAABDzL//EABQRAQAAAAAAAAAAAAAAAAAAABD/2gAIAQMBAT8QP//EABQRAQAAAAAAAAAAAAAAAAAAABD/2gAIAQIBAT8QP//EAB0QAQACAgIDAAAAAAAAAAAAAAEAESExQVGxwfD/2gAIAQEAAT8QbiWwQX0QQ8PziCpFyWug9TWXJKNeIh3pP//Z'); background-size: cover; display: block;"
+  ></span>
+  <img
+        class="gatsby-resp-image-image"
+        alt="nyr"
+        title="nyr"
+        src="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/81565c4b134625dde6eb15769b72eb1b/1c72d/isomorphic-rendering-nyr-1.jpg"
+        srcset="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/81565c4b134625dde6eb15769b72eb1b/a80bd/isomorphic-rendering-nyr-1.jpg 148w,
+https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/81565c4b134625dde6eb15769b72eb1b/1c91a/isomorphic-rendering-nyr-1.jpg 295w,
+https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/81565c4b134625dde6eb15769b72eb1b/1c72d/isomorphic-rendering-nyr-1.jpg 590w,
+https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/81565c4b134625dde6eb15769b72eb1b/a8a14/isomorphic-rendering-nyr-1.jpg 885w,
+https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/81565c4b134625dde6eb15769b72eb1b/fbd2c/isomorphic-rendering-nyr-1.jpg 1180w,
+https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/81565c4b134625dde6eb15769b72eb1b/9c7c2/isomorphic-rendering-nyr-1.jpg 1211w"
+        sizes="(max-width: 590px) 100vw, 590px"
+        style="width:100%;height:100%;margin:0;vertical-align:middle;position:absolute;top:0;left:0;"
+        loading="lazy"
+      />
+  </a>
+    </span></p>
+<h2>前言</h2>
+<p>从一开始的静态网页以及浏览器的出现，出现了文档链接其他文档这样的交互方式。后来 JavaScript 的出现了，通过在文档中编写脚本，借助浏览器的能力，文档和用户的交互有了更多的可能。再到后来 PHP、ASP 以及各种 CGI 应用的出现，CGI 应用通过自身的访问数据库、文件系统等各种能力，动态的生成文档，返回给用户，文档的内容有了更多的可能，这就是服务端渲染（SSR）的大致过程。最初前端部分的代码在 CGI 应用中的占比不高，主要是以服务端的代码为主，嵌入一部分的前端代码无伤大雅，但是随着前端内容的不断膨胀，前端代码在 CGI 应用中的占比不断提高，从代码的可维护性和用户体验的角度上看，这样的服务端渲染的方式不再合适。</p>
+<p>后来衍生出了客户端渲染（CSR），前端代码从 CGI 应用中分离，文档的构建不再由 CGI 应用负责，而是用户获取到 JavaScript 脚本后，浏览器端执行 JavaScript 脚本动态的生成，并通过发送 ajax 请求和后端服务通信，获取到数据后，再通过 DOM 操作更新页面，可以理解为这是一个将 PJAX 做到了极致的技术。通过 CSR 可以实现单页应用，达到避免页面跳转时的白屏的目的，从工程的角度看，减少了代码的耦合，CGI 应用中的前端代码可以被分离出来作为一个独立的应用。但 CSR 也带来了些问题，用户下载到的文档是一个不包含内容的文档，需要执行 JavaScript 脚本后才可以构建出内容，这对于搜索引擎来说不够友好，如果搜素引擎没有执行脚本中的内容无法得到文档的内容，再者是页面首次加载会有白屏时间，用户体验不够好。</p>
+<p>造成上面的问题的最主要的一个点就是，在 CSR 应用中用户下载的 HTML 文档不包含内容，需要客户端执行完 JavaScript 脚本后，才可以得到内容。那么问题就来了，我们是不是可以让 JavaScript 脚本执行的过程在服务端中执行一遍，这样得到的 HTML 文档就包含了页面内容。同时，请求发生在服务端时延会比在客户端小，能提高总体的加载速度。</p>
+<p>市面上已经有了许多同构渲染的方案，例如 next.js、nuxt.js，但是我选择自己用 React、ReactDOM、Koa 实现一遍，以便于更好地理解这个过程，以及更好地做优化和故障排查。</p>
+<h2>同构渲染的主要过程</h2>
+<h3>传统的 CSR</h3>
+<p><span
+      class="gatsby-resp-image-wrapper"
+      style="position: relative; display: block; margin-left: auto; margin-right: auto; max-width: 451px; "
+    >
+      <a
+    class="gatsby-resp-image-link"
+    href="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/4fbdb341b172f42311182c9395fe70cd/38070/isomorphic-rendering-2.png"
+    style="display: block"
+    target="_blank"
+    rel="noopener"
+  >
+    <span
+    class="gatsby-resp-image-background-image"
+    style="padding-bottom: 60.13513513513513%; position: relative; bottom: 0; left: 0; background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAMCAYAAABiDJ37AAAACXBIWXMAAAsSAAALEgHS3X78AAACLElEQVQoz3VTS2sTYRSdKlWCIL5bQ7WhlhAJdohmFbLyRwgKtla0Rf+BkIVoGyoWus42y+xDfkB22YWQJyHv92uRxyTOJN94zjBVCfHCmfvN3O+c3FekUqn0qdPpXLTb7R/w541Gwx+NRrck2C0Y3FOA74+AXYvFYmUsEolsNZvNE3JM7gW0PkuLxUJftkqlckiSLMv34DaABwDPm06n8z5jiUTicJknhNCl0Wg0x1mFsAqvMJDL5T6SZLPZmNUT4DGwzbPVat1hDJW8NnXIIVcdj8dzCgp+haAwA3qxWHxPktvtvgO3Y4qyVLvL5eI3CXf2p9Opnk6n1WQyKVCu3u/3BQX/zdoQrNfr70jyeDzs4V0Tt1m21+u9yVgmkzng3VarpeIsZrOZzuT+CNJrmmYI4lePSHI4HOzfrjkYZulEG4yBoc9vzCSmgEYYJeNhNJMp42wIlstlYyjhcHgdbg24cukDgcA1xmq12lt9ha0sGWUckITjVWnJyKHFYrENDOYr1uUM90/hfyKpo5VDwYV9kkKh0PqyoM/nY7ZSKpWyo9dng8HgG/AdOMWgvkjD4dBYxPl8jsqFIZjNZj+QZLfbN7mOgAt4DrzYhjGG1Trm3clkoiuK8rdkc7GF+f6LD6R+TJLf778O95Dal6sTDAaNrPP5/CtVVXX8SxSUrna7XQ1rM+a0UtVqVS8UCgtA4F3g/aXZrzXpP4Ye3kCWcq/X20O5zyAox+Nxx29CeyT68Af8lQAAAABJRU5ErkJggg=='); background-size: cover; display: block;"
+  ></span>
+  <img
+        class="gatsby-resp-image-image"
+        alt="csr-render"
+        title="csr-render"
+        src="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/4fbdb341b172f42311182c9395fe70cd/38070/isomorphic-rendering-2.png"
+        srcset="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/4fbdb341b172f42311182c9395fe70cd/12f09/isomorphic-rendering-2.png 148w,
+https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/4fbdb341b172f42311182c9395fe70cd/e4a3f/isomorphic-rendering-2.png 295w,
+https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/4fbdb341b172f42311182c9395fe70cd/38070/isomorphic-rendering-2.png 451w"
+        sizes="(max-width: 451px) 100vw, 451px"
+        style="width:100%;height:100%;margin:0;vertical-align:middle;position:absolute;top:0;left:0;"
+        loading="lazy"
+      />
+  </a>
+    </span></p>
+<h3>同构渲染</h3>
+<p><span
+      class="gatsby-resp-image-wrapper"
+      style="position: relative; display: block; margin-left: auto; margin-right: auto; max-width: 590px; "
+    >
+      <a
+    class="gatsby-resp-image-link"
+    href="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/2ef66591fbc8e0b1d115ab40747659bf/91e7e/isomorphic-rendering-3.png"
+    style="display: block"
+    target="_blank"
+    rel="noopener"
+  >
+    <span
+    class="gatsby-resp-image-background-image"
+    style="padding-bottom: 39.189189189189186%; position: relative; bottom: 0; left: 0; background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAICAYAAAD5nd/tAAAACXBIWXMAAAsSAAALEgHS3X78AAABnklEQVQoz01Sy0rDUBC97hTUUoOxm8ZWTKGgFKF05ULoD7j0T/wBKaKrLlQiFDeuakF01c/oprRQSp90kSZp+q6JufFMSWouhMPMmTn3zNwwTdMKs9nsczqdlgeDwQ3DCYVCMUBUEIQT4Han07meTCZl1H2NRiOl1+vtMO/0+33BNM13cN+o+WBu4CDxxgIHqTVCJO/X2Lb9oyjKOdL7+HZLpdJVUIMtFgsbuKJgPB4/kUAkEokCjmRZliiG+7t/PVvN5/NnSJPL7WKxeMk5X4BziGfL5ZKvVisSdQ3DeCWBRCJxAIhD8JhiXdfvicdYfD6fG+12W/KnwPgp6gfnAvlaEMFaEMXPVJTJZPZonGw2G6YYznPEQ5jDrdFqtTaC3W43hT4bnAuO08icrFIDdvVCRaIokrO4JEkyxcPh8MEbmVuWpVer1Y1go9FIOY5j+TzDTlxfELcUqCiZTJKzcDqdFj2Hj16Dg3qzXq/HfMFms3mBHf5uBCGi4XXJpauqai74usAtQuRvvR3SFN1KpXLoC9ZqtVNcOMHY9JdYf69shEK4lHCiAAAAAElFTkSuQmCC'); background-size: cover; display: block;"
+  ></span>
+  <img
+        class="gatsby-resp-image-image"
+        alt="csr-render"
+        title="csr-render"
+        src="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/2ef66591fbc8e0b1d115ab40747659bf/fcda8/isomorphic-rendering-3.png"
+        srcset="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/2ef66591fbc8e0b1d115ab40747659bf/12f09/isomorphic-rendering-3.png 148w,
+https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/2ef66591fbc8e0b1d115ab40747659bf/e4a3f/isomorphic-rendering-3.png 295w,
+https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/2ef66591fbc8e0b1d115ab40747659bf/fcda8/isomorphic-rendering-3.png 590w,
+https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/2ef66591fbc8e0b1d115ab40747659bf/91e7e/isomorphic-rendering-3.png 692w"
+        sizes="(max-width: 590px) 100vw, 590px"
+        style="width:100%;height:100%;margin:0;vertical-align:middle;position:absolute;top:0;left:0;"
+        loading="lazy"
+      />
+  </a>
+    </span></p>
+<p>使用同构渲染技术，用户在获取到 HTML 时，文档就已经包含了内容，这可以较少应用的加载屏时长。React 是基于 Virtual DOM 来构建页面内容，可以使用 ReactDOM.render/ReactDOM.hydrate/renderToString 将 React 组件渲染出来。只不过，前两者传参需要一个 DOM 对象，ReactDOM 会操作这个 DOM，渲染出页面，而 renderToString 是直接输出 HTML 文本。hydrate 相比于 render 会对已有的内容进行 hydrate 操作。</p>
+<p>因此我们可以让 Server 也渲染一遍 React 组件，得到 HTML 文本后返回给用户，再配合 ReactDOM.hydrate，浏览器端在 DOM 中标记好处理事件。</p>
+<h2>主要需要解决的问题</h2>
+<h3>保证服务端和客户端 Virtual DOM 的一致性</h3>
+<p>客户端在构建页面时，目标 DOM 节点中已经存在了内容，因此我们需要传入 props，以保证 ReactDOM.hydrate 被调用后，构建出的 Virtual DOM 与目标 DOM 内容一致。</p>
+<p>我采用的方案是在文档初次渲染时，将服务端获取到的 initProps，序列化以及 base64 加密后注入到文档中，构建 Virtual DOM 时再解密以及反序列化。</p>
+<pre><code class="language-jsx">var htmlTemplate = `&#x3C;!DOCTYPE html>
+&#x3C;html &#x3C;%- helmet.htmlAttributes.toString() %> >
+  &#x3C;head>
+    &#x3C;%- helmet.title.toString() %>
+    &#x3C;%- helmet.meta.toString() %>
+    &#x3C;%- helmet.link.toString() %>
+  &#x3C;/head>
+  &#x3C;body &#x3C;%- helmet.bodyAttributes.toString() %> >
+    &#x3C;div id="root">&#x3C;%- content %>&#x3C;/div>
+  &#x3C;/body>
+  &#x3C;script>
+    window.__PRERENDER_INIT_PAGE_PROPS__ = "&#x3C;%- initPageProps %>";
+  &#x3C;/script>
+&#x3C;/html>
+`;
+
+ReactDOM.hydrate(
+  &#x3C;App
+    initPath={location.pathname}
+    initPageProps={parserProps(window.__PRERENDER_INIT_PAGE_PROPS__)}
+  />,
+  document.getElementById("root")
+);
+</code></pre>
+<h3>保证前后端路由解析的一致性</h3>
+<p>首次进入页面时依赖的是后端的路由，Koa 中间件需要解析出对应的页面组件，并调用其<code>getInitProps</code> 获取到数据，渲染组件以及注入页面。因此需要保证前后端路由解析的结果的一致性。最初我使用的<code>react-router-config</code>和<code>koa-router</code> 来分别实现前后端路由解析，后面为了保证解析结果的一致性，我使用了<code>path-to-regexp</code>和<code>query-string</code>实现了路由解析，并编写了对应的单元测试</p>
+<h3>CSS Modules 服务端解析的问题</h3>
+<pre><code class="language-javascript">import styles from "home.module.css";
+console.log(styles);
+/**
+ * 服务端结果
+   [
+    [
+      './src/containers/Home/home.module.css',
+      '._2qPY_oWAq232nd_VnG32FK {\n  color: red;\n}\n',
+      ''
+    ],
+    toString: [Function: toString],
+    i: [Function (anonymous)],
+    locals: { text: '_2qPY_oWAq232nd_VnG32FK' }
+  ]
+  * 客户端结果
+    { text: '_2qPY_oWAq232nd_VnG32FK' }
+ */
+</code></pre>
+<p>服务端在进行<code>CSS Modules</code>解析时得到了意料之外的结果，到目前我还没找到问题的原因。经过一番 Google 后，看到其他人也有类似的情况出现，但是其他人的解决方案的 babel plugin 并不能解决我的问题。所以我直接写了一个 babel plugin 以及对应的单元测试，转译出服务端代码时进行转换，操作 AST，以保证<code>styles</code>为<code>locals</code>中的内容。</p>
+<pre><code class="language-javascript">var t = require("@babel/types");
+
+/**
+ *  transfrom  import styles from "home.module.css";
+ *         to  import __styles from "home.module.css";
+ *             var styles = __styles.locals;
+ */
+
+module.exports = {
+  visitor: {
+    ImportDefaultSpecifier(path) {
+      var parent = path.parent;
+      var node = path.node;
+      if (
+        t.isImportDeclaration(parent) &#x26;&#x26;
+        /\.module\.css/.test(parent.source.value)
+      ) {
+        var originName = node.local.name;
+        node.local.name = "__" + originName;
+        path.parentPath.insertAfter(
+          t.variableDeclaration("var", [
+            t.variableDeclarator(
+              t.identifier(originName),
+              t.memberExpression(
+                t.identifier(node.local.name),
+                t.identifier("locals")
+              )
+            ),
+          ])
+        );
+      }
+    },
+  },
+};
+</code></pre>
+<h3>使用 Cluster 提高性能</h3>
+<p>为了更好地利用主机的计算资源，我使用了 Node.js 中的 Cluster 模块，进行多进程优化。</p>
+<pre><code class="language-javascript">import * as cluster from "cluster";
+import * as os from "os";
+
+export function run(worker: () => void) {
+  if (ENALBE_SERVER_CLUSTER) {
+    const cpuNum = os.cpus().length;
+    if (cluster.isMaster) {
+      for (let i = 0; i &#x3C; cpuNum; i++) {
+        cluster.fork();
+      }
+      console.log(`start ${cpuNum} process`);
+      cluster.on("exit", (worker, code, signal) => {
+        console.log(`worker ${worker.process.pid} exited`);
+      });
+    } else {
+      worker();
+    }
+  } else {
+    worker();
+  }
+}
+
+run(() => {
+  const app = new Koa();
+  middlewares.forEach(middleware => {
+    app.use(middleware);
+  });
+  app.listen(SERVER_PORT, () => {
+    console.log(`worker ready, listen request from 0.0.0.0:${SERVER_PORT}`);
+  });
+});
+</code></pre>
+<h2>小结</h2>
+<p>这只是一个简单的同构渲染的实践，可以做优化的地方还很多。欢迎 clone 源码自己看一遍，欢迎 Pull Request。等等，发现跑题了，NYR 是和小伙伴们想一起做的 PT 站<del>，在线等其他有缘人一起把 NYR 写完</del>。</p>
+<p><a href="https://github.com/NJUPT-NYR/SOPT-Frontend">https://github.com/NJUPT-NYR/SOPT-Frontend</a></p></div><div class="detail__TagContainer-sc-18ilojt-1 dxLtSq"><span class="detail__Tag-sc-18ilojt-2 zXZbW"><span font-weight="800" font-size="0.9rem" class="Text-sc-16tux7c-0 dkZhrJ">随笔</span></span></div><div class="detail__CopyrightContainer-sc-18ilojt-0 iokEtQ"><span color="#3c4858" font-size="20px" class="Text-sc-16tux7c-0 kMIhOF">本博客所有文章除特别声明外，均采用 CC BY-SA 3.0协议 。转载请注明出处！</span></div></div></div></div></div></div><div id="gatsby-announcer" style="position:absolute;top:0;width:1px;height:1px;padding:0;overflow:hidden;clip:rect(0, 0, 0, 0);white-space:nowrap;border:0" aria-live="assertive" aria-atomic="true"></div></div><script id="gatsby-script-loader">/*<![CDATA[*/window.pagePath="/detail/f4c66827-7fc5-5f69-9f15-ba2281de820c";/*]]>*/</script><script id="gatsby-chunk-mapping">/*<![CDATA[*/window.___chunkMapping={"polyfill":["/polyfill-1008a80e41310ed18520.js"],"app":["/app-1613184315499.js"],"polyfills-dom":["/polyfills-dom-3649e20d1440358fa5be.js"],"polyfills-core-js":["/polyfills-core-js-cd8ce62f5d20cabafea8.js"],"polyfills-css-shim":["/polyfills-css-shim-0aa62ae61acb18c47d25.js"],"component---src-pages-404-tsx":["/component---src-pages-404-tsx-c60f39c685a67d2a3154.js"],"component---src-pages-about-tsx":["/component---src-pages-about-tsx-33b8d320bc0c112962e8.js"],"component---src-pages-detail-tsx":["/component---src-pages-detail-tsx-afee9d0c9194a8b81f8d.js"],"component---src-pages-index-tsx":["/component---src-pages-index-tsx-0dba1b3e683aad22e233.js"],"component---src-pages-list-tsx":["/component---src-pages-list-tsx-37209d5703ef02ec4284.js"]};/*]]>*/</script><script src="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/polyfill-1008a80e41310ed18520.js" nomodule=""></script><script src="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/webpack-runtime-2f77efe4d2c4c5d2a3e7.js" async=""></script><script src="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/framework-b5b229d58c3c710d5429.js" async=""></script><script src="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/app-1613184315499.js" async=""></script><script src="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/commons-922720e11ebbf3e755ae.js" async=""></script><script src="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/component---src-pages-detail-tsx-afee9d0c9194a8b81f8d.js" async=""></script></body></html>
