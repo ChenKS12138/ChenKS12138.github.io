@@ -1,11 +1,9 @@
 import React, { useCallback, useRef, useEffect } from "react";
 import { PageProps } from "gatsby";
 import styled from "styled-components";
+import "github-markdown-css/github-markdown.css";
 
 import { Layout, Text, BoxContainer } from "@/components";
-
-// 配置post主题
-import DefaultTheme from "@/theme/DefaultTheme";
 
 import appConfig from "@/app.config";
 
@@ -32,8 +30,7 @@ function Detail(props: PageProps) {
         }
         title={title}
       >
-        <DefaultTheme />
-        {children}
+        <div className="markdown-body">{children}</div>
       </Layout>
     ),
     []
