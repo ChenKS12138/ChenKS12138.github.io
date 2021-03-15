@@ -9,4 +9,4 @@ export { default as Avatar } from "./Avatar";
 export { default as DevideLine } from "./DevideLine";
 export { default as BoxContainer } from "./BoxContainer";
 export { default as ExternalLink } from "./ExternalLink";
-export * as Flex from "./Flex";
+export { default as Flex } from "./Flex";
