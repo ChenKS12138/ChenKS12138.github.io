@@ -18,7 +18,8 @@ jobs:
           cmd: install # will run `yarn install` command
       - uses: borales/actions-yarn@v2.0.0
         with:
-          cmd: build:cdn # Build 🔧
+          # cmd: build:cdn # Build 🔧
+          cmd: build # Build 🔧
 
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@releases/v3
