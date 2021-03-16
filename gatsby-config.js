@@ -77,7 +77,14 @@ module.exports = {
         allExtensions: true, // defaults to false
       },
     },
-    `gatsby-plugin-purgecss`,
+    // {
+    //   resolve: "gatsby-plugin-purgecss",
+    //   options: {
+    //     purgeCSSOptions: {
+    //       safelist: ["markdown-body"],
+    //     },
+    //   },
+    // },
     `gatsby-plugin-split-css`,
   ],
 };
