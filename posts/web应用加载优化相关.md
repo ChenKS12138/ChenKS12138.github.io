@@ -5,7 +5,7 @@ tags: ["随笔"]
 index_img: ../assets/collect-homework-first-version.png
 ---
 
-## 前言
+# 前言
 
 ![first-version](../assets/collect-homework-first-version.png)
 

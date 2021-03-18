@@ -5,11 +5,11 @@ tags: ["JavaScript"]
 index_img: ../assets/Gbtt2R.png
 ---
 
-## JavaScript 中的 BigInt
+# JavaScript 中的 BigInt
 
 之前写 JavaScript 代码，有听说到`Number.MAX_VALUE`和`Number.MAX_SAFE_INTEGER`，但是一直没有做深入的理解，对`Number.MAX_SAFE_INTEGER`并不太了解。
 
-### 遇到的问题
+## 遇到的问题
 
 要从一个密码学实验代码说起，最近在用 JavaScript 实现 RSA 算法，遇到了一个问题。RSA 算法是基于大质数乘积的因式分解困难的难题实现的。
 
@@ -65,7 +65,7 @@ const generateD = (e, m) => {
 };
 ```
 
-### 原因分析
+## 原因分析
 
 原因在于 JavaScript 中的`Number`无论是整数还是小数都是使用 IEEE754 的双精度浮点数表示的。
 
@@ -81,7 +81,7 @@ const generateD = (e, m) => {
 
 > Number.MAX_SAFE_VALUE[<sup>[2]</sup>](#refer-2) : The value of `Number.MAX_SAFE_INTEGER` is the largest integer n such that n and n + 1 are both exactly representable as a Number value.
 
-### BigInt
+## BigInt
 
 我们可以用 BigInt 来表示任意大的整数，但也有需要注意的地方
 
@@ -91,7 +91,7 @@ const generateD = (e, m) => {
 4. 在 JSON 中使用时，需要自己实现`BigInt.prototype.toJSON`
 5. 因为对 BigInt 的操作并不是常数时间，因此 BigInt 不适合用于密码学[<sup>[3]</sup>](#refer-3)
 
-### 参考引用
+# 参考引用
 
 - [1] https://www.binaryconvert.com/result_double.html?decimal=057048048055049057057050053052055052048057057049
 

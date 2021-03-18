@@ -7,7 +7,7 @@ index_img: ../assets/isomorphic-rendering-nyr-1.jpg
 
 ![nyr](../assets/isomorphic-rendering-nyr-1.jpg)
 
-## 前言
+# 前言
 
 从一开始的静态网页以及浏览器的出现，出现了文档链接其他文档这样的交互方式。后来 JavaScript 的出现了，通过在文档中编写脚本，借助浏览器的能力，文档和用户的交互有了更多的可能。再到后来 PHP、ASP 以及各种 CGI 应用的出现，CGI 应用通过自身的访问数据库、文件系统等各种能力，动态的生成文档，返回给用户，文档的内容有了更多的可能，这就是服务端渲染（SSR）的大致过程。最初前端部分的代码在 CGI 应用中的占比不高，主要是以服务端的代码为主，嵌入一部分的前端代码无伤大雅，但是随着前端内容的不断膨胀，前端代码在 CGI 应用中的占比不断提高，从代码的可维护性和用户体验的角度上看，这样的服务端渲染的方式不再合适。
 
@@ -17,13 +17,13 @@ index_img: ../assets/isomorphic-rendering-nyr-1.jpg
 
 市面上已经有了许多同构渲染的方案，例如 next.js、nuxt.js，但是我选择自己用 React、ReactDOM、Koa 实现一遍，以便于更好地理解这个过程，以及更好地做优化和故障排查。
 
-## 同构渲染的主要过程
+# 同构渲染的主要过程
 
-### 传统的 CSR
+## 传统的 CSR
 
 ![csr-render](../assets/isomorphic-rendering-2.png)
 
-### 同构渲染
+## 同构渲染
 
 ![csr-render](../assets/isomorphic-rendering-3.png)
 
@@ -31,9 +31,9 @@ index_img: ../assets/isomorphic-rendering-nyr-1.jpg
 
 因此我们可以让 Server 也渲染一遍 React 组件，得到 HTML 文本后返回给用户，再配合 ReactDOM.hydrate，浏览器端在 DOM 中标记好处理事件。
 
-## 主要需要解决的问题
+# 主要需要解决的问题
 
-### 保证服务端和客户端 Virtual DOM 的一致性
+## 保证服务端和客户端 Virtual DOM 的一致性
 
 客户端在构建页面时，目标 DOM 节点中已经存在了内容，因此我们需要传入 props，以保证 ReactDOM.hydrate 被调用后，构建出的 Virtual DOM 与目标 DOM 内容一致。
 
@@ -65,11 +65,11 @@ ReactDOM.hydrate(
 );
 ```
 
-### 保证前后端路由解析的一致性
+## 保证前后端路由解析的一致性
 
 首次进入页面时依赖的是后端的路由，Koa 中间件需要解析出对应的页面组件，并调用其`getInitProps` 获取到数据，渲染组件以及注入页面。因此需要保证前后端路由解析的结果的一致性。最初我使用的`react-router-config`和`koa-router` 来分别实现前后端路由解析，后面为了保证解析结果的一致性，我使用了`path-to-regexp`和`query-string`实现了路由解析，并编写了对应的单元测试
 
-### CSS Modules 服务端解析的问题
+## CSS Modules 服务端解析的问题
 
 ```javascript
 import styles from "home.module.css";
@@ -130,7 +130,7 @@ module.exports = {
 };
 ```
 
-### 使用 Cluster 提高性能
+## 使用 Cluster 提高性能
 
 为了更好地利用主机的计算资源，我使用了 Node.js 中的 Cluster 模块，进行多进程优化。
 
@@ -168,7 +168,7 @@ run(() => {
 });
 ```
 
-## 小结
+# 小结
 
 这只是一个简单的同构渲染的实践，可以做优化的地方还很多。欢迎 clone 源码自己看一遍，欢迎 Pull Request。等等，发现跑题了，NYR 是和小伙伴们想一起做的 PT 站~~，在线等其他有缘人一起把 NYR 写完~~。
 

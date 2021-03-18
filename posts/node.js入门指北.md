@@ -5,7 +5,7 @@ tags: ["JavaScript", "Node.js"]
 index_img: ../assets/nodejs_tutorial/2.png
 ---
 
-## 前言
+# 前言
 
 `Node.js`是作为一个前端开发者必备的技术栈。
 
@@ -17,7 +17,7 @@ index_img: ../assets/nodejs_tutorial/2.png
 
 ![img](../assets/nodejs_tutorial/2.png)
 
-## 环境安装
+# 环境安装
 
 进入`node.js`官方 https://nodejs.org/en/ ，他会自动根据你的环境推荐安装包。`windows`环境推荐选择`.msi`后缀的安装文件，安装过程就是一路确定到底就可以了。`mac`推荐使用`HomeBrew`下载~~HomeBrew 真香~~
 
@@ -39,7 +39,7 @@ node -v
 
 ![img](../assets/nodejs_tutorial/3.png)
 
-## 初次使用
+# 初次使用
 
 试试直接在终端中直接输入`node`，就会进入这个界面。这是 node.js 交互式解释器，可能用过`python`的同学就会有点熟悉了。我们可以直接输入`JavaScript`代码并执行，而不需要浏览器环境。
 
@@ -51,7 +51,7 @@ node -v
 
 ![img](../assets/nodejs_tutorial/6.png)
 
-## node 环境和浏览器环境的区别
+# node 环境和浏览器环境的区别
 
 node 环境中的少了浏览器中的一些 api，像`document`,`window`,`alert`,`history`都是不支持的。
 
@@ -63,7 +63,7 @@ node 环境中的少了浏览器中的一些 api，像`document`,`window`,`alert
 
 ![img](../assets/nodejs_tutorial/8.png)
 
-## 什么是 npm
+# 什么是 npm
 
 npm~~是"您配吗",呸~~ 是 Node Package Manager，也就是 Node 的包管理器。
 
@@ -73,7 +73,7 @@ npm~~是"您配吗",呸~~ 是 Node Package Manager，也就是 Node 的包管理
 
 ![img](../assets/nodejs_tutorial/9.png)
 
-## npm 官网
+# npm 官网
 
 https://www.npmjs.com/
 
@@ -85,11 +85,11 @@ npm 是世界上最大的包管理~~不是我瞎说的，官网写的~~。
 
 我们也可以在这上边寻找我们一些其他人的造好的轮子，像一些前端开发框架的脚手架`@vue/cli`,`create-react-app`之类的，还有 node.js 后端框架`express`,`koa`,`egg`之类的，以及一些其他好用的工具。
 
-## 一些其他的包管理
+# 一些其他的包管理
 
 `npm`也有一些令人诟病的地方，像安装速度慢，依赖关系树，镜像以及其他之类的问题，因此出现了一些其他的 node 的包管理器，像`cnpm` ,`yarn` 之类的，可以去了解一下。
 
-## package.json
+# package.json
 
 这是一个 node 项目或者说是一个 npm 包的必备的文件。它包含了项目的必要的信息，以及这个项目所依赖的一些的依赖。
 
@@ -107,7 +107,7 @@ npm 是世界上最大的包管理~~不是我瞎说的，官网写的~~。
 | dependencies    | 指定了项目运行所依赖的模块                                                                  |
 | devDependencies | 指定项目开发所需要的模块                                                                    |
 
-## 如何使用 node.js 过滤问卷名单
+# 如何使用 node.js 过滤问卷名单
 
 这就当是一个简单的使用 node.js 的例子吧。我们的寒假项目需要非科协的同学填写问卷，但是有科协的同学填写了问卷，这时我们就需要过滤人员的名单。
 
@@ -137,7 +137,7 @@ npm 是世界上最大的包管理~~不是我瞎说的，官网写的~~。
 
 到这里，我们就实现了需求，这只是冰山一角，node.js 能做的事情还很多。
 
-## 如何运行别人的 node 项目
+# 如何运行别人的 node 项目
 
 我们将代码上传至 GitHub 时，一般都会将依赖之类的文件添加进`.gitignore`。所以每次 clone 一个 node 项目我们都需要重新下载依赖。例如，上面的那个过滤问卷名单的例子 🌰，我已经将代码放到了 GitHub 上。
 
@@ -155,6 +155,6 @@ https://github.com/ChenKS12138/node-demo-tutorial
 
 运行`npm install`就可以下载依赖了。
 
-## 结语
+# 结语
 
 node 能做的事情还很多，这个只是一小部分。至此，你已经打开的新世界的大门。

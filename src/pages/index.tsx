@@ -19,11 +19,7 @@ export default function Index(props: PageProps) {
       <Layout
         backgroundSrc={appConfig.headerImages.home}
         content={
-          <HeaderContent>
-            {responseData?.images?.[0]?.copyright ||
-              String(error) ||
-              "loading..."}
-          </HeaderContent>
+          <HeaderContent>{responseData?.images?.[0]?.copyright}</HeaderContent>
         }
         title="HomePage"
       >
