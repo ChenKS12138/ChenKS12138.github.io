@@ -182,7 +182,7 @@ export const query = graphql`
   {
     allMarkdownRemark(
       sort: { order: DESC, fields: frontmatter___date }
-      limit: 5
+      limit: 15 # filter: { frontmatter: { tags: { nin: "leetcode" } } }
     ) {
       nodes {
         id
