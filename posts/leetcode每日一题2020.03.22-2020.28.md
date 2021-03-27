@@ -166,3 +166,44 @@ var deleteDuplicates = function (head) {
   return head;
 };
 ```
+
+# 2021.03.27 旋转链表
+
+[https://leetcode-cn.com/problems/rotate-list/](https://leetcode-cn.com/problems/rotate-list/)
+
+```javascript
+/**
+ * @param {ListNode} head
+ * @param {number} k
+ * @return {ListNode}
+ */
+var rotateRight = function (head, k) {
+  let p0 = head,
+    len = 0;
+  while (p0) {
+    p0 = p0.next;
+    len += 1;
+  }
+  k = k % len;
+  if (k === 0 || !head || !head.next) {
+    return head;
+  }
+  let p1 = head,
+    p2 = head;
+  while (k-- >= 0) {
+    p2 = p2.next;
+  }
+  while (p2) {
+    p2 = p2.next;
+    p1 = p1.next;
+  }
+  const newHead = p1.next;
+  p1.next = null;
+  p2 = newHead;
+  while (p2 && p2.next) {
+    p2 = p2.next;
+  }
+  p2.next = head;
+  return newHead;
+};
+```
