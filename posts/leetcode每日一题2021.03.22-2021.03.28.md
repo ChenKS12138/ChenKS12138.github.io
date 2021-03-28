@@ -207,3 +207,40 @@ var rotateRight = function (head, k) {
   return newHead;
 };
 ```
+
+# 2021.03.28 二叉搜索树迭代器
+
+[https://leetcode-cn.com/problems/binary-search-tree-iterator/](https://leetcode-cn.com/problems/binary-search-tree-iterator/)
+
+```javascript
+/**
+ * @param {TreeNode} root
+ */
+var BSTIterator = function (root) {
+  this._queue = [];
+  const stack = [];
+  while (root || stack.length) {
+    while (root) {
+      stack.push(root);
+      root = root.left;
+    }
+    root = stack.pop();
+    this._queue.push(root);
+    root = root.right;
+  }
+};
+
+/**
+ * @return {number}
+ */
+BSTIterator.prototype.next = function () {
+  return this._queue.shift().val;
+};
+
+/**
+ * @return {boolean}
+ */
+BSTIterator.prototype.hasNext = function () {
+  return !!this._queue.length;
+};
+```
