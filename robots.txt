@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+Sitemap: https://blog.cattchen.top/sitemap.xml
+Host: https://blog.cattchen.top
