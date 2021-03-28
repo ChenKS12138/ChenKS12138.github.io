@@ -114,5 +114,44 @@ module.exports = {
     //   },
     // },
     `gatsby-plugin-split-css`,
+    {
+      resolve: "gatsby-plugin-robots-txt",
+      options: {
+        host: "https://blog.cattchen.top",
+        sitemap: "https://blog.cattchen.top/sitemap.xml",
+        policy: [{ userAgent: "*", allow: "/" }],
+      },
+    },
+    {
+      resolve: `gatsby-plugin-sitemap`,
+      query: `
+      {
+        allSitePage {
+          nodes {
+            path
+          }
+        }
+        site {
+          host
+          buildTime
+        }
+      }`,
+      options: {
+        sitemapSize: 5000,
+      },
+      resolveSiteUrl: ({ site, allSitePage }) => {
+        //Alternatively, you may also pass in an environment variable (or any location) at the beginning of your `gatsby-config.js`.
+        return site.site.host;
+      },
+      serialize: ({ site, allSitePage }) =>
+        allSitePage.nodes.map(node => {
+          return {
+            url: `${site.site.host}${node.path}`,
+            changefreq: `daily`,
+            priority: 0.7,
+            lastmod: site.site.buildTime,
+          };
+        }),
+    },
   ],
 };
