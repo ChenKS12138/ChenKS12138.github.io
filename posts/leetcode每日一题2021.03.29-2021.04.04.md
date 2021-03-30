@@ -23,9 +23,58 @@ impl Solution {
     }
 }
 
+// 调用API 一行搞定
 impl Solution {
 		pub fn reverse_bits(x: u32) -> u32 {
 				x.reverse_bits();
 		}
+}
+```
+
+# 2021.03.30 搜索二维矩阵
+
+[https://leetcode-cn.com/problems/search-a-2d-matrix/](https://leetcode-cn.com/problems/search-a-2d-matrix/)
+
+```javascript
+/**
+ * 从右上角进行遍历
+ * @param {number[][]} matrix
+ * @param {number} target
+ * @return {boolean}
+ */
+var searchMatrix = function (matrix, target) {
+  let i = 0,
+    j = matrix[0].length - 1;
+  while (i >= 0 && j >= 0 && i < matrix.length && j < matrix[0].length) {
+    const current = matrix[i][j];
+    if (current === target) {
+      return true;
+    } else if (current > target) {
+      j--;
+    } else {
+      i++;
+    }
+  }
+  return false;
+};
+```
+
+```rust
+impl Solution {
+    pub fn search_matrix(matrix: Vec<Vec<i32>>, target: i32) -> bool {
+        let mut i = 0_i32;
+        let mut j = (matrix[0].len() - 1) as i32;
+        while i >= 0 && j >= 0 && i < matrix.len() as i32 && j < matrix[0].len() as i32 {
+            let &current = &matrix[i as usize][j as usize];
+            if current == target {
+                return true;
+            } else if current > target {
+                j -= 1;
+            } else {
+                i += 1;
+            }
+        }
+        false
+    }
 }
 ```
