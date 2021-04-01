@@ -153,3 +153,68 @@ impl Solution {
     }
 }
 ```
+
+# 2021.04.01 笨阶乘
+
+```javascript
+/**
+ * 直接模拟一遍
+ * 时间复杂度 O(n)
+ * 空间复杂度 O(1)
+ * @param {number} N
+ * @return {number}
+ */
+var clumsy = function (N) {
+  let res = 0,
+    tmp = 0;
+  for (let i = 0; i < N; i++) {
+    const current = N - i;
+    switch (i % 4) {
+      case 0:
+        tmp = i === 0 ? current : -current;
+        break;
+      case 1:
+        tmp *= current;
+        break;
+      case 2:
+        tmp = ~~(tmp / current);
+        break;
+      case 3:
+        res += tmp;
+        res += current;
+        tmp = 0;
+    }
+  }
+  return res + tmp;
+};
+```
+
+```rust
+impl Solution {
+    pub fn clumsy(n: i32) -> i32 {
+        let mut res = 0;
+        let mut tmp = 0;
+        for i in 0..n {
+            let current = n - i;
+            match i % 4 {
+                0 => {
+                    tmp = if i == 0 { current } else { -current };
+                }
+                1 => {
+                    tmp *= current;
+                }
+                2 => {
+                    tmp /= current;
+                }
+                3 => {
+                    res += tmp;
+                    res += current;
+                    tmp = 0;
+                }
+                _ => {}
+            }
+        }
+        res + tmp
+    }
+}
+```
