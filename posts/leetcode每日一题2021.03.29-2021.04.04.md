@@ -156,6 +156,8 @@ impl Solution {
 
 # 2021.04.01 笨阶乘
 
+[https://leetcode-cn.com/problems/clumsy-factorial/](https://leetcode-cn.com/problems/clumsy-factorial/)
+
 ```javascript
 /**
  * 直接模拟一遍
@@ -215,6 +217,110 @@ impl Solution {
             }
         }
         res + tmp
+    }
+}
+```
+
+# 2021.04.02 直方图的水量
+
+[https://leetcode-cn.com/problems/volume-of-histogram-lcci/](https://leetcode-cn.com/problems/volume-of-histogram-lcci/)
+
+```javascript
+/**
+ * 单调栈
+ * @param {number[]} height
+ * @return {number}
+ */
+var trap = function (heights) {
+  const stack = [];
+  const caps = [];
+  let result = 0;
+  for (const height of heights) {
+    while (stack[stack.length - 1] < height) {
+      const capIndex = stack.pop();
+      for (let i = capIndex; i < height; i++) {
+        result += caps[i] || 0;
+        caps[i] = 0;
+      }
+    }
+    for (let i = height; i < stack[0]; i++) {
+      if (caps[i] === undefined) {
+        caps[i] = 0;
+      }
+      caps[i] += 1;
+    }
+    stack.push(height);
+  }
+  return result;
+};
+```
+
+```javascript
+/**
+ * 空间复杂度O(n)
+ * 时间复杂度O(n)
+ * @param {number[]} height
+ * @return {number}
+ */
+var trap = function (height) {
+  const leftArr = Array.from({ length: height.length });
+  const rightArr = Array.from({ length: height.length });
+  let leftMax = 0,
+    rightMax = 0;
+  for (let i = 0; i < height.length; i++) {
+    if (height[i] >= leftMax) {
+      leftArr[i] = 0;
+      leftMax = height[i];
+    } else {
+      leftArr[i] = leftMax - height[i];
+    }
+    const ri = height.length - 1 - i;
+    if (height[ri] >= rightMax) {
+      rightArr[ri] = 0;
+      rightMax = height[ri];
+    } else {
+      rightArr[ri] = rightMax - height[ri];
+    }
+  }
+  const result = Array.from({ length: height.length });
+  for (let i = 0; i < result.length; i++) {
+    result[i] = Math.min(leftArr[i], rightArr[i]);
+  }
+  return result.length ? result.reduce((a, b) => a + b) : 0;
+};
+```
+
+```rust
+impl Solution {
+    pub fn trap(height: Vec<i32>) -> i32 {
+        let left: Vec<i32> = height
+            .iter()
+            .scan(0, |acc, &x| {
+                if *acc <= x {
+                    *acc = x;
+                    Some(0)
+                } else {
+                    Some(*acc - x)
+                }
+            })
+            .collect();
+        let right: Vec<i32> = height
+            .iter()
+            .rev()
+            .scan(0, |acc, &x| {
+                if *acc <= x {
+                    *acc = x;
+                    Some(0)
+                } else {
+                    Some(*acc - x)
+                }
+            })
+            .collect();
+        let right_rev: Vec<i32> = right.into_iter().rev().collect();
+        left.iter()
+            .zip(&right_rev)
+            .map(|(a, b)| std::cmp::min(a, b))
+            .fold(0, |a, b| a + b)
     }
 }
 ```
