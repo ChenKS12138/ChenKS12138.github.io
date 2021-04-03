@@ -324,3 +324,53 @@ impl Solution {
     }
 }
 ```
+
+# 2021.04.03 最长公共子序列
+
+[https://leetcode-cn.com/problems/longest-common-subsequence/](https://leetcode-cn.com/problems/longest-common-subsequence/)
+
+```javascript
+/**
+ * 时间复杂度O(n2)
+ * 空间复杂度O(n)
+ * 动态规划
+ * @param {string} text1
+ * @param {string} text2
+ * @return {number}
+ */
+var longestCommonSubsequence = function (text1, text2) {
+  const dp = Array.from({ length: text2.length + 1 }).map(() => 0);
+  for (let i = 1; i <= text1.length; i++) {
+    const prevDp = Array.from(dp);
+    for (let j = 1; j <= text2.length; j++) {
+      if (text1[i - 1] === text2[j - 1]) {
+        dp[j] = prevDp[j - 1] + 1;
+      } else {
+        dp[j] = Math.max(prevDp[j], dp[j - 1]);
+      }
+    }
+  }
+  return dp[text2.length];
+};
+```
+
+```rust
+impl Solution {
+    pub fn longest_common_subsequence(text1: String, text2: String) -> i32 {
+        let mut dp: Vec<i32> = vec![0; text2.len() + 1];
+        let chars1: Vec<char> = text1.chars().collect();
+        let chars2: Vec<char> = text2.chars().collect();
+        for i in 1..=text1.len() {
+            let prev_dp = dp.clone();
+            for j in 1..=text2.len() {
+                if chars1[i - 1] == chars2[j - 1] {
+                    dp[j] = prev_dp[j - 1] + 1;
+                } else {
+                    dp[j] = std::cmp::max(prev_dp[j], dp[j - 1])
+                }
+            }
+        }
+        dp[text2.len()]
+    }
+}
+```
