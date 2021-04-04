@@ -374,3 +374,54 @@ impl Solution {
     }
 }
 ```
+
+# 2021.04.04 森林中的兔子
+
+[https://leetcode-cn.com/problems/rabbits-in-forest/](https://leetcode-cn.com/problems/rabbits-in-forest/)
+
+1. 回答内容不一样的兔子必不是同一种颜色
+2. 回答内容一样的兔子可能是同一种颜色
+3. 回答 `[0]`,`[1,1]`,`[2,2,2]`,`[3,3,3,3]`,`[4,4,4,4,4]`的兔子同一种颜色
+
+```javascript
+/**
+ * @param {number[]} answers
+ * @return {number}
+ */
+var numRabbits = function (answers) {
+  let result = 0;
+  const map = new Map();
+  for (const answer of answers) {
+    let prevValue = map.get(answer) || 0;
+    map.set(answer, prevValue + 1);
+  }
+  for (const [key, value] of map) {
+    result += ~~(value / (key + 1)) * (key + 1);
+    if (value % (key + 1) !== 0) {
+      result += key + 1;
+    }
+  }
+  return result;
+};
+```
+
+```rust
+impl Solution {
+    pub fn num_rabbits(answers: Vec<i32>) -> i32 {
+        use std::collections::HashMap;
+        let mut map: HashMap<i32, i32> = HashMap::new();
+        let mut result = 0;
+        for answer in answers.iter() {
+            let prev_value = map.get(answer).unwrap_or(&0);
+            map.insert(answer.clone(), prev_value + 1);
+        }
+        for (key, value) in map {
+            result += (value / (key + 1)) * (key + 1);
+            if value % (key + 1) != 0 {
+                result += key + 1;
+            }
+        }
+        result
+    }
+}
+```
