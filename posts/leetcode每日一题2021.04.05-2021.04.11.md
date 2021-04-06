@@ -65,3 +65,95 @@ impl Solution {
     }
 }
 ```
+
+# 2021.04.06 删除有序数组中的重复项 II
+
+[https://leetcode-cn.com/problems/remove-duplicates-from-sorted-array-ii/](https://leetcode-cn.com/problems/remove-duplicates-from-sorted-array-ii/)
+
+```javascript
+/**
+ * @param {number[]} nums
+ * @return {number}
+ */
+var removeDuplicates = function (nums) {
+  if (!nums || !nums.length) return nums;
+  let prevCount = 1;
+  let prevValue = nums[0];
+  let storeIndex = nums.length - 1;
+  for (let i = 1; i <= storeIndex; i++) {
+    const current = nums[i];
+    if (prevValue === current) {
+      prevCount += 1;
+      if (prevCount > 2) {
+        swap(nums, i, storeIndex--);
+        for (let j = i; j < storeIndex; j++) {
+          if (nums[j] > nums[j + 1]) {
+            swap(nums, j, j + 1);
+          } else {
+            break;
+          }
+        }
+        i -= 1;
+        continue;
+      }
+    } else {
+      prevCount = 1;
+      prevValue = current;
+    }
+  }
+  return storeIndex + 1;
+};
+
+/**
+ * @param {number[]} nums
+ * @param {number} i
+ * @param {number} j
+ */
+function swap(nums, i, j) {
+  const tmp = nums[i];
+  nums[i] = nums[j];
+  nums[j] = tmp;
+}
+```
+
+```rust
+impl Solution {
+    pub fn remove_duplicates(nums: &mut Vec<i32>) -> i32 {
+        if nums.len() == 0 {
+            return 0;
+        }
+        let mut prev_count = 1;
+        let mut prev_value = nums[0];
+        let mut store_index = nums.len() - 1;
+        let mut i = 1;
+        while i <= store_index {
+            let current = nums[i];
+            if current == prev_value {
+                prev_count += 1;
+                if prev_count > 2 {
+                    Solution::swap(nums, i, store_index);
+                    store_index -= 1;
+                    for j in i..store_index {
+                        if nums[j] > nums[j + 1] {
+                            Solution::swap(nums, j, j + 1);
+                        } else {
+                            break;
+                        }
+                    }
+                    i -= 1;
+                }
+            } else {
+                prev_count = 1;
+                prev_value = current;
+            }
+            i += 1;
+        }
+        (store_index as i32) + 1
+    }
+    fn swap(nums: &mut Vec<i32>, i: usize, j: usize) {
+        let tmp = nums[i];
+        nums[i] = nums[j];
+        nums[j] = tmp;
+    }
+}
+```
