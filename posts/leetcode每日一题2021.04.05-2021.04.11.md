@@ -157,3 +157,66 @@ impl Solution {
     }
 }
 ```
+
+# 2021.04.07 搜索旋转排序数组 II
+
+[https://leetcode-cn.com/problems/search-in-rotated-sorted-array-ii/](https://leetcode-cn.com/problems/search-in-rotated-sorted-array-ii/)
+
+```javascript
+/**
+ * @param {number[]} nums
+ * @param {number} target
+ * @return {boolean}
+ */
+var search = function (nums, target) {
+  if (!nums.length) return false;
+  if (target >= nums[0]) {
+    for (let i = 0; i < nums.length; i++) {
+      if (target === nums[i]) {
+        return true;
+      } else if (nums[i] > target) {
+        return false;
+      }
+    }
+    return false;
+  } else {
+    for (let i = nums.length - 1; i >= 0; i--) {
+      if (target === nums[i]) {
+        return true;
+      } else if (nums[i] < target) {
+        return false;
+      }
+    }
+    return false;
+  }
+};
+```
+
+```rust
+impl Solution {
+    pub fn search(nums: Vec<i32>, target: i32) -> bool {
+        if nums.len() == 0 {
+            return false;
+        }
+        if target >= nums[0] {
+            for i in 0..nums.len() {
+                if nums[i] == target {
+                    return true;
+                } else if nums[i] > target {
+                    return false;
+                }
+            }
+            return false;
+        } else {
+            for i in (0..nums.len()).rev() {
+                if nums[i] == target {
+                    return true;
+                } else if nums[i] < target {
+                    return false;
+                }
+            }
+            return false;
+        }
+    }
+}
+```
