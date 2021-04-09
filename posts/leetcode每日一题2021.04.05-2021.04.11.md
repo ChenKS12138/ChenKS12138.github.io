@@ -220,3 +220,47 @@ impl Solution {
     }
 }
 ```
+
+# 2021.04.08 寻找旋转数组中的最小值
+
+[https://leetcode-cn.com/problems/find-minimum-in-rotated-sorted-array/](https://leetcode-cn.com/problems/find-minimum-in-rotated-sorted-array/)
+
+```javascript
+/**
+ * @param {number[]} nums
+ * @return {number}
+ */
+var findMin = function (nums) {
+  if (nums[0] > nums[nums.length - 1]) {
+    for (let i = nums.length - 1; i > 0; i--) {
+      if (nums[i - 1] > nums[i]) {
+        return nums[i];
+      }
+    }
+  } else {
+    return nums[0];
+  }
+};
+```
+
+# 2021.04.09 寻找旋转排序数组中的最小值 II
+
+[https://leetcode-cn.com/problems/find-minimum-in-rotated-sorted-array-ii/](https://leetcode-cn.com/problems/find-minimum-in-rotated-sorted-array-ii/)
+
+```javascript
+/**
+ * @param {number[]} nums
+ * @return {number}
+ */
+var findMin = function (nums) {
+  if (nums.length <= 1) return nums[0];
+  if (nums[0] >= nums[nums.length - 1]) {
+    for (let i = nums.length - 1; i > 0; i--) {
+      if (nums[i - 1] > nums[i]) {
+        return nums[i];
+      }
+    }
+  }
+  return nums[0];
+};
+```
