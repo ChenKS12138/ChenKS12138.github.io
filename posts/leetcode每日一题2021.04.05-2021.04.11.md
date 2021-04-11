@@ -289,3 +289,64 @@ var isUgly = function (n) {
   return n === 1;
 };
 ```
+
+# 2021.04.11 丑数 II
+
+[https://leetcode-cn.com/problems/ugly-number-ii/](https://leetcode-cn.com/problems/ugly-number-ii/)
+
+```javascript
+/**
+ * @param {number} n
+ * @return {number}
+ */
+var nthUglyNumber = function (n) {
+  const list = [1, 2, 3, 5];
+  const set = new Set(list);
+  while (--n) {
+    const value = list.shift();
+    if (!set.has(value * 2)) {
+      list.push(value * 2);
+      set.add(value * 2);
+    }
+    if (!set.has(value * 3)) {
+      list.push(value * 3);
+      set.add(value * 3);
+    }
+    if (!set.has(value * 5)) {
+      list.push(value * 5);
+      set.add(value * 5);
+    }
+    heapify(list);
+  }
+  return list[0];
+};
+
+/**
+ * @param {number[]} arr
+ * @param {number} n
+ */
+function heapify(arr) {
+  for (let i = (arr.length >> 1) - 1; i >= 0; i--) {
+    let child = i * 2 + 1;
+    if (child < arr.length) {
+      if (child + 1 < arr.length && arr[child + 1] < arr[i]) {
+        child += 1;
+      }
+      if (arr[child] < arr[i]) {
+        swap(arr, child, i);
+      }
+    }
+  }
+}
+
+/**
+ * @param {number[]} arr
+ * @param {number} i
+ * @param {number} j
+ */
+function swap(arr, i, j) {
+  const tmp = arr[i];
+  arr[i] = arr[j];
+  arr[j] = tmp;
+}
+```
