@@ -43,14 +43,9 @@ const config: Config = {
   twitter: "https://twitter.com/ChenKS12138",
   links: [
     {
-      name: "tinyhuange",
-      avatar: "https://avatars0.githubusercontent.com/u/31771183?s=400&v=4",
-      link: "http://zaiyewujiang.cn/",
-    },
-    {
       name: "xichi",
       avatar: "https://avatars3.githubusercontent.com/u/48639990?s=460&v=4",
-      link: "https://1999-xichi.github.io/",
+      link: "https://blog.xichi.xyz/",
     },
     {
       name: "yizero",
@@ -82,12 +77,6 @@ const config: Config = {
       avatar:
         "https://avatars0.githubusercontent.com/u/44054691?s=400&u=9dcfe768ad2ce2b45a06e809dd283b36fd7a7b47&v=4",
       link: "http://www.yuki.systems/",
-    },
-    {
-      name: "SleepDevil",
-      avatar:
-        "https://avatars1.githubusercontent.com/u/55879038?s=400&u=2066c672a2b2751cf3f546c15cfbca1cf760fb70&v=4",
-      link: "https://github.com/SleepDevil",
     },
     {
       name: "xjzsq",

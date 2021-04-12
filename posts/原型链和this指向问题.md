@@ -31,19 +31,18 @@ js 中的 this 指向和函数的调用方式有关，我们可以分为以下�
 
 4. 除此之外还可以通过`call`,`apply`,`bind`这些方法来修改 this 的指向。
 
-```javasc
-function func1(){
+```javascript
+function func1() {
   console.log(this);
 }
 
-
 const obj1 = {
-  func:func1
-}
+  func: func1,
+};
 
 const person = {
-  name:'chen'
-}
+  name: "chen",
+};
 
 func1(); // 函数作为普通函数调用
 obj1.func(); // 函数作为对象的方法调用
