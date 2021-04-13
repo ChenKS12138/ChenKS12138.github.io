@@ -1403,3 +1403,34 @@ var largestNumber = function (nums) {
   return result;
 };
 ```
+
+# 2021.04.13 二叉搜索树节点最小距离
+
+[https://leetcode-cn.com/problems/minimum-distance-between-bst-nodes/](https://leetcode-cn.com/problems/minimum-distance-between-bst-nodes/)
+
+```javascript
+/**
+ * @param {TreeNode} root
+ * @return {number}
+ */
+var minDiffInBST = function (root) {
+  if (!root) return Infinity;
+  const val = root.val;
+  let left = root.left;
+  while (left && left.right) {
+    left = left.right;
+  }
+  let right = root.right;
+  while (right && right.left) {
+    right = right.left;
+  }
+  let diff = Infinity;
+  if (left) {
+    diff = Math.min(diff, val - left.val);
+  }
+  if (right) {
+    diff = Math.min(diff, right.val - val);
+  }
+  return Math.min(diff, minDiffInBST(root.left), minDiffInBST(root.right));
+};
+```
