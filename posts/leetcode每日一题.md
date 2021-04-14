@@ -1434,3 +1434,67 @@ var minDiffInBST = function (root) {
   return Math.min(diff, minDiffInBST(root.left), minDiffInBST(root.right));
 };
 ```
+
+# 2021.04.14 实现 Trie（前缀树）
+
+[https://leetcode-cn.com/problems/implement-trie-prefix-tree/](https://leetcode-cn.com/problems/implement-trie-prefix-tree/)
+
+```javascript
+/**
+ * Initialize your data structure here.
+ */
+var Trie = function () {
+  this._tree = {};
+};
+
+/**
+ * Inserts a word into the trie.
+ * @param {string} word
+ * @return {void}
+ */
+Trie.prototype.insert = function (word) {
+  const chars = word.split("");
+  chars[chars.length - 1] += "#";
+  let current = this._tree;
+  while (chars.length) {
+    const char = chars.shift();
+    if (!current[char]) {
+      current[char] = {};
+    }
+    current = current[char];
+  }
+};
+
+/**
+ * Returns if the word is in the trie.
+ * @param {string} word
+ * @return {boolean}
+ */
+Trie.prototype.search = function (word) {
+  const chars = word.split("");
+  chars[chars.length - 1] += "#";
+  let current = this._tree;
+  while (chars.length) {
+    const char = chars.shift();
+    if (!current[char]) return false;
+    current = current[char];
+  }
+  return true;
+};
+
+/**
+ * Returns if there is any word in the trie that starts with the given prefix.
+ * @param {string} prefix
+ * @return {boolean}
+ */
+Trie.prototype.startsWith = function (prefix) {
+  const chars = prefix.split("");
+  let current = this._tree;
+  while (chars.length) {
+    const char = chars.shift();
+    if (!current[char]) return this.search(prefix);
+    current = current[char];
+  }
+  return true;
+};
+```
