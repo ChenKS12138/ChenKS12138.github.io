@@ -1498,3 +1498,46 @@ Trie.prototype.startsWith = function (prefix) {
   return true;
 };
 ```
+
+# 2021.04.15 打家劫舍 II
+
+[https://leetcode-cn.com/problems/house-robber-ii/](https://leetcode-cn.com/problems/house-robber-ii/)
+
+状态转移方程为
+
+> dp[i] = Math.max(dp[i-1],dp[i-2]+nums[i])
+
+这道题还需要注意的一个点是数组的第一个和最后一个元素不可以同时取到。所以跑了两次，分别去取不到第一个和最后一个元素，取最大。
+
+```javascript
+/**
+ * @param {number[]} nums
+ * @return {number}
+ */
+var rob = function (nums) {
+  if (nums.length <= 3) {
+    return Math.max(...nums);
+  }
+  return Math.max(
+    robRange(nums, 0, nums.length - 2),
+    robRange(nums, 1, nums.length - 1)
+  );
+};
+
+/**
+ *
+ * @param {number[]} nums
+ * @param {number} start
+ * @param {number} end
+ */
+function robRange(nums, start, end) {
+  let first = nums[start];
+  let second = Math.max(first, nums[start + 1]);
+  for (let i = start + 2; i <= end; i++) {
+    let tmp = second;
+    second = Math.max(second, first + nums[i]);
+    first = tmp;
+  }
+  return second;
+}
+```
