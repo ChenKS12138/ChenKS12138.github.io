@@ -1541,3 +1541,32 @@ function robRange(nums, start, end) {
   return second;
 }
 ```
+
+# 2021.04.16
+
+# 2021.04.17 存在重复的元素 II
+
+[https://leetcode-cn.com/problems/contains-duplicate-iii/](https://leetcode-cn.com/problems/contains-duplicate-iii/)
+
+```javascript
+/**
+ * @param {number[]} nums
+ * @param {number} k
+ * @param {number} t
+ * @return {boolean}
+ */
+var containsNearbyAlmostDuplicate = function (nums, k, t) {
+  const sized = [];
+  for (let i = 0; i < nums.length; i++) {
+    const current = nums[i];
+    if (sized.some(one => Math.abs(one - current) <= t)) {
+      return true;
+    }
+    sized.push(current);
+    if (sized.length > k) {
+      sized.shift();
+    }
+  }
+  return false;
+};
+```
