@@ -1544,6 +1544,92 @@ function robRange(nums, start, end) {
 
 # 2021.04.16
 
+[https://leetcode-cn.com/problems/scramble-string/](https://leetcode-cn.com/problems/scramble-string/)
+
+```javascript
+/**
+ * @param {string} s1
+ * @param {string} s2
+ * @return {boolean}
+ */
+var isScramble = function (s1, s2) {
+  const length = s1.length;
+  const memo = Array.from({ length }).map(() =>
+    Array.from({ length }).map(() => Array.from({ length: length + 1 }).fill(0))
+  );
+  return dfs(s1, s2, 0, 0, length, memo);
+};
+
+/**
+ *
+ * @param {string} s1
+ * @param {string} s2
+ * @param {number} i
+ * @param {number} j
+ * @param {number} length
+ * @param {*} memo
+ */
+function dfs(s1, s2, i, j, length, memo) {
+  if (memo[i][j][length] !== 0) {
+    return memo[i][j][length] === 1;
+  }
+
+  if (s1.slice(i, i + length) === s2.slice(j, j + length)) {
+    memo[i][j][length] = 1;
+    return true;
+  }
+
+  if (!isHarmoney(s1, s2, i, j, length)) {
+    memo[i][j][length] = -1;
+    return false;
+  }
+
+  for (let k = 1; k < length; k++) {
+    if (
+      (dfs(s1, s2, i, j, k, memo) &&
+        dfs(s1, s2, i + k, j + k, length - k, memo)) ||
+      (dfs(s1, s2, i, j + length - k, k, memo) &&
+        dfs(s1, s2, i + k, j, length - k, memo))
+    ) {
+      memo[i][j][length] = 1;
+      return true;
+    }
+  }
+
+  memo[i][j][length] = -1;
+  return false;
+}
+
+/**
+ * @param {string} s1
+ * @param {string} s2
+ * @param {number} i
+ * @param {number} j
+ * @param {number} length
+ */
+function isHarmoney(s1, s2, i, j, length) {
+  const map = Object.create(null);
+  while (length--) {
+    const char1 = s1[i++];
+    const char2 = s2[j++];
+    if (map[char1] === undefined) {
+      map[char1] = 0;
+    }
+    if (map[char2] === undefined) {
+      map[char2] = 0;
+    }
+    map[char1] += 1;
+    map[char2] -= 1;
+  }
+  for (const value of Object.values(map)) {
+    if (value !== 0) {
+      return false;
+    }
+  }
+  return true;
+}
+```
+
 # 2021.04.17 存在重复的元素 II
 
 [https://leetcode-cn.com/problems/contains-duplicate-iii/](https://leetcode-cn.com/problems/contains-duplicate-iii/)
