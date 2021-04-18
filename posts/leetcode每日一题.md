@@ -1656,3 +1656,59 @@ var containsNearbyAlmostDuplicate = function (nums, k, t) {
   return false;
 };
 ```
+
+# 2021.04.18 删除有序数组中的重复项
+
+[https://leetcode-cn.com/problems/remove-duplicates-from-sorted-array/](https://leetcode-cn.com/problems/remove-duplicates-from-sorted-array/)
+
+```javascript
+/**
+ * @param {number[]} nums
+ * @return {number}
+ */
+var removeDuplicates = function (nums) {
+  const map = Object.create(null);
+  let storeIndex = nums.length - 1;
+  for (let i = 0; i <= storeIndex; i++) {
+    heapify(nums, i, storeIndex);
+    const current = nums[i];
+    if (!map[current]) {
+      map[current] = true;
+    } else {
+      swap(nums, storeIndex--, i);
+      i -= 1;
+    }
+  }
+  return storeIndex + 1;
+};
+
+/**
+ *
+ * @param {number[]} nums
+ * @param {number} i
+ * @param {number} j
+ */
+function swap(nums, i, j) {
+  const tmp = nums[i];
+  nums[i] = nums[j];
+  nums[j] = tmp;
+}
+
+/**
+ * @param {number[]} nums
+ * @param {number} start
+ * @param {number} end
+ */
+function heapify(nums, start, end) {
+  const len = end - start + 1;
+  for (let i = Math.floor(len / 2) - 1; i >= 0; i--) {
+    let child = i * 2 + 1 + start;
+    if (child <= end) {
+      if (child + 1 <= end && nums[child + 1] < nums[child]) child += 1;
+      if (nums[child] < nums[i + start]) {
+        swap(nums, child, i + start);
+      }
+    }
+  }
+}
+```
