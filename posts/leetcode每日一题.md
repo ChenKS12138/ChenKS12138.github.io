@@ -1712,3 +1712,36 @@ function heapify(nums, start, end) {
   }
 }
 ```
+
+# 2021.04.19 移除元素
+
+[https://leetcode-cn.com/problems/remove-element/](https://leetcode-cn.com/problems/remove-element/)
+
+```javascript
+/**
+ * @param {number[]} nums
+ * @param {number} val
+ * @return {number}
+ */
+var removeElement = function (nums, val) {
+  let storeIndex = nums.length - 1;
+  for (let i = 0; i <= storeIndex; i++) {
+    if (nums[i] === val) {
+      swap(nums, i, storeIndex--);
+      i -= 1;
+    }
+  }
+  return storeIndex + 1;
+};
+
+/**
+ * @param {number[]} arr
+ * @param {number} i
+ * @param {number} j
+ */
+function swap(arr, i, j) {
+  const tmp = arr[i];
+  arr[i] = arr[j];
+  arr[j] = tmp;
+}
+```
