@@ -1772,3 +1772,30 @@ var strStr = function (haystack, needle) {
   return -1;
 };
 ```
+
+# 2021.04.21 解码方法
+
+[https://leetcode-cn.com/problems/decode-ways/](https://leetcode-cn.com/problems/decode-ways/)
+
+```javascript
+/**
+ * @param {string} s
+ * @return {number}
+ */
+var numDecodings = function (s) {
+  if (!s || !s.length || s[0] === "0") return 0;
+  const dp = Array.from({ length: s.length + 1 }).map(() => 0);
+  dp[0] = 1;
+  dp[1] = 1;
+  for (let i = 1; i < s.length; i++) {
+    if (s[i] !== "0") {
+      dp[i + 1] += dp[i];
+    }
+    const parsed = parseInt(s.slice(i - 1, i + 1));
+    if (parsed > 9 && parsed < 27) {
+      dp[i + 1] += dp[i - 1];
+    }
+  }
+  return dp[s.length];
+};
+```
