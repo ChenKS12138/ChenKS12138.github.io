@@ -44,6 +44,7 @@
     "gatsby-cli": "^2.12.44",
     "gatsby-plugin-robots-txt": "^1.5.5",
     "gatsby-plugin-sitemap": "^3.1.0",
+    "gatsby-remark-copy-linked-files": "^4.1.0",
     "gatsby-remark-images": "^3.3.9",
     "gatsby-remark-prismjs": "^4.1.0",
     "glob": "^7.1.6",
