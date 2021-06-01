@@ -10,3 +10,4 @@ export { default as DevideLine } from "./DevideLine";
 export { default as BoxContainer } from "./BoxContainer";
 export { default as ExternalLink } from "./ExternalLink";
 export { default as Flex } from "./Flex";
+export { default as Footer } from "./Footer";
