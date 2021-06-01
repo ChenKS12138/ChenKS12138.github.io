@@ -1799,3 +1799,38 @@ var numDecodings = function (s) {
   return dp[s.length];
 };
 ```
+
+# 2021.06.01 你能在你最喜欢的那天吃到你最喜欢的糖果吗
+
+前缀和。需要保证可以吃到的糖果数量落在一个区间内。
+
+```javascript
+/**
+ * @param {number[]} candiesCount
+ * @param {number[][]} queries
+ * @return {boolean[]}
+ */
+var canEat = function (candiesCount, queries) {
+  // return queries.map((one) => canEatQuery(candiesCount, one));
+  const arr = Array.from({ length: candiesCount.length });
+  arr[0] = 0;
+  for (let i = 1; i < candiesCount.length; i++) {
+    arr[i] = arr[i - 1] + candiesCount[i - 1];
+  }
+  const result = Array.from({ length: queries.length }).fill(false);
+  console.log(arr);
+  for (let i = 0; i < queries.length; i++) {
+    const query = queries[i];
+    const [favoriteType, favoriteDay, dailyCap] = query;
+    const n = arr[favoriteType];
+    if ((favoriteDay + 1) * dailyCap <= n) {
+      result[i] = false;
+    } else if (n + candiesCount[favoriteType] < favoriteDay + 1) {
+      result[i] = false;
+    } else {
+      result[i] = true;
+    }
+  }
+  return result;
+};
+```
