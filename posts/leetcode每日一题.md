@@ -1834,3 +1834,498 @@ var canEat = function (candiesCount, queries) {
   return result;
 };
 ```
+
+# 2021.06.02 连续的子数组和
+
+```javascript
+/**
+ * @param {number[]} nums
+ * @param {number} k
+ * @return {boolean}
+ */
+var checkSubarraySum = function (nums, k) {
+  if (nums.length < 2) return false;
+  const prefixs = [];
+  const set = new Set();
+  prefixs[0] = nums[0];
+  for (let i = 1; i < nums.length; i++) {
+    const current = (prefixs[i - 1] + nums[i]) % k;
+    prefixs[i] = current;
+    if (i > 0 && current === 0) {
+      return true;
+    }
+    if (i > 1) {
+      set.add(prefixs[i - 2]);
+    }
+    if (set.has(current)) {
+      return true;
+    }
+  }
+  return false;
+};
+```
+
+### 2021.06.06 一和零
+
+```javascript
+/**
+ * 使用递归的解法
+ */
+/**
+ * @param {string[]} strs
+ * @param {number} m
+ * @param {number} n
+ * @return {number}
+ */
+var findMaxForm = function (strs, m, n) {
+  return findMax(strs, m, n);
+};
+
+/**
+ * @param {string[]} strs
+ * @param {number} m
+ * @param {number} n
+ * @param {number} currentM
+ * @param {number} currentN
+ */
+function findMax(strs, m, n, index = 0, currentM = 0, currentN = 0) {
+  if (!strs.length || index >= strs.length || currentM > m || currentN > n)
+    return 0;
+  const item = strs[index];
+  const nextM = currentM + item.split("").filter(one => one === "0").length;
+  const nextN = currentN + item.split("").filter(one => one === "1").length;
+  return Math.max(
+    findMax(strs, m, n, index + 1, currentM, currentN),
+    nextM <= m && nextN <= n
+      ? 1 + findMax(strs, m, n, index + 1, nextM, nextN)
+      : 0
+  );
+}
+```
+
+# 2021.06.25 打开转盘锁
+
+```javascript
+/**
+ * @param {string[]} deadends
+ * @param {string} target
+ * @return {number}
+ */
+var openLock = function (deadends, target) {
+  if (deadends.includes(target)) return -1;
+  const queue = ["0000"];
+  const visited = new Set();
+  let depth = 0;
+  while (queue.length) {
+    const len = queue.length;
+    for (let i = 0; i < len; i++) {
+      const item = queue.shift();
+      if (deadends.includes(item) || visited.has(item)) {
+        continue;
+      }
+      visited.add(item);
+      if (item === target) {
+        return depth;
+      } else {
+        shift(item, 0, -1, queue, visited);
+        shift(item, 0, 1, queue, visited);
+        shift(item, 1, -1, queue, visited);
+        shift(item, 1, 1, queue, visited);
+        shift(item, 2, -1, queue, visited);
+        shift(item, 2, 1, queue, visited);
+        shift(item, 3, -1, queue, visited);
+        shift(item, 3, 1, queue, visited);
+      }
+    }
+    depth++;
+  }
+  return -1;
+};
+
+/**
+ * @param {string} str
+ * @param {number} index
+ * @param {number} inc
+ * @param {string[]} arr
+ * @param {Set} set
+ */
+function shift(str, index, inc, arr, set) {
+  const chars = str.split("");
+  chars[index] = String((Number(chars[index]) + inc + 10) % 10);
+  const next = chars.join("");
+  if (!set.has(next)) {
+    arr.push(next);
+  }
+}
+```
+
+# 2021.06.26 滑动谜题
+
+```javascript
+/**
+ * @param {number[][]} board
+ * @return {number}
+ */
+var slidingPuzzle = function (board) {
+  const visited = new Set();
+  const queue = [[...board[0], ...board[1]].join("")];
+  let steps = 0;
+  while (queue.length) {
+    const len = queue.length;
+    for (let i = 0; i < len; i++) {
+      const item = queue.shift();
+      if (item === "123450") return steps;
+      visited.add(item);
+      shiftAndPush(item, 1, queue, visited);
+      shiftAndPush(item, 2, queue, visited);
+      shiftAndPush(item, 3, queue, visited);
+      shiftAndPush(item, 4, queue, visited);
+    }
+    steps += 1;
+  }
+  return -1;
+};
+
+/**
+ *
+ * @param {string} str
+ * @param {number} direct
+ * @param {string[]} arr
+ * @param {set} set
+ */
+function shiftAndPush(str, direct, arr, set) {
+  const chars = str.split("");
+  const pos = chars.findIndex(one => one === "0");
+  if (pos < 3 && direct === 1) return;
+  if (pos % 3 === 2 && direct === 2) return;
+  if (pos > 2 && direct === 3) return;
+  if (pos % 3 === 0 && direct === 4) return;
+
+  if (direct === 1) swap(chars, pos, pos - 3);
+  if (direct === 2) swap(chars, pos, pos + 1);
+  if (direct === 3) swap(chars, pos, pos + 3);
+  if (direct === 4) swap(chars, pos, pos - 1);
+
+  const nextStr = chars.join("");
+  if (set.has(nextStr)) return;
+  arr.push(nextStr);
+}
+
+function swap(arr, index1, index2) {
+  const tmp = arr[index1];
+  arr[index1] = arr[index2];
+  arr[index2] = tmp;
+}
+```
+
+# 2021.07.01 传递信息
+
+```go
+func numWays(n int, relation [][]int, k int) (count int) {
+	queue := make([]int, 0)
+	queue = append(queue, 0)
+	for ; k > 0; k-- {
+		nextQueue := make([]int, 0)
+        count = 0
+		for _, r := range queue {
+			for _, v := range relation {
+				if v[0] == r {
+					next := v[1]
+					nextQueue = append(nextQueue, next)
+					if next == n-1 {
+						count += 1
+					}
+				}
+			}
+		}
+		queue = nextQueue
+	}
+	return count
+}
+```
+
+# 2021.07.02 雪糕的最大数量
+
+```go
+func maxIceCream(costs []int, coins int) int {
+    if len(costs) == 0 || coins <= 0 {
+        return 0
+    }
+	sort.Ints(costs)
+	index := 0
+	for {
+		coins -= costs[index]
+		if coins < 0 {
+			return index
+		} else if coins == 0 {
+			return index + 1
+		} else if index + 1 >= len(costs) {
+			return len(costs)
+		}
+		index += 1
+	}
+}
+```
+
+# 2021.07.03 根据字符出现频率排序
+
+```go
+func frequencySort(s string) string {
+	bucket := make(map[string]int)
+	for _, v := range s {
+		bucket[string(v)] += 1
+	}
+	chars := strings.Split(s, "")
+	sort.Slice(chars, func(i, j int) bool {
+		a := bucket[chars[i]]
+		b := bucket[chars[j]]
+		if a == b {
+			return chars[i][0] > chars[j][0]
+		}
+		return b < a
+	})
+	s = strings.Join(chars, "")
+	return s
+}
+```
+
+# 2021.07.04 错误的集合
+
+```go
+func findErrorNums(nums []int) []int {
+	bucket := make([]int, len(nums))
+	for _, v := range nums {
+		bucket[v-1] += 1
+	}
+	lack, duplicate := 0, 0
+	for i, v := range bucket {
+		if v == 2 {
+			duplicate = i + 1
+		} else if v == 0 {
+			lack = i + 1
+		}
+	}
+	return []int{duplicate, lack}
+}
+```
+
+# 2021.07.06 点菜展示表
+
+```go
+func displayTable(orders [][]string) (result [][]string) {
+	dict := make(map[string]map[string]int)
+	tableSet := make(map[string]bool)
+	foodSet := make(map[string]bool)
+	for _, v := range orders {
+		tableName := v[1]
+		foodItem := v[2]
+		tableSet[tableName] = true
+		foodSet[foodItem] = true
+		if _, ok := dict[tableName]; !ok {
+			dict[tableName] = make(map[string]int)
+		}
+		dict[tableName][foodItem] += 1
+	}
+
+	foods := make([]string, 0)
+	for k := range foodSet {
+		foods = append(foods, k)
+	}
+	sort.Strings(foods)
+
+	tables := make([]string, 0)
+	for k := range tableSet {
+		tables = append(tables, k)
+	}
+	sort.Slice(tables, func(i, j int) bool {
+		a, _ := strconv.Atoi(tables[i])
+		b, _ := strconv.Atoi(tables[j])
+		return a < b
+	})
+
+	header := make([]string, 0)
+	header = append(header, "Table")
+	header = append(header, foods...)
+	result = append(result, header)
+
+	for _, table := range tables {
+		row := make([]string, len(foods)+1)
+		row[0] = table
+		for i, foodItem := range foods {
+			row[i+1] = fmt.Sprint(dict[table][foodItem])
+		}
+		result = append(result, row)
+	}
+	return result
+}
+```
+
+# 2021.07.07 大餐计数
+
+```go
+const (
+	MOD = 1e9 + 7
+)
+
+func countPairs(deliciousness []int) int {
+	bucket := make(map[int]int)
+	max := maxIntSlice(deliciousness)
+	maxSum := max * 2
+	count := 0
+	sort.Ints(deliciousness)
+	for _, v := range deliciousness {
+		for sum := 1; sum <= maxSum; sum <<= 1 {
+			c, ok := bucket[sum-v]
+			if ok {
+				count = (count + c) % MOD
+			}
+		}
+		bucket[v] += 1
+	}
+	return count
+}
+
+func maxIntSlice(nums []int) (max int) {
+	if len(nums) == 0 {
+		panic("len == 0")
+	}
+	max = nums[0]
+	for _, v := range nums {
+		if v > max {
+			max = v
+		}
+	}
+	return max
+}
+```
+
+# 2021.07.08 和相同的二元字数组
+
+```go
+func numSubarraysWithSum(nums []int, goal int) int {
+	if len(nums) == 0 {
+		return 0
+	}
+	prefixs := make([]int, len(nums)+1)
+	for i, num := range nums {
+		prefixs[i+1] = prefixs[i] + num
+	}
+	dict := make(map[int]int)
+	result := 0
+	for _, prefix := range prefixs {
+		v, ok := dict[prefix-goal]
+		if ok {
+			result += v
+		}
+		dict[prefix] += 1
+	}
+	return result
+}
+```
+
+# 2021.07.09 主要元素
+
+```go
+func majorityElement(nums []int) int {
+	dict := make(map[int]int)
+	for _, num := range nums {
+		dict[num] += 1
+	}
+	l := len(nums)
+	half := (l / 2) + 1
+	for k, v := range dict {
+		if v >= half {
+			return k
+		}
+	}
+	return -1
+}
+```
+
+# 2021.07.10 基于时间的键值存储
+
+```go
+type TimeMapValue struct {
+	TimeStamp int
+	Value     string
+}
+
+type TimeMap struct {
+	Dict map[string][]TimeMapValue
+}
+
+/** Initialize your data structure here. */
+func Constructor() TimeMap {
+	return TimeMap{
+		Dict: make(map[string][]TimeMapValue),
+	}
+}
+
+func (t *TimeMap) Set(key string, value string, timestamp int) {
+	t.Dict[key] = append(t.Dict[key], TimeMapValue{
+		Value:     value,
+		TimeStamp: timestamp,
+	})
+}
+
+func (t *TimeMap) Get(key string, timestamp int) string {
+	s := t.Dict[key]
+	if len(s) == 0 {
+		return ""
+	}
+	l, r := 0, len(s)
+	for l <= r {
+		if l == r {
+			if l >= len(s) {
+				return s[len(s)-1].Value
+			}
+			if s[l].TimeStamp < timestamp {
+				return s[l].Value
+			}
+			if s[l].TimeStamp > timestamp && (l-2) >= 0 {
+				return s[l-2].Value
+			}
+		}
+		mid := (l + r) / 2
+		if s[mid].TimeStamp == timestamp {
+			return s[mid].Value
+		} else if s[mid].TimeStamp < timestamp {
+			l = mid + 1
+		} else {
+			r = mid - 1
+		}
+	}
+	return ""
+}
+```
+
+# 2021.07.11 H 指数
+
+```go
+func hIndex(citations []int) int {
+	if len(citations) == 0 {
+		return 0
+	}
+	sort.Ints(citations)
+	reverseInts(citations)
+	for i, v := range citations {
+		if i+1 > v {
+			return i
+		}
+	}
+	return len(citations)
+}
+
+func reverseInts(nums []int) {
+	l := len(nums)
+	if l == 0 {
+		return
+	}
+	mid := l / 2
+	for i := 0; i < mid; i++ {
+		tmp := nums[i]
+		nums[i] = nums[l-1-i]
+		nums[l-1-i] = tmp
+	}
+}
+```
