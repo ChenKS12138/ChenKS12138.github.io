@@ -2329,3 +2329,28 @@ func reverseInts(nums []int) {
 	}
 }
 ```
+
+# 2021.07.02 H 指数 II
+
+```go
+func hIndex(citations []int) int {
+    if len(citations) == 0 {
+        return 0
+    }
+    rev(citations)
+    for i,v := range citations {
+        if i+1 > v {
+            return i
+        }
+    }
+    return len(citations)
+}
+
+func rev(nums []int) {
+    l := len(nums)
+    mid := l/2
+    for i:=0;i<mid;i++ {
+        nums[i],nums[l-1-i] = nums[l-1-i],nums[i]
+    }
+}
+```
