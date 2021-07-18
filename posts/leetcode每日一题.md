@@ -2330,7 +2330,7 @@ func reverseInts(nums []int) {
 }
 ```
 
-# 2021.07.02 H 指数 II
+# 2021.07.12 H 指数 II
 
 ```go
 func hIndex(citations []int) int {
@@ -2352,5 +2352,122 @@ func rev(nums []int) {
     for i:=0;i<mid;i++ {
         nums[i],nums[l-1-i] = nums[l-1-i],nums[i]
     }
+}
+```
+
+# 2021.07.13
+
+```go
+func groupAnagrams(strs []string) [][]string {
+	dict := make(map[string][]string)
+	for _, str := range strs {
+		sorted := sortedStr(str)
+		value, ok := dict[sorted]
+		if !ok {
+			dict[sorted] = make([]string, 0, 1)
+			value = dict[sorted]
+		}
+		dict[sorted] = append(value, str)
+
+	}
+	result := make([][]string, 0)
+	for _, v := range dict {
+		result = append(result, v)
+	}
+	return result
+}
+
+func sortedStr(str string) string {
+	chars := ([]int32)(str)
+	sort.Slice(chars, func(i, j int) bool {
+		return chars[i] < chars[j]
+	})
+	return string(chars)
+}
+```
+
+# 2021.07.14
+
+```go
+func search(nums []int, target int) int {
+    l,r := 0,len(nums)-1
+    for l<=r {
+        mid := (l+r)/2
+        if nums[mid] == target {
+            count := 1
+            l,r := mid-1,mid+1
+            for l>=0 && nums[l] == target {
+                count += 1
+                l -= 1
+            }
+            for r < len(nums) && nums[r] == target {
+                count += 1
+                r += 1
+            }
+            return count
+        } else if nums[mid] < target {
+            l = mid + 1
+        } else {
+            r = mid - 1
+        }
+    }
+    return 0;
+}
+```
+
+# 2021.07.17
+
+```go
+func maxSubArray(nums []int) int {
+    maxValue := nums[0]
+    tmp := maxValue
+    for i:=1;i<len(nums);i++ {
+        if tmp <= 0 {
+            tmp = nums[i]
+        } else {
+            tmp += nums[i]
+        }
+        maxValue = max(maxValue,tmp)
+    }
+    return maxValue
+}
+
+func max(a,b int )int {
+    if a > b {
+        return a
+    } else {
+        return b
+    }
+}
+```
+
+# 2021.07.18
+
+```go
+func groupAnagrams(strs []string) [][]string {
+	dict := make(map[string][]string)
+	for _, str := range strs {
+		sorted := sortedStr(str)
+		value, ok := dict[sorted]
+		if !ok {
+			dict[sorted] = make([]string, 0, 1)
+			value = dict[sorted]
+		}
+		dict[sorted] = append(value, str)
+
+	}
+	result := make([][]string, 0)
+	for _, v := range dict {
+		result = append(result, v)
+	}
+	return result
+}
+
+func sortedStr(str string) string {
+	chars := ([]int32)(str)
+	sort.Slice(chars, func(i, j int) bool {
+		return chars[i] < chars[j]
+	})
+	return string(chars)
 }
 ```
