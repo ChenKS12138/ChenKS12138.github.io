@@ -2471,3 +2471,28 @@ func sortedStr(str string) string {
 	return string(chars)
 }
 ```
+
+# 2021.07.20
+
+```go
+func minPairSum(nums []int) int {
+    p1,p2 := 0, len(nums)-1
+    rec := append(sort.IntSlice(nil),nums...)
+    rec.Sort()
+    result := 0
+    for p1 < p2 {
+        result = max(result,rec[p1]+rec[p2])
+        p1 += 1
+        p2 -= 1
+    }
+    return result
+}
+
+func max(a,b int) int {
+    if a > b {
+        return a
+    } else {
+        return b
+    }
+}
+```
