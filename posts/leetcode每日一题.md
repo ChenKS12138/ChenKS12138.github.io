@@ -2496,3 +2496,47 @@ func max(a,b int) int {
     }
 }
 ```
+
+# 2021.07.21
+
+```go
+/**
+ * Definition for singly-linked list.
+ * type ListNode struct {
+ *     Val int
+ *     Next *ListNode
+ * }
+ */
+func getIntersectionNode(headA, headB *ListNode) *ListNode {
+    p1, p2 := headA, headB
+    for p1 != nil && p2 != nil {
+        p1 = p1.Next
+        p2 = p2.Next
+    }
+    if p1 == nil {
+        p3 := headB;
+        for p2 != nil {
+            p3 = p3.Next;
+            p2 = p2.Next;
+        }
+        p2 = p3;
+        p1 = headA;
+    } else {
+        p3 := headA;
+        for p1 != nil {
+            p3 = p3.Next;
+            p1 = p1.Next;
+        }
+        p1 = p3;
+        p2 = headB;
+    }
+    for p1 != nil && p2 != nil {
+        if p1 == p2 {
+            return p1;
+        }
+        p1 = p1.Next
+        p2 = p2.Next
+    }
+    return nil
+}
+```
