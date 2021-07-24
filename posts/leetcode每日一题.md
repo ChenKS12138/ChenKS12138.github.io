@@ -2540,3 +2540,35 @@ func getIntersectionNode(headA, headB *ListNode) *ListNode {
     return nil
 }
 ```
+
+# 2021.07.24
+
+```go
+func maximumTime(time string) string {
+	chars := ([]rune)(time)
+	for i, v := range chars {
+		if v == '?' {
+			switch i {
+			case 0:
+				nextN := chars[1]
+				if nextN == '?' || nextN == '0' || nextN == '1' || nextN == '2' || nextN == '3' {
+					chars[0] = '2'
+				} else {
+					chars[0] = '1'
+				}
+			case 1:
+				if chars[0] == '2' {
+					chars[1] = '3'
+				} else {
+					chars[1] = '9'
+				}
+			case 3:
+				chars[3] = '5'
+			case 4:
+				chars[4] = '9'
+			}
+		}
+	}
+	return string(chars)
+}
+```
