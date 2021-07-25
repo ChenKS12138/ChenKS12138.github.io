@@ -2572,3 +2572,71 @@ func maximumTime(time string) string {
 	return string(chars)
 }
 ```
+
+# 2021.07.25
+
+```go
+type CountSet map[int]struct{}
+
+func (cs CountSet) Update(value int) {
+	_, ok := cs[value]
+	if !ok {
+		cs[value] = struct{}{}
+	} else {
+		delete(cs, value)
+	}
+}
+
+func (cs CountSet) Pick() int {
+	for k := range cs {
+		return k
+	}
+	panic("Empty CountSet")
+}
+
+type PairMap map[int][]int
+
+func (pm PairMap) Update(key, value int) {
+	arr, ok := pm[key]
+	if !ok {
+		pm[key] = []int{value}
+	} else {
+		pm[key] = append(arr, value)
+	}
+}
+
+func restoreArray(adjacentPairs [][]int) []int {
+    if len(adjacentPairs) == 0 {
+        return []int{}
+    }
+	cs := &CountSet{}
+	pm := &PairMap{}
+	for _, pair := range adjacentPairs {
+		cs.Update(pair[0])
+		cs.Update(pair[1])
+		pm.Update(pair[0], pair[1])
+		pm.Update(pair[1], pair[0])
+	}
+	head := cs.Pick()
+	result := []int{head}
+	set := make(map[int]struct{})
+	set[head] = struct{}{}
+	for {
+		next, ok := (*pm)[result[len(result)-1]]
+		if !ok {
+			break
+		} else {
+			if _, found := set[next[0]]; !found {
+				result = append(result, next[0])
+				set[next[0]] = struct{}{}
+			} else if len(next) > 1 {
+				result = append(result, next[1])
+				set[next[1]] = struct{}{}
+			} else {
+				break
+			}
+		}
+	}
+	return result
+}
+```
