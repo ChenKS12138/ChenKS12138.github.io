@@ -2640,3 +2640,97 @@ func restoreArray(adjacentPairs [][]int) []int {
 	return result
 }
 ```
+
+# 2021.07.27
+
+```go
+func findSecondMinimumValue(root *TreeNode) int {
+	arr := append(sort.IntSlice(nil))
+	var dfs func(root *TreeNode)
+	dfs = func(root *TreeNode) {
+		if root != nil {
+			if len(arr) < 3 {
+				arr = append(arr, root.Val)
+			} else {
+				arr[2] = root.Val
+				arr.Sort()
+			}
+			if root.Left != nil && root.Right != nil {
+				if root.Left.Val == root.Val {
+					dfs(root.Right)
+				} else if root.Right.Val == root.Val {
+					return
+				} else {
+					dfs(root.Left)
+				}
+			}
+		}
+	}
+	dfs(root)
+	if arr.Len() < 2 {
+		return -1
+	}
+    fmt.Println(arr)
+	return arr[1]
+}
+```
+
+# 2021.07.28
+
+```go
+/**
+ * Definition for a binary tree node.
+ * type TreeNode struct {
+ *     Val int
+ *     Left *TreeNode
+ *     Right *TreeNode
+ * }
+ */
+func distanceK(root *TreeNode, target *TreeNode, k int) []int {
+    if root == nil || target == nil {
+        return []int{}
+    }
+	dict := make(map[*TreeNode](*TreeNode))
+	var dfs1 func(root *TreeNode)
+	dfs1 = func(root *TreeNode) {
+		if root != nil {
+			if root.Left != nil {
+				dict[root.Left] = root
+				dfs1(root.Left)
+			}
+			if root.Right != nil {
+				dict[root.Right] = root
+				dfs1(root.Right)
+			}
+		}
+	}
+	dfs1(root)
+	result := []int{}
+	visited := make(map[*TreeNode]struct{})
+	var dfs2 func(root *TreeNode, k int)
+	dfs2 = func(root *TreeNode, k int) {
+		if root != nil {
+			if k == 0 {
+				result = append(result, root.Val)
+			} else if k > 0 {
+				if _, ok := visited[root.Left]; !ok {
+					visited[root.Left] = struct{}{}
+					dfs2(root.Left, k-1)
+				}
+				if _, ok := visited[root.Right]; !ok {
+					visited[root.Right] = struct{}{}
+					dfs2(root.Right, k-1)
+				}
+				parent := dict[root]
+				if _, ok := visited[parent]; !ok {
+					visited[parent] = struct{}{}
+					dfs2(parent, k-1)
+				}
+			}
+		}
+	}
+	visited[target] = struct{}{}
+	dfs2(target, k)
+	return result
+}
+```
