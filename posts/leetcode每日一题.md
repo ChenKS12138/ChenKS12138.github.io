@@ -2734,3 +2734,40 @@ func distanceK(root *TreeNode, target *TreeNode, k int) []int {
 	return result
 }
 ```
+
+# 2021.07.29
+
+```go
+func pathInZigZagTree(label int) []int {
+	if label == 1 {
+		return []int{1}
+	}
+	n := 1
+	for pow2(n)-1 < label {
+		n += 1
+	}
+	result := []int{}
+	current := label
+	for current > 1 {
+		result = append(result, current)
+		current /= 2
+		n -= 1
+		current = pow2(n-1) + pow2(n) - 1 - current
+	}
+	result = append(result, 1)
+	for i := 0; i < len(result)/2; i++ {
+		result[i], result[len(result)-1-i] = result[len(result)-1-i], result[i]
+	}
+	return result
+}
+
+func pow2(a int) int {
+	if a < 0 {
+		return 0
+	}
+	if a == 0 {
+		return 1
+	}
+	return 1 << a
+}
+```
