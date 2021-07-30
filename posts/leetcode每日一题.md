@@ -2771,3 +2771,16 @@ func pow2(a int) int {
 	return 1 << a
 }
 ```
+
+# 2021.07.30
+
+```go
+func titleToNumber(columnTitle string) int {
+	result := 0
+	for i := 0; i < len(columnTitle); i++ {
+		index := len(columnTitle) - 1 - i
+		result += int(columnTitle[index]-64) * int(math.Pow(26.0, float64(i)))
+	}
+	return result
+}
+```
