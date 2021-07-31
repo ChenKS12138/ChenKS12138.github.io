@@ -2784,3 +2784,49 @@ func titleToNumber(columnTitle string) int {
 	return result
 }
 ```
+
+# 2021.07.31
+
+```go
+func verticalTraversal(root *TreeNode) [][]int {
+	dict := make(map[int]map[int][]int)
+	result := make([][]int, 0)
+	var dfs func(root *TreeNode, depth int, offset int)
+	dfs = func(root *TreeNode, depth, offset int) {
+		if root != nil {
+			if _, ok := dict[offset]; !ok {
+				dict[offset] = make(map[int][]int)
+			}
+			if _, ok := dict[offset][depth]; !ok {
+				dict[offset][depth] = []int{}
+			}
+			dict[offset][depth] = append(dict[offset][depth], root.Val)
+			dfs(root.Left, depth+1, offset-1)
+			dfs(root.Right, depth+1, offset+1)
+		}
+	}
+	dfs(root, 0, 0)
+
+	colKeys := append(sort.IntSlice(nil))
+	for k := range dict {
+		colKeys = append(colKeys, k)
+	}
+	colKeys.Sort()
+
+	for _, colKey := range colKeys {
+		rowKeys := append(sort.IntSlice(nil))
+		for k := range dict[colKey] {
+			rowKeys = append(rowKeys, k)
+		}
+		rowKeys.Sort()
+		colResult := make([]int, 0)
+		for _, rowKey := range rowKeys {
+			items := dict[colKey][rowKey]
+			sort.Ints(items)
+			colResult = append(colResult, items...)
+		}
+		result = append(result, colResult)
+	}
+	return result
+}
+```
