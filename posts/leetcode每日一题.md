@@ -2830,3 +2830,31 @@ func verticalTraversal(root *TreeNode) [][]int {
 	return result
 }
 ```
+
+# 2021.08.01
+
+```go
+func kWeakestRows(mat [][]int, k int) []int {
+	dict := make([][2]int, len(mat))
+	for i, row := range mat {
+		rowCount := 0
+		for _, item := range row {
+			if item == 1 {
+				rowCount += 1
+			}
+		}
+		dict[i] = [2]int{i, rowCount}
+	}
+	sort.Slice(dict, func(i, j int) bool {
+		if dict[i][1] == dict[j][1] {
+			return dict[i][0] < dict[j][0]
+		}
+		return dict[i][1] < dict[j][1]
+	})
+	result := []int{}
+	for i := 0; i < k; i++ {
+		result = append(result, dict[i][0])
+	}
+	return result
+}
+```
