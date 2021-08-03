@@ -2858,3 +2858,26 @@ func kWeakestRows(mat [][]int, k int) []int {
 	return result
 }
 ```
+
+# 2021.08.03
+
+```go
+func findUnsortedSubarray(nums []int) int {
+	rc := append(sort.IntSlice(nil), nums...)
+	rc.Sort()
+	l, r := len(rc)-1, 0
+	for i := 0; i < len(nums); i++ {
+		if nums[i] != rc[i] {
+			l = i
+			for i := len(nums) - 1; i >= 0; i-- {
+				if nums[i] != rc[i] {
+					r = i
+					return r - l + 1
+				}
+			}
+            break;
+		}
+	}
+	return 0
+}
+```
