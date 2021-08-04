@@ -2881,3 +2881,25 @@ func findUnsortedSubarray(nums []int) int {
 	return 0
 }
 ```
+
+# 2021.08.04
+
+```go
+func triangleNumber(nums []int) int {
+	rc := append(sort.IntSlice(nil), nums...)
+	rc.Sort()
+	count := 0
+	for i := 0; i < len(rc); i++ {
+		for j := i + 1; j < len(rc); j++ {
+			for k := j + 1; k < len(rc); k++ {
+				if rc[i] > 0 && rc[i]+rc[j] > rc[k] {
+					count += 1
+				} else {
+					break
+				}
+			}
+		}
+	}
+	return count
+}
+```
