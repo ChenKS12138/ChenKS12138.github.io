@@ -2903,3 +2903,43 @@ func triangleNumber(nums []int) int {
 	return count
 }
 ```
+
+# 2021.08.15
+
+```go
+const MOD = 1e9 + 7
+
+func findPaths(m int, n int, maxMove int, startRow int, startColumn int) int {
+	mem := make([][][]int, m)
+	for i := range mem {
+		mem[i] = make([][]int, n)
+		for j := range mem[i] {
+			mem[i][j] = make([]int, maxMove+1)
+			for k := range mem[i][j] {
+				mem[i][j][k] = -1
+			}
+		}
+	}
+	var dfs func(x, y, moves int) int
+	dfs = func(x, y, moves int) int {
+		if moves < 0 {
+			return 0
+		}
+		if x < 0 || y < 0 || x >= m || y >= n {
+			return 1
+		} else if restMoves := mem[x][y][moves]; restMoves != -1 {
+			return restMoves
+		} else {
+			count := 0
+			count = ( count + dfs(x+1, y, moves-1)) % MOD
+			count = ( count + dfs(x-1, y, moves-1)) % MOD
+			count = ( count + dfs(x, y+1, moves-1)) % MOD
+			count = ( count + dfs(x, y-1, moves-1)) % MOD
+			mem[x][y][moves] = count
+			return mem[x][y][moves]
+		}
+	}
+	dfs(startRow, startColumn, maxMove)
+	return mem[startRow][startColumn][maxMove]
+}
+```
