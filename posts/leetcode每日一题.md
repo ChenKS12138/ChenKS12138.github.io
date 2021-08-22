@@ -2943,3 +2943,37 @@ func findPaths(m int, n int, maxMove int, startRow int, startColumn int) int {
 	return mem[startRow][startColumn][maxMove]
 }
 ```
+
+# 2021.08.22
+
+```go
+func escapeGhosts(ghosts [][]int, target []int) bool {
+	dis1 := dis([2]int{target[0], target[1]}, [2]int{0, 0})
+	dis2 := int(1e5)
+	for _, ghost := range ghosts {
+		tmpDis := dis([2]int{target[0], target[1]}, [2]int{ghost[0], ghost[1]})
+		dis2 = min(dis2, tmpDis)
+	}
+	return dis1 < dis2
+}
+
+func min(a, b int) int {
+	if a <= b {
+		return a
+	} else {
+		return b
+	}
+}
+
+func abs(a int) int {
+	if a >= 0 {
+		return a
+	} else {
+		return -a
+	}
+}
+
+func dis(a, b [2]int) int {
+	return abs(a[0]-b[0]) + abs(a[1]-b[1])
+}
+```
