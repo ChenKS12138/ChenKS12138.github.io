@@ -2977,3 +2977,51 @@ func dis(a, b [2]int) int {
 	return abs(a[0]-b[0]) + abs(a[1]-b[1])
 }
 ```
+
+# 2021.08.24
+
+```go
+func findCheapestPrice(n int, flights [][]int, src int, dst int, k int) int {
+	dp := make([][]int, k+2)
+	for i := range dp {
+		dp[i] = make([]int, n)
+		for j := range dp[i] {
+			dp[i][j] = -1
+		}
+	}
+	dp[0][src] = 0
+	for i := 1; i < len(dp); i++ {
+		for j := 0; j < len(dp[0]); j++ {
+			for _, flight := range flights {
+				if dp[i-1][flight[0]] != -1 && flight[1] == j {
+					if dp[i][j] == -1 {
+						dp[i][j] = dp[i-1][flight[0]] + flight[2]
+					} else {
+						dp[i][j] = min(dp[i][j], dp[i-1][flight[0]]+flight[2])
+					}
+				}
+			}
+		}
+	}
+
+	result := -1
+	for i := 0; i < len(dp); i++ {
+		if dp[i][dst] != -1 {
+			if result == -1 {
+				result = dp[i][dst]
+			} else {
+				result = min(dp[i][dst], result)
+			}
+		}
+	}
+	return result
+}
+
+func min(a, b int) int {
+	if a <= b {
+		return a
+	} else {
+		return b
+	}
+}
+```
