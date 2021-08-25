@@ -3025,3 +3025,29 @@ func min(a, b int) int {
 	}
 }
 ```
+
+# 2021.08.25
+
+```go
+func allPathsSourceTarget(graph [][]int) [][]int {
+	n := len(graph)
+	result := [][]int{}
+	var dfs func(path []int, options [][]int)
+	dfs = func(path []int, options [][]int) {
+		if path[len(path)-1] == n-1 {
+			copyPath := make([]int, len(path))
+            copy(copyPath,path)
+			result = append(result, copyPath)
+		} else {
+			current := options[path[len(path)-1]]
+			for _, option := range current {
+				copyPath := make([]int, len(path))
+				copy(copyPath, path)
+				dfs(append(copyPath, option), options)
+			}
+		}
+	}
+	dfs([]int{0}, graph)
+	return result
+}
+```
