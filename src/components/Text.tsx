@@ -40,4 +40,7 @@ export default styled.span`
       return textDecoration ? `text-decoration: ${textDecoration};` : "";
     }
   }
+  @media (prefers-color-scheme: dark) {
+    color: white;
+  }
 `;

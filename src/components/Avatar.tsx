@@ -25,4 +25,7 @@ export default styled.img`
       ? `box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12) !important;`
       : "";
   }}
+  @media (prefers-color-scheme: dark) {
+    background-color: white;
+  }
 `;

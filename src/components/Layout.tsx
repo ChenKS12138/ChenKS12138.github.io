@@ -77,6 +77,9 @@ const AppWrapper = styled.div`
   display: flex;
   flex-direction: column;
   background-color: rgb(235, 235, 235);
+  @media (prefers-color-scheme: dark) {
+    background-color: #212529;
+  }
 `;
 
 const AppHeader = styled(Header)`
@@ -93,6 +96,9 @@ const AppContentContainer = styled.div`
   background-color: rgb(255, 255, 255);
   box-shadow: 0 12px 15px 0 rgba(0, 0, 0, 0.24),
     0 17px 50px 0 rgba(0, 0, 0, 0.19);
+  @media (prefers-color-scheme: dark) {
+    background-color: #343a40;
+  }
 `;
 
 const AppContent = styled.div`

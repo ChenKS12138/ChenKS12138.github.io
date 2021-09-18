@@ -84,4 +84,7 @@ export default createGlobalStyle`
     padding: 14px;
     border-radius: 4px
   }
+  .post-content {
+    color: white;
+  }
 `;

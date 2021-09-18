@@ -57,7 +57,7 @@ function Detail(props: PageProps) {
           ))}
       </TagContainer>
       <CopyrightContainer>
-        <Text color="#3c4858" fontSize="20px" lineHeight="30px">
+        <Text fontSize="20px" lineHeight="30px">
           本博客所有文章除特别声明外，均采用 CC BY-SA 3.0协议 。转载请注明出处！
         </Text>
       </CopyrightContainer>
@@ -75,8 +75,13 @@ const CopyrightContainer = styled.div`
   border-left-width: 6px;
   border-left-style: solid;
   border-radius: 5px;
+  color: #3c4858;
   @media screen and (max-width: 770px) {
     margin: 40px 10px;
+  }
+  @media (prefers-color-scheme: dark) {
+    color: white;
+    background-color: #495057;
   }
 `;
 
@@ -97,6 +102,10 @@ const Tag = styled.span`
   box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
   ::before {
     content: "# ";
+  }
+  @media (prefers-color-scheme: dark) {
+    color: white;
+    background-color: #495057;
   }
 `;
 

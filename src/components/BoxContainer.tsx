@@ -143,4 +143,7 @@ export default styled.div`
       return maxWidth ? `max-width: ${maxWidth};` : "";
     }
   }
+  @media (prefers-color-scheme: dark) {
+    color: white;
+  }
 `;

@@ -107,6 +107,9 @@ const ArchiveItem = styled.div`
   margin: 20px auto;
   padding-bottom: 30px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  @media (prefers-color-scheme: dark) {
+    border-bottom-color: #6c757d;
+  }
 `;
 
 const ArchiveItemContent = styled.div`
@@ -130,6 +133,9 @@ const ArchiveItemImage = styled.div`
   @media screen and (max-width: 770px) {
     width: 100%;
   }
+  @media (prefers-color-scheme: dark) {
+    background-color: white;
+  }
 `;
 
 const ArchiveItemRight = styled.div`
@@ -144,17 +150,26 @@ const ArchiveItemTitle = styled.div`
   font-weight: 700;
   font-size: 1.5rem;
   line-height: 2;
+  @media (prefers-color-scheme: dark) {
+    color: white;
+  }
 `;
 const ArchiveItemIntro = styled.div`
   font-size: 1rem;
   color: #3c4858;
   line-height: 1.5;
+  @media (prefers-color-scheme: dark) {
+    color: white;
+  }
 `;
 
 const ArchiveItemOtherInfo = styled.div`
   margin-top: 10px;
   display: flex;
   align-items: center;
+  @media (prefers-color-scheme: dark) {
+    color: #e9ecef;
+  }
 `;
 
 const ArchiveItemMeta = styled.div`
@@ -162,6 +177,9 @@ const ArchiveItemMeta = styled.div`
   color: #3c4858;
   line-height: 1.5;
   margin: 0 5px;
+  @media (prefers-color-scheme: dark) {
+    color: white;
+  }
 `;
 
 const HeaderContent = styled.div`
@@ -176,6 +194,9 @@ const HeaderContent = styled.div`
   max-width: 80vw;
   width: 600px;
   font-weight: 300;
+  @media (prefers-color-scheme: dark) {
+    color: white;
+  }
 `;
 
 export const query = graphql`
