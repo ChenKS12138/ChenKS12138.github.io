@@ -2,7 +2,7 @@
 title: 《the linux programming interface》练习
 date: 2021-09-28 15:58:01
 tags: ["随笔"]
-index_img: ../assets/linux-programming-interface/the-linux-programming-interface.png
+index_img: ../assets/tlpi/the-linux-programming-interface.png
 ---
 
 [《the linux programming interface》](https://man7.org/tlpi/index.html)
@@ -218,4 +218,65 @@ int main(int argc, char *argv[]) {
   close(fd);
   exit(EXIT_SUCCESS);
 }
+```
+
+### 5.3
+
+```shell
+# generate f1
+./atomic_append f1 1000000 & ./atomic_append f1 1000000
+# generate f2
+./atomic_append f1 1000000 x & ./atomic_append f1 1000000 x
+```
+
+![5-3-1](../assets/tlpi/5-3-1.png)
+
+不使用`O_APPEND`会发生竞态问题。t4 时 process1 的 fd 的偏移量并不是文件尾，而是最后一个字节，因此没有成为在文件尾添加一个字节。
+
+| time slice | process1              | process2              |
+| ---------- | --------------------- | --------------------- |
+| t1         | lseek(fd,0,SEEK_END); |                       |
+| t2         |                       | lseek(fd,0,SEEK_END); |
+| t3         |                       | write(fd,"a",1);      |
+| t4         | write(fd,"a",1);      |                       |
+
+```c
+#include <fcntl.h>
+#include <stdio.h>
+#include <string.h>
+#include <tlpi_hdr.h>
+#include <unistd.h>
+
+int main(int argc, char *argv[]) {
+  if (argc < 3) {
+    usageErr("%s filename num-bytes [x]", argv[0]);
+  }
+  int fd, ino, num_bytes, open_flag;
+  num_bytes = atoll(argv[2]);
+  open_flag = O_WRONLY | O_CREAT;
+  if (!(argc > 3 && strcmp(argv[3], "x") == 0)) {
+    open_flag |= O_APPEND;
+  }
+  fd = open(argv[1], open_flag, 0644);
+  if (fd == -1) {
+    errExit("open");
+  }
+  while ((num_bytes--) > 0) {
+    ino = lseek(fd, 0, SEEK_END);
+    if (ino == -1) {
+      errExit("lseek");
+    }
+    ino = write(fd, "a", 1);
+    if (ino == -1) {
+      errExit("write");
+    }
+  }
+  close(fd);
+}
+```
+
+### 5.4
+
+```c
+
 ```
