@@ -1,7 +1,6 @@
 import React, { useCallback, useRef, useEffect } from "react";
 import { PageProps } from "gatsby";
 import styled from "styled-components";
-import "github-markdown-css/github-markdown.css";
 
 import { Layout, Text, BoxContainer } from "@/components";
 
