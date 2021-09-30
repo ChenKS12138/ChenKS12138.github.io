@@ -537,3 +537,157 @@ int main() {
   free(iov2[1].iov_base);
 }
 ```
+
+## 第六章
+
+### 6-1
+
+10MB 的数组指的是变量`main.mbuf`，它没有被初始化，是分配到 bss 段，在最后生成的代码中只记录的大小。
+
+```CQL
+// 方式1 初始化 mbuf会被分配到 data segment
+static char mbuf[10240000] = {1};
+// 方式2 赋值 mbuf被分配到 bss segment
+static char mbuf[10240000];
+mbuf[0]=1;
+```
+
+![6-1-1](../assets/tlpi/6-1-1.png)
+
+但是如果对 mbuf 进行初始化，会在最后的 binaray 占用 10MB 的空间存储 mbuf 的值，程序运行时再直接拷贝到 data segment。bss 区的数据不用去占据 ELF 文件的磁盘空间。
+
+[https://stackoverflow.com/questions/16557677/difference-between-data-section-and-the-bss-section-in-c](https://stackoverflow.com/questions/16557677/difference-between-data-section-and-the-bss-section-in-c)
+
+> Data
+>
+> ​ The values for these variables are initially stored within the read-only memory (typically within the code segment) and are copied into the data segment during the start-up routine of the program.
+
+### 6-2
+
+```c
+#include <setjmp.h>
+#include <tlpi_hdr.h>
+
+static jmp_buf env;
+
+void f1() {
+  printf("in f1\n");
+  if (setjmp(env) == 1) {
+    printf("jump from f2()\n");
+  }
+}
+
+void f2() {
+  printf("in f2\n");
+  longjmp(env, 1);
+}
+
+int main() {
+  f1();
+  f2();
+}
+```
+
+### 6-3
+
+```c
+#include <assert.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <tlpi_hdr.h>
+
+#define TLPI_ENV_SUCCESS 1
+
+extern char **environ;
+
+int tlpi_setenv(const char *name, const char *value, int overwrite) {
+  char *str;
+  int l_name, l_value, ino;
+
+  str = getenv(name);
+  if (str != NULL && !overwrite) {
+    return TLPI_ENV_SUCCESS;
+  }
+  if (str != NULL) {
+    free(str);
+  }
+  l_name = strlen(name);
+  l_value = strlen(value);
+  str = malloc(l_name + l_value + 2);
+  strcpy(str, name);
+  strcpy(str + l_name + 1, value);
+  str[l_name] = '=';
+  ino = putenv(str);
+  return ino;
+};
+
+int tlpi_unsetenv(const char *name) {
+  extern char **environ;
+  char **ep_curr, **ep_end;
+  int ep_len;
+  for (ep_curr = environ; *ep_curr != NULL; ep_curr++) {
+  }
+  ep_len = ep_curr - environ;
+  ep_end = environ + ep_len;
+  for (ep_curr = environ; ep_curr != ep_end; ep_curr++) {
+    char *name_p1 = *ep_curr, *name_p2 = (char *)(name);
+    while (*name_p1 == *name_p2 && *name_p2 != 0) {
+      name_p1++;
+      name_p2++;
+    }
+    if (*name_p1 == '=' && *name_p2 == 0) {
+      ep_end--;
+      if (ep_curr == ep_end) {
+        *ep_curr = NULL;
+      } else {
+        *ep_curr = *ep_end;
+        *ep_end = NULL;
+      }
+      continue;
+    }
+  }
+  return TLPI_ENV_SUCCESS;
+};
+
+int main() {
+  char *key1 = "TLPI_TEST", *value1 = "cattchen", *key2 = "TLPI_TEST_2",
+       *value2 = "value2";
+  int ino;
+
+  clearenv();
+  ino = tlpi_setenv(key1, value1, 1);
+  if (ino == -1) {
+    errExit("tlpi_setenv1");
+  }
+  assert(strcmp(getenv(key1), value1) == 0);
+  ino = tlpi_setenv(key2, value2, 1);
+  if (ino == -1) {
+    errExit("tlpi_setenv2");
+  }
+  ino = tlpi_setenv(key2, value1, 0);
+  if (ino == -1) {
+    errExit("tlpi_setenv3");
+  }
+  assert(strcmp(getenv(key2), value2) == 0);
+
+  ino = tlpi_unsetenv(key2);
+  if (ino == -1) {
+    errExit("tlpi_unsetenv1");
+  }
+  assert(getenv(key2) == NULL);
+  ino = tlpi_unsetenv(key1);
+  if (ino == -1) {
+    errExit("tlpi_unsetenv2");
+  }
+  assert(getenv(key1) == NULL);
+}
+```
+
+## 第七章
+
+### 7-1
+
+```c
+
+```
