@@ -560,7 +560,7 @@ mbuf[0]=1;
 
 > Data
 >
-> ​ The values for these variables are initially stored within the read-only memory (typically within the code segment) and are copied into the data segment during the start-up routine of the program.
+> The values for these variables are initially stored within the read-only memory (typically within the code segment) and are copied into the data segment during the start-up routine of the program.
 
 ### 6-2
 
@@ -688,6 +688,184 @@ int main() {
 
 ### 7-1
 
-```c
+![7-1-1](../assets/tlpi/7-1-1.png)
 
+```c
+#include <tlpi_hdr.h>
+#define MAX_ALLOCS 1000000
+
+int main(int argc, char *argv[]) {
+  char *ptr[MAX_ALLOCS];
+  int freeStep, freeMin, freeMax, blockSize, numAllocs, j;
+  printf("\n");
+  if (argc < 3)
+    usageErr("%s num-allocs block-size [step [min [max]]]\n", argv[0]);
+
+  numAllocs = getInt(argv[1], GN_GT_0, "num-allocs");
+  if (numAllocs > MAX_ALLOCS)
+    cmdLineErr("free-max > num-allocs\n");
+
+  blockSize = getInt(argv[2], GN_GT_0 | GN_ANY_BASE, "bolck-size");
+
+  freeStep = (argc > 3) ? getInt(argv[3], GN_GT_0, "step") : 1;
+  freeMin = (argc > 4) ? getInt(argv[4], GN_GT_0, "min") : 1;
+  freeMax = (argc > 5) ? getInt(argv[5], GN_GT_0, "max") : numAllocs;
+
+  if (freeMax > numAllocs)
+    cmdLineErr("free-max > num-allocs\n");
+
+  printf("Initial program brea: %10p\n", sbrk(0));
+  printf("Allocating %d*%d bytes\n", numAllocs, blockSize);
+  for (j = 0; j < numAllocs; j++) {
+    ptr[j] = malloc(blockSize);
+    if (ptr[j] == NULL)
+      errExit("malloc");
+    printf("Current Program Break %10p\n", sbrk(0));
+  }
+
+  printf("Program break is now %10p\n", sbrk(0));
+  printf("Freeing blocks from %d to %d in steps of %d\n", freeMin, freeMax,
+         freeStep);
+
+  for (j = freeMin - 1; j < freeMax; j += freeStep)
+    free(ptr[j]);
+  printf("After free(),program break is %10p\n", sbrk(0));
+  exit(EXIT_SUCCESS);
+}
+```
+
+### 7-2
+
+主要是踩了一个坑，调试花了比较长的时间，指针值进行相加减时，会有隐式的类型转换，最后得到的结果也不是我预想的字节数。同时标准库的 printf 有调用 malloc 建立缓冲区需要注意。
+
+![7-2-1](../assets/tlpi/7-2-1.png)
+
+```c
+#include <assert.h>
+#include <stdarg.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+
+#define PRINT_BUFFER_SIZE 200
+char msgbuf[PRINT_BUFFER_SIZE];
+
+// printf 会使用glibc/malloc
+int tlpi_printf(char *format, ...) {
+  va_list arglist;
+  int ret, len;
+  va_start(arglist, format);
+  vsnprintf(msgbuf, PRINT_BUFFER_SIZE, format, arglist);
+  len = strlen(msgbuf);
+  ret = write(STDOUT_FILENO, msgbuf, len);
+  va_end(arglist);
+  return ret;
+};
+
+/**
+ * low address               ->           high address
+ * malloc_meta|buffer|...|malloc_meta|buffer|
+ *  ↑                      ↑
+ * [malloc_meta_first]    [malloc_meta_last]
+ */
+typedef struct malloc_meta {
+  // TODO *prev *next 减小体积
+  struct malloc_meta *prev;
+  struct malloc_meta *next;
+  unsigned short is_in_use : 1;
+} malloc_meta;
+
+#define MALLOC_META_SIZE (sizeof(malloc_meta))
+#define MALLOC_META_INUSE 1
+#define MALLOC_META_NOUSE 0
+#define malloc_size(curr)                                                      \
+  (((char *)(curr) - (char *)(curr->prev)) - sizeof(malloc_meta))
+
+static malloc_meta *malloc_meta_first = NULL; // address of first malloc_meta
+static malloc_meta *malloc_meta_last = NULL;  // address of last malloc_meta
+
+void *tlpi_malloc(int size) {
+  if (size < 0)
+    return NULL;
+  malloc_meta *curr = malloc_meta_first, *candidate = NULL;
+  size_t curr_size, candidate_size = SIZE_MAX;
+  while (curr) {
+    curr_size = malloc_size(curr);
+    if (curr->is_in_use == MALLOC_META_NOUSE && curr_size >= size &&
+        curr_size < candidate_size) {
+      candidate = curr;
+      candidate_size = curr_size;
+    }
+    curr = curr->next;
+  }
+  if (candidate == NULL) {
+    void *ino;
+    ino = sbrk(size + MALLOC_META_SIZE);
+    if (ino == (void *)(-1)) {
+      return NULL;
+    }
+    candidate = ino;
+    if (malloc_meta_first == NULL) {
+      malloc_meta_first = candidate;
+    } else {
+      malloc_meta_last->next = candidate;
+      candidate->prev = malloc_meta_last;
+    }
+    malloc_meta_last = candidate;
+  } else if (candidate->prev != NULL) {
+    malloc_meta *rest;
+    size_t rest_size;
+    rest_size = malloc_size(candidate) - size;
+    if (rest_size > MALLOC_META_SIZE) {
+      rest = (malloc_meta *)((char *)(candidate) + MALLOC_META_SIZE + size);
+      rest->is_in_use = MALLOC_META_NOUSE;
+      if (candidate != malloc_meta_last) {
+        candidate->next->prev = rest;
+      }
+      rest->next = candidate->next;
+      rest->prev = candidate;
+      candidate->next = rest;
+    }
+  }
+  candidate->is_in_use = MALLOC_META_INUSE;
+  return (void *)((char *)(candidate) + MALLOC_META_SIZE);
+};
+
+void tlpi_free(void *ptr) {
+  malloc_meta *curr;
+  size_t curr_size;
+  curr = (malloc_meta *)((char *)(ptr)-MALLOC_META_SIZE);
+  curr->is_in_use = MALLOC_META_NOUSE;
+  while (curr && curr == malloc_meta_last &&
+         curr->is_in_use == MALLOC_META_NOUSE) {
+    curr_size = malloc_size(curr) + MALLOC_META_SIZE;
+    sbrk(-curr_size);
+    curr = curr->prev;
+    malloc_meta_last = curr;
+  }
+  if (malloc_meta_last == NULL) {
+    malloc_meta_first = NULL;
+  }
+};
+
+int main() {
+  int *ptr_arr[20];
+  for (int i = 0; i < 20; i++) {
+    ptr_arr[i] = tlpi_malloc(sizeof(int) * (20 - i));
+    *ptr_arr[i] = i + 1;
+  }
+  for (int i = 0; i < 20; i++) {
+    assert(*ptr_arr[i] == i + 1);
+  }
+  for (int i = 0; i < 10; i++) {
+    tlpi_free(ptr_arr[i]);
+    ptr_arr[i] = tlpi_malloc(sizeof(int) * (i + 1));
+    *ptr_arr[i] = i + 1;
+  }
+  for (int i = 0; i < 20; i++) {
+    assert(*ptr_arr[i] == i + 1);
+  }
+}
 ```
