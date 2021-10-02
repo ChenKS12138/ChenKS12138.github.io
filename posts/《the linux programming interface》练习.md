@@ -869,3 +869,65 @@ int main() {
   }
 }
 ```
+
+## 第八章
+
+### 8-1
+
+这个问题本身是有的问题的，示例代码可能被优化为两种结果（这个取决于编译器），同时两次`getpwnam`返回的是同一个指针，只是两次这个指针指向的内容不同，所以才导致了这个现象。
+
+https://stackoverflow.com/questions/37043139/statically-allocated-variable-when-using-getpwnam
+
+```c
+// 原始代码
+printf("%ld %ld\n", (long)(getpwnam("cattchen")->pw_uid), (long)(getpwnam("root")->pw_uid));
+
+// 编译器可能的优化结果1
+struct passwd *p1, *p2;
+p1 = getpwnam("cattchen");
+p2 = getpwnam("root");
+printf("%u\n", p1->pw_uid);
+printf("%u\n", p2->pw_uid);
+
+// 编译器可能的优化结果2
+struct passwd *p1, *p2;
+p1 = getpwnam("cattchen");
+printf("%u\n", p1->pw_uid);
+p2 = getpwnam("root");
+printf("%u\n", p2->pw_uid);
+
+// 避免歧义的写法
+printf("%ld %ld\n",(long)((*getpwnam("cattchen")).pw_uid),(long)((*getpwnam("root")).pw_uid));
+```
+
+### 8-2
+
+```c
+#include <assert.h>
+#include <pwd.h>
+#include <string.h>
+
+struct passwd *tlpi_getpwnam(const char *name) {
+  struct passwd *pw;
+  setpwent();
+  do {
+    pw = getpwent();
+  } while (pw && strcmp(pw->pw_name, name) != 0);
+  endpwent();
+  return pw;
+}
+
+int main() {
+  assert((*(getpwnam("root"))).pw_uid == (*(tlpi_getpwnam("root"))).pw_uid);
+  assert((*(getpwnam("cattchen"))).pw_uid ==
+         (*(tlpi_getpwnam("cattchen"))).pw_uid);
+}
+```
+
+## 第九章
+
+### 9-1
+
+```c
+
+```
