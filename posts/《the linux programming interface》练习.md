@@ -929,5 +929,161 @@ int main() {
 ### 9-1
 
 ```c
+#define _GNU_SOURCE
+#include <assert.h>
+#include <stdio.h>
+#include <sys/fsuid.h>
+#include <unistd.h>
 
+int main() {
+  uid_t u_real, u_effective, u_saved, u_fs = 0;
+  getresuid(&u_real, &u_effective, &u_saved);
+  u_fs = setfsuid(u_fs);
+  assert(u_real == 1000 && u_effective == 0 && u_saved == 0 && u_fs == 0);
+  printf("precheck pass\n");
+
+  // setuid(2000);
+  // getresuid(&u_real, &u_effective, &u_saved);
+  // printf("%d %d %d\n", u_real, u_effective, u_saved);
+  // assert(u_real == 2000 && u_effective == 2000 && u_saved == 2000);
+  // printf("a passed\n");
+
+  // setreuid(-1, 2000);
+  // getresuid(&u_real, &u_effective, &u_saved);
+  // printf("%d %d %d\n", u_real, u_effective, u_saved);
+  // assert(u_real == 1000 && u_effective == 2000 && u_saved == 2000);
+  // printf("b passed\n");
+
+  // seteuid(2000);
+  // getresuid(&u_real, &u_effective, &u_saved);
+  // printf("%d %d %d\n", u_real, u_effective, u_saved);
+  // assert(u_real == 1000 && u_effective == 2000 && u_saved == 0);
+  // printf("c passed\n");
+
+  // setresuid(-1, 2000, 3000);
+  // getresuid(&u_real, &u_effective, &u_saved);
+  // printf("%d %d %d\n", u_real, u_effective, u_saved);
+  // assert(u_real == 1000 && u_effective == 2000 && u_saved == 3000);
+  // printf("e passed\n");
+}
+```
+
+### 9-2
+
+该进程不享有特权，因为`effective`不为 0。
+
+### 9-3
+
+```c
+#include <grp.h>
+#include <limits.h>
+#include <pwd.h>
+#include <stdio.h>
+#include <tlpi_hdr.h>
+
+int tlpi_initgroups(const char *name, gid_t group) {
+  struct group *g;
+  char **mem;
+  gid_t grouplist[NGROUPS_MAX + 1];
+  size_t grouplist_len = 0;
+  int ino;
+  setgrent();
+  while ((g = getgrent()) != NULL) {
+    for (mem = g->gr_mem; *mem != NULL; mem++) {
+      if (strcmp(*mem, name) == 0) {
+        grouplist[grouplist_len++] = g->gr_gid;
+        break;
+      }
+    }
+  }
+  endgrent();
+  grouplist[grouplist_len++] = group;
+  ino = setgroups(grouplist_len, grouplist);
+  return ino;
+}
+
+int main() {
+  gid_t grouplist[NGROUPS_MAX + 1];
+  int ino;
+  ino = tlpi_initgroups("cattchen", 3000);
+  if (ino == -1) {
+    errExit("initgroups");
+  }
+
+  ino = getgroups(NGROUPS_MAX + 1, grouplist);
+  if (ino == -1) {
+    errExit("getgroups");
+  }
+  for (int i = 0; i < ino; i++) {
+    printf("%d\n", grouplist[i]);
+  }
+}
+```
+
+### 9-4
+
+```c
+#define _GNU_SOURCE
+#include <stdio.h>
+#include <tlpi_hdr.h>
+#include <unistd.h>
+
+static uid_t u1, u2, u3;
+void show_uid() {
+  int ino;
+  ino = getresuid(&u1, &u2, &u3);
+  if (ino == -1) {
+    errExit("getresuid");
+  }
+  printf("real %d effective %d saved %d\n", u1, u2, u3);
+}
+
+int main() {
+  int ino;
+  show_uid();
+
+  // a
+  // ino = seteuid(u1);
+  // if (ino == -1) {
+  //   errExit("seteuid");
+  // }
+  // show_uid();
+  // exit(EXIT_SUCCESS);
+
+  // b
+  // ino = setresuid(u1, u1, u1);
+  // show_uid();
+}
+```
+
+### 9-5
+
+```c
+#define _GNU_SOURCE
+#include <stdio.h>
+#include <tlpi_hdr.h>
+#include <unistd.h>
+
+static uid_t u1, u2, u3;
+void show_uid() {
+  int ino;
+  ino = getresuid(&u1, &u2, &u3);
+  if (ino == -1) {
+    errExit("getresuid");
+  }
+  printf("real %d effective %d saved %d\n", u1, u2, u3);
+}
+
+/*
+ * # shell process real user as cattchen
+ * gcc ch9/9-5.c -o set-user-ID-root -ltlpi
+ * sudo chown root set-user-ID-root
+ * sudo chmod u+s set-user-ID-root
+ * ./set-user-ID-root
+ */
+
+int main() {
+  int ino;
+  show_uid();
+}
 ```
