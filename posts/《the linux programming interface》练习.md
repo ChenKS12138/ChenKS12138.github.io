@@ -1087,3 +1087,225 @@ int main() {
   show_uid();
 }
 ```
+
+## 第十章
+
+### 10-1
+
+需要隔 42949672 秒
+
+```c
+#include <stdint.h>
+#include <sys/times.h>
+#include <tlpi_hdr.h>
+
+#define BUF_SIZE 200
+
+int main() {
+  int clock_per_second = sysconf(_SC_CLK_TCK);
+  double res = UINT32_MAX / clock_per_second;
+  printf("%lf\n", res);
+}
+```
+
+## 第十一章
+
+### 11-1
+
+```c
+#include <tlpi_hdr.h>
+
+static void sysconfPrint(const char *msg, int name) {
+  long lim;
+  errno = 0;
+  lim = sysconf(name);
+  if (lim != -1) {
+    printf("%s %ld\n", msg, lim);
+  } else {
+    if (errno == 0) {
+      printf("%s (indeterminate)\n", msg);
+    } else {
+      errExit("sysconf %s", msg);
+    }
+  }
+}
+
+int main() {
+  sysconfPrint("_SC_ARG_MAX: ", _SC_ARG_MAX);
+  sysconfPrint("_SC_LOGIN_NAME_MAX: ", _SC_LOGIN_NAME_MAX);
+  sysconfPrint("_SC_OPEN_MAX: ", _SC_OPEN_MAX);
+  sysconfPrint("_SC_NGROUPS_MAX: ", _SC_NGROUPS_MAX);
+  sysconfPrint("_SC_PAGESIZE: ", _SC_PAGESIZE);
+  sysconfPrint("_SC_RTSIG_MAX: ", _SC_RTSIG_MAX);
+  exit(EXIT_SUCCESS);
+}
+```
+
+## 第十二章
+
+### 12-1
+
+```c
+#include <ctype.h>
+#include <dirent.h>
+#include <fcntl.h>
+#include <pwd.h>
+#include <stdio.h>
+#include <string.h>
+#include <tlpi_hdr.h>
+#include <unistd.h>
+
+#define AUTOINCMM_INIT_SIZE 32
+
+typedef struct auto_inc_mm {
+  void *ptr;
+  unsigned int size;
+  unsigned int pos;
+} auto_inc_mm;
+
+auto_inc_mm *autoincmm_create() {
+  auto_inc_mm *mm;
+  mm = malloc(sizeof(auto_inc_mm));
+  mm->ptr = malloc(AUTOINCMM_INIT_SIZE + 1);
+  mm->size = AUTOINCMM_INIT_SIZE;
+  mm->pos = 0;
+  return mm;
+}
+
+struct proc_status_item {
+  char *name;
+  char *value;
+};
+
+void autoincmm_append(auto_inc_mm *mm, void *src, size_t size) {
+  unsigned int next_size = mm->size;
+  while (size + mm->pos >= next_size) {
+    next_size = next_size * (next_size < 1024 ? 2 : 1.25);
+  }
+  if (next_size != mm->size) {
+    void *next_ptr = malloc(next_size + 1);
+    memcpy(next_ptr, mm->ptr, mm->pos);
+    mm->ptr = next_ptr;
+    mm->size = next_size;
+  }
+  memcpy(mm->ptr + mm->pos, src, size);
+  mm->pos += size;
+  *(((char *)(mm->ptr) + mm->pos)) = 0;
+};
+
+void autoincmm_reset(auto_inc_mm *mm) { mm->pos = 0; }
+
+static int ps_fd;
+
+int setpsent(const char *filename) {
+  ps_fd = open(filename, O_RDONLY);
+  return ps_fd;
+}
+
+#define BUFFER_SIZE 32
+struct proc_status_item *getpsent() {
+  int ino;
+  static auto_inc_mm *mm;
+  static char buffer[BUFFER_SIZE];
+  static unsigned int pos_buffer = 0;
+
+  static struct proc_status_item curr;
+  static auto_inc_mm *curr_name;
+  static auto_inc_mm *curr_value;
+
+  if (mm == NULL)
+    mm = autoincmm_create();
+  if (curr_name == NULL)
+    curr_name = autoincmm_create();
+  if (curr_value == NULL)
+    curr_value = autoincmm_create();
+
+  autoincmm_reset(mm);
+  autoincmm_reset(curr_name);
+  autoincmm_reset(curr_value);
+
+  while (1) {
+    ino = read(ps_fd, buffer, BUFFER_SIZE);
+    if (ino == -1)
+      errExit("read");
+    if (ino == 0) {
+      return NULL;
+    }
+    pos_buffer = ino;
+    for (int i = 0; i < ino; i++) {
+      if (buffer[i] == '\n') {
+        pos_buffer = i;
+        break;
+      }
+    }
+    autoincmm_append(mm, buffer, pos_buffer);
+    if (pos_buffer != ino) {
+      int offset = pos_buffer - ino + 1;
+      lseek(ps_fd, offset, SEEK_CUR);
+      break;
+    }
+  }
+  int i = 0;
+  while (*(char *)(mm->ptr + i) != ':') {
+    autoincmm_append(curr_name, mm->ptr + (i++), 1);
+  }
+  i++;
+  while (*(char *)(mm->ptr + i) == '\t' || *(char *)(mm->ptr + i) == ' ') {
+    i++;
+  };
+  while (*(char *)(mm->ptr + i) != 0) {
+    autoincmm_append(curr_value, mm->ptr + (i++), 1);
+  }
+  curr.name = curr_name->ptr;
+  curr.value = curr_value->ptr;
+  return &curr;
+}
+
+int endpsent() { return close(ps_fd); }
+
+uid_t uid_from_name(const char *name) {
+  struct passwd *pw;
+  pw = getpwnam(name);
+  if (pw == NULL)
+    errExit("getpwnam");
+  return pw->pw_uid;
+}
+
+int main(int argc, char *argv[]) {
+  if (argc < 2)
+    usageErr("%s <user>\n", argv[0]);
+  uid_t uid;
+  int ino;
+  char filename[64];
+  DIR *dir;
+  struct dirent *dire;
+  struct proc_status_item *curr;
+
+  uid = uid_from_name(argv[1]);
+  dir = opendir("/proc");
+  while ((dire = readdir(dir)) != NULL) {
+    if (!strspn(dire->d_name, "1234567890") || dire->d_type != DT_DIR) {
+      continue;
+    }
+    snprintf(filename, 64, "/proc/%s/status", dire->d_name);
+    ino = setpsent(filename);
+    if (ino == -1) {
+      continue;
+    }
+    char *name = NULL;
+    uid_t curr_uid = -1;
+    while ((curr = getpsent()) != NULL) {
+      if (strcmp(curr->name, "Name") == 0) {
+        name = malloc(strlen(curr->value) + 1);
+        strcpy(name, curr->value);
+      } else if (strcmp(curr->name, "Uid") == 0) {
+        curr_uid = atol(curr->value);
+      }
+    }
+    if (curr_uid == uid) {
+      puts(name);
+    }
+    endpsent();
+  };
+}
+```
