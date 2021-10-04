@@ -1309,3 +1309,243 @@ int main(int argc, char *argv[]) {
   };
 }
 ```
+
+### 12-2
+
+![12-2-1](../assets/tlpi/12-2-1.png)
+
+```c
+#include <dirent.h>
+#include <fcntl.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <tlpi_hdr.h>
+#include <unistd.h>
+
+#define AUTOINCMM_SIZE_INIT 32
+
+typedef struct auto_inc_mm {
+  void *ptr;
+  size_t size;
+  size_t pos;
+} auto_inc_mm;
+
+auto_inc_mm *autoincmm_create() {
+  auto_inc_mm *mm = malloc(sizeof(auto_inc_mm));
+  mm->ptr = malloc(AUTOINCMM_SIZE_INIT);
+  mm->size = AUTOINCMM_SIZE_INIT;
+  mm->pos = 0;
+  return mm;
+}
+
+void autoincmm_append(auto_inc_mm *mm, void *ptr, size_t size) {
+  size_t next_size = mm->size;
+  while (mm->pos + size >= next_size) {
+    next_size = next_size * (next_size <= 1024 ? 2 : 1.25);
+  }
+  if (next_size != mm->size) {
+    void *next_ptr = malloc(next_size);
+    memcpy(next_ptr, mm->ptr, mm->pos);
+    free(mm->ptr);
+    mm->ptr = next_ptr;
+  }
+  memcpy(mm->ptr + mm->pos, ptr, size);
+  mm->pos += size;
+}
+
+void autoincmm_reset(auto_inc_mm *mm) { mm->pos = 0; }
+
+struct pstree_node {
+  char *name;
+  unsigned int pid;
+  unsigned int ppid;
+} pstree_node;
+
+struct ps_item {
+  char *name;
+  char *value;
+};
+
+static int ps_fd = -1;
+int setpsent(const char *filename) {
+  ps_fd = open(filename, O_RDONLY);
+  return ps_fd;
+};
+struct ps_item *getpsent() {
+  static char buffer[AUTOINCMM_SIZE_INIT];
+  static auto_inc_mm *mm = NULL;
+  static auto_inc_mm *curr_name = NULL;
+  static auto_inc_mm *curr_value = NULL;
+  static struct ps_item curr;
+  int ino;
+  unsigned int pos;
+
+  if (mm == NULL)
+    mm = autoincmm_create();
+  if (curr_name == NULL)
+    curr_name = autoincmm_create();
+  if (curr_value == NULL)
+    curr_value = autoincmm_create();
+
+  autoincmm_reset(mm);
+  autoincmm_reset(curr_name);
+  autoincmm_reset(curr_value);
+
+  while (1) {
+    ino = read(ps_fd, buffer, AUTOINCMM_SIZE_INIT);
+    if (ino == -1)
+      errExit("read");
+    if (ino == 0) {
+      return NULL;
+    }
+    pos = ino;
+    for (int i = 0; i < ino; i++) {
+      if (buffer[i] == '\n') {
+        pos = i;
+        break;
+      }
+    }
+    autoincmm_append(mm, buffer, pos);
+    if (pos != ino) {
+      autoincmm_append(mm, "", 1);
+      int offset = pos - ino + 1;
+      lseek(ps_fd, offset, SEEK_CUR);
+      break;
+    }
+  }
+  int i = 0;
+  while (*((char *)(mm->ptr) + i) != ':') {
+    autoincmm_append(curr_name, mm->ptr + (i++), 1);
+  }
+  i++;
+  while (*((char *)(mm->ptr) + i) == ' ' || *((char *)(mm->ptr) + i) == '\t') {
+    i++;
+  }
+  while (*((char *)(mm->ptr) + i) != 0) {
+    autoincmm_append(curr_value, mm->ptr + (i++), 1);
+  }
+  autoincmm_append(curr_name, "", 1);
+  autoincmm_append(curr_value, "", 1);
+  curr.name = curr_name->ptr;
+  curr.value = curr_value->ptr;
+  return &curr;
+};
+void endpsend() { close(ps_fd); };
+
+void print_pstree(struct pstree_node **list, int ppid, int depth) {
+  for (struct pstree_node **item = list; *item != NULL; item++) {
+    if (ppid == (*item)->ppid) {
+      for (int i = 0; i < depth; i++) {
+        printf("|\t");
+      }
+      printf("|---%s(%d)\n", (*item)->name, (*item)->pid);
+      print_pstree(list, (*item)->pid, depth + 1);
+    }
+  }
+}
+
+int main() {
+  char filename[PATH_MAX];
+  DIR *d;
+  struct dirent *dire;
+  d = opendir("/proc");
+  struct pstree_node *ps;
+  struct ps_item *curr;
+  auto_inc_mm *list = autoincmm_create();
+  while ((dire = readdir(d)) != NULL) {
+    if (!strspn(dire->d_name, "1234567890") || dire->d_type != DT_DIR) {
+      continue;
+    }
+    snprintf(filename, PATH_MAX, "/proc/%s/status", dire->d_name);
+    ps = malloc(sizeof(struct pstree_node));
+    setpsent(filename);
+    while ((curr = getpsent()) != NULL) {
+      if (strcmp(curr->name, "Name") == 0) {
+        ps->name = malloc(strlen(curr->value) + 1);
+        strcpy(ps->name, curr->value);
+      } else if (strcmp(curr->name, "Pid") == 0) {
+        ps->pid = atoi(curr->value);
+      } else if (strcmp(curr->name, "PPid") == 0) {
+        ps->ppid = atoi(curr->value);
+      }
+    }
+    endpsend();
+    autoincmm_append(list, &ps, sizeof(ps));
+    ps = NULL;
+  }
+  autoincmm_append(list, &ps, sizeof(ps));
+  print_pstree(list->ptr, 0, 0);
+}
+```
+
+### 12-3
+
+```c
+#include <dirent.h>
+#include <fcntl.h>
+#include <limits.h>
+#include <stdio.h>
+#include <tlpi_hdr.h>
+#include <unistd.h>
+
+void reset_filename(char *ptr, size_t size) { memset(ptr, 0, size); }
+
+int main(int argc, char *argv[]) {
+  char target_filename[PATH_MAX], tmp_filename[PATH_MAX],
+      tmp2_filename[PATH_MAX];
+  int fd, ino;
+  if (argc < 2)
+    usageErr("%s <filename>\n", argv[0]);
+  fd = open(argv[1], O_RDONLY);
+  if (fd == -1)
+    errExit("open");
+  snprintf(tmp_filename, PATH_MAX, "/proc/self/fd/%d", fd);
+  ino = readlink(tmp_filename, target_filename, PATH_MAX);
+  reset_filename(tmp_filename, PATH_MAX);
+  if (ino == -1)
+    errExit("readlink");
+
+  DIR *d1, *d2;
+  struct dirent *dire1, *dire2;
+  d1 = opendir("/proc");
+  if (d1 == NULL)
+    errExit("opendir d1");
+  while ((dire1 = readdir(d1)) != NULL) {
+    if (!strspn(dire1->d_name, "1234567890") || dire1->d_type != DT_DIR) {
+      continue;
+    }
+    snprintf(tmp_filename, PATH_MAX, "/proc/%s/fd", dire1->d_name);
+    d2 = opendir(tmp_filename);
+    reset_filename(tmp_filename, PATH_MAX);
+    if (d2 == NULL)
+      errExit("opendir d2");
+    while ((dire2 = readdir(d2)) != NULL) {
+      if (strcmp(dire2->d_name, ".") == 0 || strcmp(dire2->d_name, "..") == 0) {
+        continue;
+      }
+      snprintf(tmp_filename, PATH_MAX, "/proc/%s/fd/%s", dire1->d_name,
+               dire2->d_name);
+      ino = readlink(tmp_filename, tmp2_filename, PATH_MAX);
+      if (ino == -1)
+        errExit("readlink");
+      if (strcmp(tmp2_filename, target_filename) == 0) {
+        printf("fd: %s\n", dire1->d_name);
+      }
+      reset_filename(tmp_filename, PATH_MAX);
+      reset_filename(tmp2_filename, PATH_MAX);
+    }
+  }
+  close(fd);
+  closedir(d1);
+  closedir(d2);
+}
+```
+
+## 第十三章
+
+### 13-1
+
+```c
+
+```
