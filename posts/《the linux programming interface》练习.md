@@ -1547,5 +1547,160 @@ int main(int argc, char *argv[]) {
 ### 13-1
 
 ```c
+#include <fcntl.h>
+#include <sys/stat.h>
+#include <tlpi_hdr.h>
 
+#ifndef BUF_SIZE
+#define BUF_SIZE 1024
+#endif
+
+int main(int argc, char *argv[]) {
+  int input_fd, output_fd, open_flags;
+  mode_t file_perms;
+  ssize_t num_read;
+  char buf[BUF_SIZE];
+
+  if (argc != 3)
+    usageErr("%s old-file new-file\n", argv[0]);
+
+  input_fd = open(argv[1], O_RDONLY);
+  if (input_fd == -1)
+    errExit("open");
+
+  open_flags = O_CREAT | O_WRONLY | O_TRUNC;
+
+#ifdef USE_SYNC
+  open_flags |= O_SYNC;
+#endif
+
+  file_perms = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH;
+  output_fd = open(argv[2], open_flags, file_perms);
+  if (output_fd == -1)
+    errExit("open");
+  while ((num_read = read(input_fd, buf, BUF_SIZE) > 0))
+    if (write(output_fd, buf, num_read) == -1)
+      errExit("write");
+  if (num_read == -1)
+    errExit("read");
+
+  if (close(input_fd) == -1)
+    errExit("close");
+
+  if (close(output_fd) == -1)
+    errExit("close");
+
+  exit(EXIT_SUCCESS);
+}
+```
+
+```shell
+dd if=/dev/urandom of=1.bin bs=1024 count=100
+gcc ch13/13-1.c -DBUF_SIZE=1 -ltlpi -o copy-1
+gcc ch13/13-1.c -DBUF_SIZE=1048576 -ltlpi -o copy-1048576
+gcc ch13/13-1.c -DBUF_SIZE=1 -DUSE_SYNC -ltlpi -o copy-1-sync
+gcc ch13/13-1.c -DBUF_SIZE=1048576 -DUSE_SYNC -ltlpi -o copy-1048576-sync
+```
+
+![13-1-1](../assets/tlpi/13-1-1.png)
+
+### 13-3
+
+`fflush(fp);`会清空进程的用户空间 buffer，调用`write`将内容写入内核缓冲区
+
+`fsync(fileno(fp));`等到内核缓冲区的内容加入写队列，内容都写到磁盘后才返回
+
+### 13-4
+
+```c
+#include <stdio.h>
+#include <unistd.h>
+
+int main() {
+  printf("If I had more time, \n");
+  write(STDOUT_FILENO, "I would have written you a shorter letter.\n", 43);
+}
+```
+
+![13-4-1](../assets/tlpi/13-4-1.png)
+
+当 stdout 指向终端时，默认的缓冲类型为`_IOLBF`，输出换行符前（除非缓冲区已满）将缓冲数据。
+
+当 stdout 指向文件时，默认的缓冲类型为`_IOFBF`，缓冲区满时才会读/写数据。
+
+### 13-5
+
+```c
+#include <fcntl.h>
+#include <stdio.h>
+#include <tlpi_hdr.h>
+#include <unistd.h>
+
+#ifndef BUF_SIZE
+#define BUF_SIZE 32
+#endif
+
+int main(int argc, char *argv[]) {
+  int num = -1, fd, ino, offset;
+  char *filename;
+  char buf[BUF_SIZE];
+  char c;
+  if (argc < 2)
+    usageErr("%s [-n num] file\n", argv[0]);
+  while ((c = getopt(argc, argv, "n:")) != -1) {
+    switch (c) {
+    case 'n':
+      num = atoi(optarg);
+      break;
+    }
+  }
+
+  if (num == -1) {
+    num = 10;
+    filename = argv[1];
+  } else {
+    filename = argv[3];
+  }
+  if (num < 1)
+    errExit("num should larger than 0");
+  fd = open(filename, O_RDONLY);
+  if (fd == -1)
+    errExit("open");
+  ino = lseek(fd, -BUF_SIZE, SEEK_END);
+  if (ino == -1)
+    errExit("lseek1");
+  while (num > 0) {
+    ino = read(fd, buf, BUF_SIZE);
+    if (ino == -1)
+      errExit("read");
+    else if (ino == 0)
+      break;
+
+    for (int i = ino - 1; i >= 0; i--) {
+      if (buf[i] == '\n') {
+        num -= 1;
+      }
+      if (num <= 0) {
+        offset = i - ino + 1;
+        ino = lseek(fd, offset, SEEK_CUR);
+        if (ino == -1)
+          errExit("lseek2");
+        break;
+      }
+    }
+    if (num <= 0)
+      break;
+    offset = -BUF_SIZE - ino;
+    ino = lseek(fd, offset, SEEK_CUR);
+    if (ino == -1)
+      errExit("lseek3");
+  }
+  while ((ino = read(fd, buf, BUF_SIZE)) > 0) {
+    ino = write(STDOUT_FILENO, buf, ino);
+    if (ino == -1) {
+      errExit("write");
+    }
+  }
+  close(fd);
+}
 ```
