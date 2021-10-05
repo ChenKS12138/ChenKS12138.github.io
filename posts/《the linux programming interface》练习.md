@@ -1704,3 +1704,291 @@ int main(int argc, char *argv[]) {
   close(fd);
 }
 ```
+
+## 第十四章
+
+## 第十五章
+
+### 15-1
+
+```bash
+#!/usr/bin/env bash
+
+echo '123' > 1.txt &&\
+chmod 0077 1.txt &&\
+cat 1.txt
+```
+
+```c
+#!/usr/bin/env bash
+
+mkdir tmp-tlpi &&\
+echo '1234' > tmp-tlpi/1.txt &&\
+chmod 0477 tmp-tlpi
+ls tmp-tlpi
+cat tmp-tlpi/1.txt
+```
+
+|            | 新建文件 | 读文件 | 写文件 | 删除文件 |
+| ---------- | -------- | ------ | ------ | -------- |
+| 父目录权限 | W+X      | X      | X      | W+X      |
+| 文件本身   | N/A      | R      | W      | (nil)    |
+
+文件标记为 sticky 后，除了有对应权限，还需要是文件的属主
+
+## 15-2
+
+不会。stat 没有访问/修改文件内容，没有修改文件的 i-node 信息
+
+![15-2-1](../assets/tlpi/15-2-1.png)
+
+### 15-3
+
+```c
+#include <fcntl.h>
+#include <stdio.h>
+#include <sys/stat.h>
+#include <time.h>
+#include <tlpi_hdr.h>
+#include <unistd.h>
+
+int main(int argc, char *argv[]) {
+  int fd, ino;
+  struct stat s;
+  if (argc < 2)
+    usageErr("%s <filename>\n", argv[0]);
+  fd = open(argv[1], O_RDONLY);
+  if (fd == -1)
+    errExit("open");
+  ino = fstat(fd, &s);
+  if (ino == -1)
+    errExit("fstat");
+  printf("Access %lu.%lu\nModify: %lu.%lu\nChange: %lu.%lu\n", s.st_atim.tv_sec,
+         s.st_atim.tv_nsec, s.st_mtim.tv_sec, s.st_mtim.tv_nsec,
+         s.st_ctim.tv_sec, s.st_ctim.tv_nsec);
+  exit(EXIT_SUCCESS);
+}
+```
+
+### 15-4
+
+```c
+#include <fcntl.h>
+#include <stdio.h>
+#include <string.h>
+#include <tlpi_hdr.h>
+
+int main(int argc, char *argv[]) {
+  int fd, file_perms = 0, ino;
+  if (argc < 3)
+    usageErr("%s filename frwx\n", argv[0]);
+  for (int i = 0, len = strlen(argv[2]); i < len; i++) {
+    switch (argv[2][i]) {
+    case 'f':
+      file_perms |= F_OK;
+      break;
+    case 'r':
+      file_perms |= R_OK;
+      break;
+    case 'w':
+      file_perms |= W_OK;
+      break;
+    case 'x':
+      file_perms |= X_OK;
+      break;
+    }
+  }
+  ino = access(argv[1], file_perms);
+  if (ino == 0) {
+    puts("yes");
+  } else {
+    puts("no");
+  }
+}
+```
+
+### 15-5
+
+需要警惕两次调用 umask 不能保证原子性
+
+```c
+#include <stdio.h>
+#include <sys/stat.h>
+
+mode_t get_mask() {
+  mode_t t;
+  t = umask(0777);
+  umask(t);
+  return t;
+}
+
+int main() { printf("%04o\n", get_mask()); }
+```
+
+### 15-6
+
+```c
+#include <stdio.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <tlpi_hdr.h>
+
+#define FILE_PERMS (S_IRUSR | S_IRGRP | S_IROTH)
+
+int main(int argc, char *argv[]) {
+  int fd, ino, file_perms;
+  struct stat s;
+  if (argc < 2)
+    usageErr("%s [filename...]\n", argv[0]);
+  for (int i = 1; i < argc; i++) {
+    file_perms = FILE_PERMS;
+    ino = stat(argv[i], &s);
+    if (ino == -1)
+      errExit("stat");
+    if (((s.st_mode & S_IFMT) == S_IFDIR) ||
+        (s.st_mode & (S_IXUSR | S_IXGRP | S_IXUSR))) {
+      file_perms |= (S_IXOTH | S_IXUSR | S_IXGRP);
+    }
+    ino = chmod(argv[i], file_perms);
+    if (ino == -1)
+      errExit("chmod");
+  }
+  exit(EXIT_SUCCESS);
+}
+```
+
+### 15-7
+
+```c
+#include <fcntl.h>
+#include <linux/fs.h>
+#include <stdio.h>
+#include <sys/ioctl.h>
+#include <tlpi_hdr.h>
+
+int main(int argc, char *argv[]) {
+  int fd, attr = 0, prev_attr, ino;
+  if (argc < 3)
+    usageErr("%s [+-=][acDijAdtsSTu] <filename>\n", argv[0]);
+  char *c_attr = argv[1];
+  char *filename = argv[2];
+  fd = open(filename, O_RDONLY);
+  ino = ioctl(fd, FS_IOC_GETFLAGS, &prev_attr);
+  if (ino == -1)
+    errExit("ioctl");
+  for (int i = 1, len = strlen(c_attr); i < len; i++) {
+    switch (c_attr[i]) {
+    case 'a':
+      attr |= FS_APPEND_FL;
+      break;
+    case 'c':
+      attr |= FS_COMPR_FL;
+      break;
+    case 'D':
+      attr |= FS_DIRSYNC_FL;
+      break;
+    case 'i':
+      attr |= FS_IMMUTABLE_FL;
+      break;
+    case 'j':
+      attr |= FS_JOURNAL_DATA_FL;
+      break;
+    case 'A':
+      attr |= FS_NOATIME_FL;
+      break;
+    case 'd':
+      attr |= FS_NODUMP_FL;
+      break;
+    case 't':
+      attr |= FS_NOTAIL_FL;
+      break;
+    case 's':
+      attr |= FS_SECRM_FL;
+      break;
+    case 'S':
+      attr |= FS_SYNC_FL;
+      break;
+    case 'T':
+      attr |= FS_TOPDIR_FL;
+      break;
+    case 'u':
+      attr |= FS_UNRM_FL;
+      break;
+    }
+  }
+  switch (c_attr[0]) {
+  case '+':
+    prev_attr |= attr;
+    break;
+  case '-':
+    prev_attr &= (~attr);
+    break;
+  case '=':
+    prev_attr = attr;
+    break;
+  default:
+    usageErr("%s <filename> [+-=][acDijAdtsSTu]\n", argv[0]);
+  }
+  ino = ioctl(fd, FS_IOC_SETFLAGS, &prev_attr);
+  if (ino == -1)
+    errExit("ioctl");
+  exit(EXIT_SUCCESS);
+}
+```
+
+## 第十六章
+
+### 16-1
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/xattr.h>
+#include <tlpi_hdr.h>
+#include <unistd.h>
+
+int main(int argc, char *argv[]) {
+  char *flag_n = NULL, *flag_v = NULL, *flag_x = NULL, *filename, *tmp;
+  char c;
+  int ino;
+  if (argc < 2)
+    usageErr("%s [-x <key>| -n <key> -v <value>] <filename>\n", argv[0]);
+  while ((c = getopt(argc, argv, "x:n:v:")) != -1) {
+    tmp = malloc(sizeof(optarg) + 1);
+    strcpy(tmp, optarg);
+    switch (c) {
+    case 'x':
+      flag_x = tmp;
+      break;
+    case 'n':
+      flag_n = tmp;
+      break;
+    case 'v':
+      flag_v = tmp;
+      break;
+    default:
+      errExit("unknown opt");
+    }
+  };
+  filename = argv[argc - 1];
+  if (flag_x != NULL) {
+    ino = removexattr(filename, flag_x);
+    if (ino == -1)
+      errExit("removexattr");
+  } else if (flag_n != NULL && flag_v != NULL) {
+    ino = setxattr(filename, flag_n, flag_v, strlen(flag_v) + 1, 0);
+    if (ino == -1)
+      errExit("setxattr");
+  }
+  exit(EXIT_SUCCESS);
+}
+```
+
+## 第十七章
+
+### 17-1
+
+```c
+
+```
