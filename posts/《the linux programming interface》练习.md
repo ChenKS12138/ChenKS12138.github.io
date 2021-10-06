@@ -1990,5 +1990,195 @@ int main(int argc, char *argv[]) {
 ### 17-1
 
 ```c
+#include <stdio.h>
+#include <sys/acl.h>
+#include <tlpi_hdr.h>
+
+#define BUF_SIZE 2048
+
+int main(int argc, char *argv[]) {
+  char *flag_type, *flag_id, *filename;
+  char *buf;
+  int fd, ino;
+  acl_entry_t entry;
+  acl_tag_t tag;
+  uid_t *qualp;
+  acl_permset_t permset;
+  acl_t acl;
+  if (argc < 2)
+    usageErr("%s [u|g] <id> <filename>\n", argv[0]);
+  flag_type = argv[1];
+  flag_id = argv[2];
+  filename = argv[3];
+  acl = acl_get_file(filename, ACL_TYPE_ACCESS);
+  ino = acl_get_entry(acl, ACL_FIRST_ENTRY, &entry);
+  if (ino == -1) {
+    errExit("acl_get_entry");
+  }
+  do {
+    ino = acl_get_tag_type(entry, &tag);
+    if (ino == -1)
+      errExit("acl_get_tag_type");
+    ino = acl_get_permset(entry, &permset);
+    if (ino == -1)
+      errExit("acl_get_permset");
+    if (tag == ACL_USER || tag == ACL_GROUP) {
+      qualp = acl_get_qualifier(entry);
+      if (qualp == NULL)
+        errExit("acl_get_qualifier");
+      if (((flag_type[0] == 'g' && tag == ACL_GROUP) ||
+           (flag_type[0] == 'u' && tag == ACL_USER)) &&
+          *qualp == atol(flag_id)) {
+        ssize_t len = BUF_SIZE - 1;
+        buf = acl_to_text(acl, &len);
+        printf("%s\n", buf);
+      }
+    }
+  } while (acl_get_entry(acl, ACL_NEXT_ENTRY, &entry) == 1);
+}
+```
+
+## 第十八章
+
+### 18-1
+
+两次文件的 i-node 编号不同，文件的删除本质是在删除文件名和 inode 的映射关系，不影响当前 fd 和 inode 的映射。
+
+### 18-2
+
+调用`symlink("myfile", "../mylink")`，创建的符号链接的内容为`myfile`，相对的是符号链接文件本身而不是 cwd，因此报错
+
+![18-2-1](../assets/tlpi/18-2-1.png)
+
+```c
+#include <dirent.h>
+#include <fcntl.h>
+#include <stdio.h>
+#include <sys/stat.h>
+#include <tlpi_hdr.h>
+
+int main() {
+  int ino, fd;
+  ino = mkdir("test", S_IRUSR | S_IWUSR | S_IXUSR);
+  if (ino == -1)
+    errExit("mkdir");
+  ino = chdir("test");
+  if (ino == -1)
+    errExit("test");
+  fd = open("myfile", O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
+  if (fd == -1)
+    errExit("open");
+  ino = symlink("myfile", "../mylink");
+  if (ino == -1)
+    errExit("symlink");
+  ino = chmod("../mylink", S_IRUSR);
+  if (ino == -1)
+    errExit("chmod");
+}
+```
+
+### 18-3
+
+```c
+#include <assert.h>
+#include <fcntl.h>
+#include <limits.h>
+#include <pwd.h>
+#include <stdio.h>
+#include <string.h>
+#include <tlpi_hdr.h>
+
+char *tlpi_realpath(const char *path) {
+  char **tokens = malloc(sizeof(char *) * PATH_MAX),
+       **next_tokens = malloc(sizeof(char *) * PATH_MAX);
+  char *next_path = malloc(PATH_MAX);
+  char tmp[PATH_MAX] = {0};
+  int token_index = 0, tmp_index = 0, char_index = 0, path_len = strlen(path);
+  char c_prev = 0, c_curr = 0;
+
+  memset(next_path, 0, PATH_MAX);
+
+  // prefix
+  if (path_len > 0) {
+    if (path[0] == '~') {
+      struct passwd *pw = getpwuid(getuid());
+      strcat(next_path, pw->pw_dir);
+      strcat(next_path, "/");
+      strcat(next_path, path + 1);
+    } else if (path[0] == '/') {
+      strcat(next_path, path);
+    } else {
+      getcwd(next_path, PATH_MAX);
+      strcat(next_path, "/");
+      strcat(next_path, path);
+    }
+  }
+
+  path_len = strlen(next_path);
+  if (path_len > 0)
+    c_curr = next_path[0];
+
+  strcpy((tokens[token_index++] = malloc(PATH_MAX)), "/");
+
+  do {
+    if (c_prev == '/' && c_curr == '/') {
+      // do nothing
+    } else if (c_prev == 0 && c_curr == '/') {
+      tmp[tmp_index++] = c_curr;
+    } else if (c_prev != '/' && c_curr == '/') {
+      tmp[tmp_index] = 0;
+      strcpy((tokens[token_index++] = malloc(PATH_MAX)), tmp);
+      tmp_index = 0;
+      tmp[tmp_index++] = c_curr;
+    } else if (tmp_index > 1 && c_curr == '.') {
+      tmp[tmp_index++] = c_curr;
+      tmp[tmp_index] = 0;
+      strcpy((tokens[token_index++] = malloc(PATH_MAX)), tmp);
+      tmp_index = 0;
+    } else {
+      tmp[tmp_index++] = c_curr;
+    }
+
+    c_prev = c_curr;
+    c_curr = next_path[++char_index];
+  } while (c_curr != 0);
+
+  if (tmp_index > 0) {
+    tmp[tmp_index] = 0;
+    strcpy((tokens[token_index++] = malloc(PATH_MAX)), tmp);
+  }
+  tokens[token_index] = NULL;
+
+  // handle `..`
+  token_index = 0;
+  for (char **curr = tokens; *curr != NULL; curr++) {
+    if (strcmp(*curr, "/.") == 0) {
+      continue;
+    } else if (strcmp(*curr, "/..") == 0 && token_index > 0) {
+      free(next_tokens[--token_index]);
+    } else {
+      next_tokens[token_index++] = *curr;
+    }
+  }
+  next_tokens[token_index] = NULL;
+  memset(next_path, 0, PATH_MAX);
+  for (char **curr = next_tokens + 1; *curr != NULL; curr++) {
+    strcat(next_path, *curr);
+  }
+  free(tokens);
+  free(next_tokens);
+  return next_path;
+}
+
+int main(int argc, char *argv[]) {
+  if (argc < 2)
+    usageErr("usage: %s <filename>\n", argv[0]);
+  printf("%s\n", tlpi_realpath(argv[1]));
+}
+```
+
+### 18-4
+
+```c
 
 ```
