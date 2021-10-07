@@ -544,7 +544,7 @@ int main() {
 
 10MB 的数组指的是变量`main.mbuf`，它没有被初始化，是分配到 bss 段，在最后生成的代码中只记录的大小。
 
-```CQL
+```c
 // 方式1 初始化 mbuf会被分配到 data segment
 static char mbuf[10240000] = {1};
 // 方式2 赋值 mbuf被分配到 bss segment
@@ -2206,5 +2206,316 @@ int main(int argc, char *argv[]) {
       listFiles(argv[i]);
     }
   }
+}
+```
+
+### 18-5
+
+```c
+#include <dirent.h>
+#include <fcntl.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/stat.h>
+#include <tlpi_hdr.h>
+
+char *tlpi_getcwd() {
+  DIR *d1;
+  struct dirent dr1, *dr2;
+  struct stat s;
+  char **tokens = malloc(sizeof(char *) * PATH_MAX);
+  int prev_inode, curr_inode, ino, token_index = 0;
+  char *path = malloc(PATH_MAX);
+
+  strcat(path, "./");
+  prev_inode = -1;
+  ino = stat(path, &s);
+  if (ino == -1)
+    errExit("stat");
+  curr_inode = s.st_ino;
+
+  do {
+    d1 = opendir(path);
+    if (d1 == NULL)
+      errExit("opendir");
+    while (readdir_r(d1, &dr1, &dr2) == 0 && dr2 != NULL) {
+      if (dr1.d_ino == prev_inode) {
+        strcpy(tokens[token_index++] = malloc(PATH_MAX), dr1.d_name);
+      }
+    }
+    prev_inode = curr_inode;
+    strcat(path, "../");
+    ino = stat(path, &s);
+    if (ino == -1)
+      errExit("stat");
+    curr_inode = s.st_ino;
+  } while (prev_inode != curr_inode);
+
+  memset(path, 0, PATH_MAX);
+  for (char **curr = tokens + token_index - 1; curr >= tokens; curr--) {
+    strcat(path, "/");
+    strcat(path, *curr);
+    free(*curr);
+  }
+  free(tokens);
+  return path;
+};
+
+int main() {
+  char *cwd;
+  cwd = tlpi_getcwd();
+  printf("%s\n", cwd);
+}
+```
+
+### 18-6
+
+```c
+#define _XOPEN_SOURCE 600
+
+#include <ftw.h>
+#include <tlpi_hdr.h>
+
+static int dir_tree(const char *pathname, const struct stat *sbuf, int type,
+                    struct FTW *ftwb) {
+  switch (sbuf->st_mode & S_IFMT) {
+  case S_IFREG:
+    printf("-");
+    break;
+  case S_IFDIR:
+    printf("d");
+    break;
+  case S_IFCHR:
+    printf("c");
+    break;
+  case S_IFBLK:
+    printf("b");
+    break;
+  case S_IFLNK:
+    printf("l");
+    break;
+  case S_IFIFO:
+    printf("p");
+    break;
+  case S_IFSOCK:
+    printf("s");
+    break;
+  default:
+    printf("?");
+    break;
+  }
+  switch (type) {
+  case FTW_D:
+    printf("D  ");
+    break;
+  case FTW_DNR:
+    printf("DNR");
+    break;
+  case FTW_DP:
+    printf("DP ");
+    break;
+  case FTW_F:
+    printf("F  ");
+    break;
+  case FTW_SL:
+    printf("SL ");
+    break;
+  case FTW_SLN:
+    printf("SLN");
+    break;
+  case FTW_NS:
+    printf("NS ");
+    break;
+  default:
+    printf("   ");
+  }
+  if (type != FTW_NS) {
+    printf("%7ld ", (long)(sbuf->st_ino));
+  } else {
+    printf("        ");
+  }
+  printf(" %*s", 4 * ftwb->level, "");
+  printf("%s\n", &pathname[ftwb->base]);
+  return 0;
+}
+
+int main(int argc, char *argv[]) {
+  int flags, opt;
+  flags = 0;
+  while ((opt = getopt(argc, argv, "dmp")) != -1) {
+    switch (opt) {
+    case 'd':
+      flags |= FTW_DEPTH;
+      break;
+    case 'm':
+      flags |= FTW_MOUNT;
+      break;
+    case 'p':
+      flags |= FTW_PHYS;
+      break;
+    default:
+      usageErr(argv[0], NULL);
+    }
+  }
+  if (argc > optind + 1)
+    usageErr(argv[0], NULL);
+  if (nftw((argc > optind) ? argv[optind] : ".", dir_tree, 10, flags) == -1) {
+    perror("ntfw");
+    exit(EXIT_FAILURE);
+  }
+  exit(EXIT_SUCCESS);
+}
+```
+
+### 18-7
+
+```c
+#define _XOPEN_SOURCE 500
+#include <ftw.h>
+#include <stdio.h>
+#include <tlpi_hdr.h>
+
+static int count_file = 0;
+static int count_dir = 0;
+static int count_symlnk = 0;
+
+static int tree_dir(const char *pathname, const struct stat *statbuf,
+                    int typeflag, struct FTW *ftwbuf) {
+  switch (typeflag) {
+  case FTW_D:
+  case FTW_DNR:
+  case FTW_DP:
+    count_dir += 1;
+    break;
+  case FTW_F:
+    count_file += 1;
+    break;
+  case FTW_SL:
+  case FTW_SLN:
+    count_symlnk += 1;
+    break;
+  }
+  return 0;
+}
+
+int main(int argc, char *argv[]) {
+  if (argc < 2)
+    usageErr("%s dirpath\n", argv[0]);
+  count_file = 0;
+  count_dir = 0;
+  count_symlnk = 0;
+  if (nftw(argv[1], tree_dir, 10, FTW_MOUNT | FTW_PHYS) == -1) {
+    errExit("nftw");
+  };
+  printf("dir %d\nfile %d\nsymbol %d\n", count_dir, count_file, count_symlnk);
+  exit(EXIT_SUCCESS);
+}
+```
+
+### 18-8
+
+```c
+#include <dirent.h>
+#include <ftw.h>
+#include <limits.h>
+#include <stdio.h>
+#include <string.h>
+#include <tlpi_hdr.h>
+
+int tlpi_ntfw(const char *dirpath,
+              int (*func)(const char *pathname, const struct stat *statbuf,
+                          int typeflag),
+              int nopenfd, int flags) {
+  DIR *d;
+  struct dirent dr1, *dr2;
+  struct stat s;
+  char path[PATH_MAX];
+  int ino;
+  d = opendir(dirpath);
+  while (readdir_r(d, &dr1, &dr2) == 0 && dr2 != NULL) {
+    if (strcmp(dr1.d_name, ".") == 0 || strcmp(dr1.d_name, "..") == 0)
+      continue;
+    memset(path, 0, PATH_MAX);
+    strcat(path, dirpath);
+    strcat(path, "/");
+    strcat(path, dr1.d_name);
+    ino = stat(path, &s);
+    if (ino == -1)
+      errExit("stat");
+    ino = func(path, &s, s.st_mode & S_IFMT);
+    if (ino != 0)
+      return ino;
+    if (dr1.d_type == DT_DIR) {
+      ino = tlpi_ntfw(path, func, nopenfd, flags);
+      if (ino != 0)
+        return ino;
+    }
+  }
+  return 0;
+}
+
+static int tree_dir(const char *pathname, const struct stat *statbuf,
+                    int typeflag) {
+  printf("%s\n", pathname);
+  return 0;
+}
+
+int main() { tlpi_ntfw(".", tree_dir, 10, 0); }
+```
+
+### 18-9
+
+![18-9-1](../assets/tlpi/18-9-1.png)
+
+进行频繁切换时`chdir`因为有频繁的申请/释放 fd 的系统调用，所以耗时会更多。
+
+```c
+#include <fcntl.h>
+#include <stdio.h>
+#include <time.h>
+#include <tlpi_hdr.h>
+#include <unistd.h>
+
+#define COUNT 1e3
+
+void bench_1(size_t count) {
+  clock_t t_start, t_end;
+  int ino;
+  t_start = clock();
+  while (count-- > 0) {
+    ino = chdir("tmp");
+    if (ino == -1)
+      errExit("chdir");
+    ino = chdir("../");
+    if (ino == -1)
+      errExit("chdir");
+  }
+  t_end = clock();
+  printf("bench1: %ld\n", (long)(t_end - t_start));
+}
+
+void bench_2(size_t count) {
+  clock_t t_start, t_end;
+  int fd1, fd2, ino;
+  t_start = clock();
+  fd1 = open("tmp", O_DIRECTORY);
+  fd2 = open("../", O_DIRECTORY);
+  if (fd1 == -1 || fd2 == -1)
+    errExit("open");
+  while (count-- > 0) {
+    ino = fchdir(fd1);
+    if (ino == -1)
+      errExit("chdir");
+    ino = fchdir(fd2);
+    if (ino == -1)
+      errExit("chdir");
+  }
+  t_end = clock();
+  printf("bench2 %ld\n", (long)(t_end - t_start));
+}
+
+int main() {
+  bench_1(COUNT);
+  bench_2(COUNT);
 }
 ```
