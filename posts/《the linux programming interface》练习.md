@@ -2519,3 +2519,55 @@ int main() {
   bench_2(COUNT);
 }
 ```
+
+### 第十九章
+
+### 19-1
+
+```c
+#define _XOPEN_SOURCE 500
+
+#include <ftw.h>
+#include <limits.h>
+#include <stdio.h>
+#include <sys/inotify.h>
+#include <tlpi_hdr.h>
+
+#define BUF_SIZE sizeof(struct inotify_event) + NAME_MAX + 1
+
+static int itd = -1;
+
+static int walk_dir(const char *fpath, const struct stat *sb, int tflag,
+                    struct FTW *ftwbuf) {
+  inotify_add_watch(itd, fpath,
+                    IN_CREATE | IN_DELETE | IN_MOVE | IN_DONT_FOLLOW);
+  return 0;
+}
+
+int main(int argc, char *argv[]) {
+  struct stat st;
+  int ino;
+  if (argc < 2)
+    usageErr("%s dirname\n", argv[0]);
+  void *buf;
+  struct inotify_event *ie;
+  char *pathname;
+
+  buf = malloc(BUF_SIZE);
+  itd = inotify_init();
+  if (nftw(argv[1], &walk_dir, 20, FTW_MOUNT | FTW_DEPTH | FTW_PHYS) == -1)
+    errExit("nftw");
+  while (read(itd, buf, BUF_SIZE) > 0) {
+    ie = (struct inotify_event *)(buf);
+    pathname = (char *)(buf) + sizeof(struct inotify_event);
+    if (ie->mask & IN_CREATE) {
+      printf("create %s\n", pathname);
+    } else if (ie->mask & IN_DELETE) {
+      printf("delete %s\n", pathname);
+    } else if (ie->mask & IN_MOVE) {
+      printf("move %s\n", pathname);
+    }
+  }
+  free(buf);
+}
+```
