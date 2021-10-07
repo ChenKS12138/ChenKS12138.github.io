@@ -158,6 +158,7 @@ const ArchiveItemIntro = styled.div`
   font-size: 1rem;
   color: #3c4858;
   line-height: 1.5;
+  overflow: hidden;
   @media (prefers-color-scheme: dark) {
     color: white;
   }

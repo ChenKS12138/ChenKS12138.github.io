@@ -21,6 +21,7 @@
     "gatsby-plugin-styled-components": "^3.3.10",
     "gatsby-plugin-typescript": "^2.4.4",
     "gatsby-remark-highlight-code": "^1.4.7",
+    "gatsby-remark-mermaid": "^2.1.0",
     "gatsby-source-filesystem": "^2.3.8",
     "gatsby-transformer-remark": "^2.8.28",
     "gatsby-transformer-sharp": "^2.5.3",
@@ -55,6 +56,7 @@
     "lint-staged": "^10.2.10",
     "moment": "^2.26.0",
     "prettier": "2.0.5",
+    "puppeteer": "^10.4.0",
     "stylelint": "^13.6.0",
     "ts-node": "^9.0.0",
     "typescript": "^3.9.5"
@@ -74,20 +76,21 @@
     "serve": "gatsby serve",
     "clean": "gatsby clean",
     "stylelint": "stylelint src/**/**.less",
-    "post": "ts-node ./cli/createPost.ts"
+    "post": "ts-node ./cli/createPost.ts",
+    "preinstall": "npx only-allow pnpm"
   },
   "lint-staged": {
     "**/*.{js,jsx,json,md,ts,tsx}": [
-      "yarn format"
+      "npm run format"
     ],
     "**/*.{less,css}": [
-      "yarn stylelint"
+      "npm run stylelint"
     ]
   },
   "husky": {
     "hooks": {
       "pre-commit": "lint-staged",
-      "pre-push": "yarn build"
+      "pre-push": "npm run build"
     }
   }
 }

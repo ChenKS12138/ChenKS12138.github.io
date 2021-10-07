@@ -2180,5 +2180,31 @@ int main(int argc, char *argv[]) {
 ### 18-4
 
 ```c
+#include <dirent.h>
+#include <tlpi_hdr.h>
 
+static void listFiles(const char *dirpath) {
+  DIR *dirp;
+  struct dirent dp, *result;
+  dirp = opendir(dirpath);
+  if (dirp == NULL) {
+    errMsg("opendir failed %s", dirpath);
+    return;
+  }
+  while (readdir_r(dirp, &dp, &result) == 0 && result != NULL) {
+    if (strcmp(dp.d_name, ".") == 0 || strcmp(dp.d_name, "..") == 0)
+      continue;
+    printf("%s\n", dp.d_name);
+  }
+}
+
+int main(int argc, char *argv[]) {
+  if (argc == 1) {
+    listFiles(".");
+  } else {
+    for (int i = 1; i < argc; i++) {
+      listFiles(argv[i]);
+    }
+  }
+}
 ```
