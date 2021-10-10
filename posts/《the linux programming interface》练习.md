@@ -2571,3 +2571,521 @@ int main(int argc, char *argv[]) {
   free(buf);
 }
 ```
+
+## 第二十章
+
+### 20-1
+
+```c
+#include <signal.h>
+#include <signal_functions.h>
+#include <tlpi_hdr.h>
+
+static int sigCnt[NSIG];
+
+static volatile sig_atomic_t gotSigint = 0;
+
+static void handler(int sig) {
+  if (sig == SIGINT)
+    gotSigint = 1;
+  else
+    sigCnt[sig]++;
+}
+
+int main(int argc, char *argv[]) {
+  int n, numSecs;
+  sigset_t pendingMask, blockingMask, emptyMask;
+  printf("pid %ld\n", (long)getpid());
+
+  for (n = 1; n < NSIG; n++) {
+    struct sigaction s1, s2;
+    s1.sa_handler = &handler;
+    sigaction(n, &s1, &s2);
+  }
+  while (!gotSigint) {
+  }
+
+  for (n = 1; n < NSIG; n++) {
+    if (sigCnt[n] != 0) {
+      printf("singal %d caught %d times\n", n, sigCnt[n]);
+    }
+  }
+  exit(EXIT_SUCCESS);
+}
+```
+
+### 20-2
+
+![20-2-1](../assets/tlpi/20-2-1.png)
+
+```c
+#include <signal.h>
+#include <stdio.h>
+#include <unistd.h>
+
+int main() {
+  printf("%d\n", getpid());
+  signal(SIGTERM, SIG_IGN);
+  while (1) {
+  }
+}
+```
+
+### 20-3
+
+```c
+#include <signal.h>
+#include <stdio.h>
+#include <unistd.h>
+
+static int sigs[NSIG];
+
+void handler(int sig) { sigs[sig]++; }
+
+int main() {
+  struct sigaction s1, s2;
+  sigset_t st;
+  int i;
+  s1.sa_handler = &handler;
+  sigemptyset(&st);
+  sigaddset(&st, SIGTERM);
+  s1.sa_mask = st;
+  s1.sa_flags = SA_RESETHAND;
+  sigaction(SIGTERM, &s1, &s2);
+
+  printf("%d\n", getpid());
+  while (!sigs[SIGINT]) {
+  }
+}
+```
+
+### 20-4
+
+```c
+
+```
+
+## 第二十一章
+
+### 21-1
+
+```c
+#include <signal.h>
+#include <stdio.h>
+
+void tlpi_abort() {
+  sigset_t st1, st2;
+  sigemptyset(&st1);
+  sigaddset(&st1, SIGABRT);
+  sigprocmask(SIG_UNBLOCK, &st1, &st2);
+  signal(SIGABRT, SIG_DFL#include <signal.h>
+#include <stdio.h>
+
+void tlpi_abort() {
+  sigset_t st1, st2;
+  sigemptyset(&st1);
+  sigaddset(&st1, SIGABRT);
+  // 将SIGABRT从进程掩码中去除
+  sigprocmask(SIG_UNBLOCK, &st1, &st2);
+  // 设置SIGABRT为默认信号处理器
+  signal(SIGABRT, SIG_DFL);
+  raise(SIGABRT);
+}
+
+int main() {
+  signal(SIGABRT, SIG_IGN);
+  printf("hello\n");
+  tlpi_abort();
+});
+  raise(SIGABRT);
+}
+
+int main() {
+  signal(SIGABRT, SIG_IGN);
+  printf("hello\n");
+  tlpi_abort();
+}
+```
+
+## 第二十二章
+
+### 22-1
+
+![22-1-1](../assets/tlpi/22-1-1.png)
+
+对 SIGCONT 设置自定义函数后，依然可以执行默认的`继续`行为。使用进程掩码阻塞后，自定义信号处理器函数不执行，不影响默认行为。
+
+```c
+#include <signal.h>
+#include <stdio.h>
+#include <unistd.h>
+
+static void handler(int sig) { printf("%d captured\n", sig); }
+
+int main(int argc, char *argv[]) {
+  struct sigaction s1;
+  sigset_t st1;
+  printf("%d\n", getpid());
+
+  sigemptyset(&st1);
+  sigaddset(&st1, SIGCONT);
+  if (argc > 1) {
+    sigprocmask(SIG_BLOCK, &st1, NULL);
+  }
+
+  signal(SIGCONT, &handler);
+  while (1) {
+  }
+}
+```
+
+### 22-2
+
+![22-2-1](../assets/tlpi/22-2-1.png)
+
+停止阻塞后，实时信号的信号处理器会比标准信号的先执行
+
+```c
+#include <signal.h>
+#include <stdio.h>
+#include <unistd.h>
+
+void handler(int sig) { printf("%d captured\n", sig); }
+
+int main() {
+  sigset_t st1;
+  int i;
+  printf("pid %d\nsigmin %d\nsigmax %d\n", getpid(), SIGRTMIN, SIGRTMAX);
+  for (i = 1; i < SIGRTMAX; i++) {
+    signal(i, handler);
+  }
+  sigemptyset(&st1);
+  for (i = 1; i < SIGRTMAX; i++) {
+    sigaddset(&st1, i);
+  }
+  sigprocmask(SIG_BLOCK, &st1, NULL);
+  sleep(15);
+  printf("time out\n");
+  sigprocmask(SIG_UNBLOCK, &st1, NULL);
+  while (1) {
+  }
+}
+```
+
+```shell
+#!/usr/bin/env bash
+
+pid=$1
+kill -CONT ${pid}
+kill -35 ${pid}
+```
+
+### 22-3
+
+![22-3-1](../assets/tlpi/22-3-1.png)
+
+```c
+#include <signal.h>
+#include <tlpi_hdr.h>
+
+static void handler(int sig) {}
+
+#define TESTSIG SIGUSR1
+
+int main(int argc, char *argv[]) {
+  if (argc != 2 || strcmp(argv[1], "--help") == 0)
+    usageErr("%s num-sigs\n", argv[0]);
+
+  int numSigs = getInt(argv[1], GN_GT_0, "num-sigs");
+
+  struct sigaction sa;
+  sigemptyset(&sa.sa_mask);
+  sa.sa_flags = 0;
+  sa.sa_handler = handler;
+  if (sigaction(TESTSIG, &sa, NULL) == -1)
+    errExit("sigaction");
+
+  /* Block the signal before fork(), so that the child doesn't manage
+     to send it to the parent before the parent is ready to catch it */
+
+  sigset_t blockedMask, emptyMask;
+  sigemptyset(&blockedMask);
+  sigaddset(&blockedMask, TESTSIG);
+  if (sigprocmask(SIG_SETMASK, &blockedMask, NULL) == -1)
+    errExit("sigprocmask");
+
+  sigemptyset(&emptyMask);
+
+  pid_t childPid = fork();
+  switch (childPid) {
+  case -1:
+    errExit("fork");
+
+  case 0: /* child */
+    for (int scnt = 0; scnt < numSigs; scnt++) {
+      if (kill(getppid(), TESTSIG) == -1)
+        errExit("kill");
+      if (sigwaitinfo(&blockedMask, NULL) == -1 && errno != EINTR)
+        errExit("sigwaitinfo");
+    }
+    exit(EXIT_SUCCESS);
+
+  default: /* parent */
+    for (int scnt = 0; scnt < numSigs; scnt++) {
+      if (sigwaitinfo(&blockedMask, NULL) == -1 && errno != EINTR)
+        errExit("sigwaitinfo");
+      if (kill(childPid, TESTSIG) == -1)
+        errExit("kill");
+    }
+    exit(EXIT_SUCCESS);
+  }
+}
+```
+
+### 22-4
+
+```c
+#define _XOPEN_SOURCE 500
+
+#include <signal.h>
+#include <stdio.h>
+
+typedef __sighandler_t sighandler_t;
+
+int tlpi_sighold(int sig) {
+  sigset_t st;
+  sigemptyset(&st);
+  sigaddset(&st, sig);
+  return sigprocmask(SIG_BLOCK, &st, NULL);
+}
+
+int tlpi_sigrelse(int sig) {
+  sigset_t st;
+  sigemptyset(&st);
+  sigaddset(&st, sig);
+  return sigprocmask(SIG_UNBLOCK, &st, NULL);
+}
+
+int tlpi_sigpause(int sig) {
+  sigset_t st;
+  if (sigprocmask(SIG_BLOCK, NULL, &st) == -1)
+    return -1;
+  sigdelset(&st, sig);
+  if (sigprocmask(SIGUNUSED, &st, NULL))
+    return -1;
+  return sigsuspend(&st);
+}
+
+sighandler_t tlpi_sigset(int sig, sighandler_t disp) {
+  struct sigaction st1, st2;
+  if (disp == SIG_HOLD) {
+    if (tlpi_sighold(sig) == -1)
+      return SIG_ERR;
+    if (sigaction(sig, NULL, &st1) == -1)
+      return SIG_ERR;
+  } else {
+    sigemptyset(&st2.sa_mask);
+    st2.sa_flags = 0;
+    st2.sa_handler = disp;
+    if (sigaction(sig, &st2, &st1) == -1)
+      return SIG_ERR;
+  }
+  return st1.sa_handler;
+};
+
+int tlpi_sigignore(int sig) {
+  if (tlpi_sigset(sig, SIG_IGN) != SIG_ERR)
+    return 0;
+  return -1;
+}
+
+int main() {}
+```
+
+## 第二十三章
+
+### 23-1
+
+```c
+#include <errno.h>
+#include <signal.h>
+#include <stdio.h>
+#include <sys/time.h>
+#include <time.h>
+#include <tlpi_hdr.h>
+#include <unistd.h>
+
+unsigned int tlpi_alarm(unsigned int seconds) {
+  struct itimerval it1, it2;
+  it1.it_interval.tv_sec = 0;
+  it1.it_interval.tv_usec = 0;
+  it1.it_value.tv_sec = seconds;
+  it1.it_value.tv_usec = 0;
+  setitimer(ITIMER_REAL, &it1, &it2);
+  return it2.it_value.tv_sec;
+}
+
+int main() {
+  tlpi_alarm(2);
+  sigset_t st;
+  sigemptyset(&st);
+  sigsuspend(&st);
+}
+```
+
+### 23-2
+
+使用`nanosleep`时，使用的相对时间，先根据当前时间计算目标时间，再休眠。期间如果被频繁打断，计算占据了时间，但是频繁的休眠失败，没有成功扣除相对时间。导致实际休眠时间更长。
+
+```c
+#define _POSIX_C_SOURCE 199309
+#define _XOPEN_SOURCE 600
+#include <signal.h>
+#include <sys/time.h>
+#include <time.h>
+#include <tlpi_hdr.h>
+
+static void sigint_handler(int sig) { return; }
+
+int main(int argc, char *argv[]) {
+  struct timeval start, finish;
+  struct timespec request;
+  struct sigaction sa;
+  int s;
+  if (argc != 3 || strcmp(argv[1], "--help") == 0)
+    usageErr("%s secs nanosecs\n", argv[0]);
+
+  printf("pid %d\n", getpid());
+  if (clock_gettime(CLOCK_REALTIME, &request) == -1)
+    errExit("clock_gettime");
+  request.tv_sec += getLong(argv[1], 0, "secs");
+  request.tv_nsec += getLong(argv[2], 0, "nanosecs");
+
+  sigemptyset(&sa.sa_mask);
+  sa.sa_flags = 0;
+  sa.sa_handler = sigint_handler;
+  if (sigaction(SIGINT, &sa, NULL) == -1)
+    errExit("sigaction");
+  if (gettimeofday(&start, NULL) == -1)
+    errExit("gettimeofday");
+
+  clock_t ct;
+
+  for (;;) {
+    s = clock_nanosleep(CLOCK_REALTIME, TIMER_ABSTIME, &request, NULL);
+    if (s == -1 && errno != EINTR)
+      errExit("nanosleep");
+    if (gettimeofday(&finish, NULL) == -1)
+      errExit("gettimeofday");
+    printf("Slept for: %9.6f secs\n",
+           finish.tv_sec - start.tv_sec +
+               (finish.tv_usec - start.tv_usec) / 1000000.0);
+    if (s == 0)
+      break;
+  }
+  printf("sleep complete\n");
+  exit(EXIT_SUCCESS);
+}
+```
+
+### 23-3
+
+```c
+#define _POSIX_C_SOURCE 199309
+#include <signal.h>
+#include <stdio.h>
+#include <time.h>
+#include <tlpi_hdr.h>
+
+void handler(int sig) {}
+
+int main() {
+  struct sigevent evp;
+  timer_t tt;
+  struct itimerspec itr;
+  sigset_t st;
+  siginfo_t sinfo;
+
+  itr.it_interval.tv_nsec = 0;
+  itr.it_interval.tv_sec = 0;
+  itr.it_value.tv_nsec = 0;
+  itr.it_value.tv_sec = 3;
+  if (timer_create(CLOCK_REALTIME, NULL, &tt) == -1)
+    errExit("timer_create");
+  if (timer_settime(tt, 0, &itr, NULL) == -1)
+    errExit("timer_settime");
+  sigemptyset(&st);
+  sigaddset(&st, SIGALRM);
+  signal(SIGALRM, &handler);
+  if (sigwaitinfo(&st, &sinfo) == -1)
+    errExit("sigwaitinfo");
+  printf("%d %d\n", sinfo.si_signo, sinfo.si_value.sival_int);
+}
+```
+
+### 23-4
+
+```c
+#define _POSIX_C_SOURCE 199309
+#include "curr_time.h"           /* Declares currTime() */
+#include "itimerspec_from_str.h" /* Declares itimerspecFromStr() */
+#include <signal.h>
+#include <time.h>
+#include <tlpi_hdr.h>
+
+#define TIMER_SIG SIGRTMAX /* Our timer notification signal */
+
+static void handler(int sig) { return; }
+
+int main(int argc, char *argv[]) {
+  struct itimerspec ts;
+  struct sigaction sa;
+  struct sigevent sev;
+  timer_t *tidlist;
+  int j;
+
+  if (argc < 2)
+    usageErr("%s secs[/nsecs][:int-secs[/int-nsecs]]...\n", argv[0]);
+
+  tidlist = calloc(argc - 1, sizeof(timer_t));
+  if (tidlist == NULL)
+    errExit("malloc");
+
+  /* Establish handler for notification signal */
+
+  signal(TIMER_SIG, &handler);
+
+  /* Create and start one timer for each command-line argument */
+
+  sev.sigev_notify = SIGEV_SIGNAL; /* Notify via signal */
+  sev.sigev_signo = TIMER_SIG;     /* Notify using this signal */
+
+  for (j = 0; j < argc - 1; j++) {
+    itimerspecFromStr(argv[j + 1], &ts);
+
+    sev.sigev_value.sival_ptr = &tidlist[j];
+    /* Allows handler to get ID of this timer */
+
+    if (timer_create(CLOCK_REALTIME, &sev, &tidlist[j]) == -1)
+      errExit("timer_create");
+    printf("Timer ID: %ld (%s)\n", (long)tidlist[j], argv[j + 1]);
+
+    if (timer_settime(tidlist[j], 0, &ts, NULL) == -1)
+      errExit("timer_settime");
+  }
+
+  sigset_t st;
+  siginfo_t sit;
+  sigemptyset(&st);
+  sigaddset(&st, TIMER_SIG);
+
+  while (sigwaitinfo(&st, &sit) != -1) {
+    timer_t *tidptr;
+
+    tidptr = sit.si_value.sival_ptr;
+    printf("[%s] Got signal %d\n", currTime("%T"), sit.si_signo);
+    printf("    *sival_ptr         = %ld\n", (long)*tidptr);
+    printf("    timer_getoverrun() = %d\n", timer_getoverrun(*tidptr));
+  }
+}
+```
