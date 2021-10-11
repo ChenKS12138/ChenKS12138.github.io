@@ -3089,3 +3089,574 @@ int main(int argc, char *argv[]) {
   }
 }
 ```
+
+## 第二十四章
+
+### 24-1
+
+共有 8 个进程，产生 7 个新进程
+
+```c
+#include <tlpi_hdr.h>
+
+int main(int argc, char *argv[]) {
+  fork();
+  fork();
+  fork();
+  printf("%d\n", getpid());
+}
+```
+
+### 24-2
+
+```c
+#include <stdio.h>
+#include <tlpi_hdr.h>
+#include <unistd.h>
+
+int main() {
+  pid_t child_pid;
+  switch (child_pid = vfork()) {
+  case -1:
+    errExit("vfork");
+    break;
+  case 0:
+    sleep(1);
+    printf("done"); // 无法被正常打印，子进程共享并关闭了fd1
+  default:
+    close(STDOUT_FILENO);
+  }
+  exit(EXIT_SUCCESS);
+}
+```
+
+### 24-3
+
+```c
+#include <signal.h>
+#include <stdio.h>
+#include <sys/wait.h>
+#include <tlpi_hdr.h>
+
+void generator_core_dump() {
+  pid_t child_pid;
+  int status = -1;
+  switch (child_pid = fork()) {
+  case -1:
+    errExit("fork");
+    break;
+  case 0:
+    pause();
+    break;
+  default:
+    kill(child_pid, SIGABRT);
+    break;
+  }
+}
+
+int main() {
+  generator_core_dump();
+  printf("done\n");
+}
+```
+
+### 24-4
+
+### 24-5
+
+```c
+#include "curr_time.h" /* Declaration of currTime() */
+#include "tlpi_hdr.h"
+#include <signal.h>
+
+#define SYNC_SIG SIGUSR1 /* Synchronization signal */
+
+static void /* Signal handler - does nothing but return */
+handler(int sig) {}
+
+int main(int argc, char *argv[]) {
+  pid_t childPid;
+  sigset_t blockMask, origMask, emptyMask;
+  struct sigaction sa;
+
+  setbuf(stdout, NULL); /* Disable buffering of stdout */
+
+  sigemptyset(&blockMask);
+  sigaddset(&blockMask, SYNC_SIG); /* Block signal */
+  if (sigprocmask(SIG_BLOCK, &blockMask, &origMask) == -1)
+    errExit("sigprocmask");
+
+  sigemptyset(&sa.sa_mask);
+  sa.sa_flags = SA_RESTART;
+  sa.sa_handler = handler;
+  if (sigaction(SYNC_SIG, &sa, NULL) == -1)
+    errExit("sigaction");
+
+  switch (childPid = fork()) {
+  case -1:
+    errExit("fork");
+
+  case 0: /* Child */
+
+    /* Child process wait for parent process */
+    if (sigsuspend(&emptyMask) == -1 && errno != EINTR)
+      errExit("sigsuspend");
+
+    /* Child does some required action here... */
+
+    printf("[%s %ld] Child started - doing some work\n", currTime("%T"),
+           (long)getpid());
+    sleep(2); /* Simulate time spent doing some work */
+
+    /* And then signals parent that it's done */
+
+    printf("[%s %ld] Child about to signal parent\n", currTime("%T"),
+           (long)getpid());
+    if (kill(getppid(), SYNC_SIG) == -1)
+      errExit("kill");
+
+    /* Now child can do other things... */
+
+    _exit(EXIT_SUCCESS);
+
+  default: /* Parent */
+
+    /* Parent may do some work here, and then waits for child to
+       complete the required action */
+
+    /* Parent finish work */
+    if (kill(childPid, SYNC_SIG) == -1)
+      errExit("kill");
+
+    printf("[%s %ld] Parent about to wait for signal\n", currTime("%T"),
+           (long)getpid());
+
+    sigemptyset(&emptyMask);
+    if (sigsuspend(&emptyMask) == -1 && errno != EINTR)
+      errExit("sigsuspend");
+    printf("[%s %ld] Parent got signal\n", currTime("%T"), (long)getpid());
+
+    /* If required, return signal mask to its original state */
+
+    if (sigprocmask(SIG_SETMASK, &origMask, NULL) == -1)
+      errExit("sigprocmask");
+
+    /* Parent carries on to do other things... */
+
+    exit(EXIT_SUCCESS);
+  }
+}
+```
+
+## 第二十五章
+
+### 25-1
+
+返回结果为`255`，-1 的 16 位表示是 0xffff，对应的低 8 位表示为 0xff，即 255。
+
+```c
+#include <sys/wait.h>
+#include <tlpi_hdr.h>
+
+int main() {
+  pid_t child_pid;
+  int status;
+  setbuf(stdout, NULL);
+  switch (child_pid = fork()) {
+  case -1:
+    errExit("fork");
+    break;
+  case 0:
+    exit(-1);
+  default:
+    wait(&status);
+    printf("status: %d\n", WEXITSTATUS(status));
+  }
+  exit(EXIT_SUCCESS);
+}
+```
+
+## 第二十六章
+
+### 26-1
+
+```c
+#include <tlpi_hdr.h>
+
+int main() {
+  pid_t child_pid;
+  switch (child_pid = fork()) {
+  case -1:
+    errExit("fork");
+    break;
+  case 0:
+    sleep(3);
+    printf("ppid: %d\n", getppid());
+    break;
+  default:
+    exit(EXIT_SUCCESS);
+    break;
+  }
+  exit(EXIT_SUCCESS);
+}
+```
+
+### 26-2
+
+当父进程变为僵尸进程后，子进程就会被 init 收养
+
+```c
+#include <tlpi_hdr.h>
+
+int main() {
+  pid_t child_pid1, child_pid2;
+  switch (child_pid1 = fork()) {
+  case -1:
+    errExit("fork");
+    break;
+  case 0:
+    switch (child_pid2 = fork()) {
+    case -1:
+      errExit("fork");
+      break;
+    case 0:
+      printf("ppid: %d\n", getppid());
+      sleep(2);
+      printf("ppid: %d\n", getppid());
+      break;
+    default:
+      sleep(1);
+      exit(EXIT_SUCCESS);
+      break;
+    }
+    break;
+  default:
+    while (1) {
+    }
+    break;
+  }
+}
+```
+
+### 26-3
+
+```c
+#include "print_wait_status.h" /* Declares printWaitStatus() */
+#include "tlpi_hdr.h"
+#include <sys/wait.h>
+
+int main(int argc, char *argv[]) {
+  int status;
+  pid_t childPid;
+
+  if (argc > 1 && strcmp(argv[1], "--help") == 0)
+    usageErr("%s [exit-status]\n", argv[0]);
+
+  switch (fork()) {
+  case -1:
+    errExit("fork");
+
+  case 0: /* Child: either exits immediately with given
+             status or loops waiting for signals */
+    printf("Child started with PID = %ld\n", (long)getpid());
+    if (argc > 1) /* Status supplied on command line? */
+      exit(getInt(argv[1], 0, "exit-status"));
+    else /* Otherwise, wait for signals */
+      for (;;)
+        pause();
+    exit(EXIT_FAILURE); /* Not reached, but good practice */
+
+  default: /* Parent: repeatedly wait on child until it
+              either exits or is terminated by a signal */
+    for (;;) {
+      siginfo_t infop;
+      childPid = waitid(P_ALL, -1, &infop, WEXITED);
+      //       childPid = waitpid(-1, &status,
+      //                          WUNTRACED
+      // #ifdef WCONTINUED /* Not present on older versions of Linux */
+      //                              | WCONTINUED
+      // #endif
+      //       );
+      if (childPid == -1)
+        errExit("waitpid");
+
+      /* Print status in hex, and as separate decimal bytes */
+
+      printf("waitpid() returned: PID=%ld; status=0x%04x (%d,%d)\n",
+             (long)childPid, (unsigned int)status, status >> 8, status & 0xff);
+      // printWaitStatus(NULL, status);
+      printf("%s %d %d\n", strsignal(infop.si_signo), infop.si_code,
+             infop.si_errno);
+
+      if (WIFEXITED(status) || WIFSIGNALED(status))
+        exit(EXIT_SUCCESS);
+    }
+  }
+}
+```
+
+### 26-4
+
+使用`sigsuspend`阻塞接收信号前，需要先使用`sigprocmask`阻塞对应信号，防止进程提前接收到信号。
+
+```c
+#include <libgen.h> /* For basename() declaration */
+#include <signal.h>
+#include <sys/wait.h>
+#include <tlpi_hdr.h>
+
+#define CMD_SIZE 200
+
+void sig_handler(int sig) { printf("captured %d\n", sig); }
+
+int main(int argc, char *argv[]) {
+  char cmd[CMD_SIZE];
+  pid_t childPid;
+  sigset_t st;
+  struct sigaction sa;
+
+  setbuf(stdout, NULL); /* Disable buffering of stdout */
+
+  printf("Parent PID=%ld\n", (long)getpid());
+
+  switch (childPid = fork()) {
+  case -1:
+    errExit("fork");
+
+  case 0: /* Child: immediately exits to become zombie */
+    printf("Child (PID=%ld) exiting\n", (long)getpid());
+    _exit(EXIT_SUCCESS);
+
+  default: /* Parent */
+    sigemptyset(&st);
+    sigaddset(&st, SIGCHLD);
+    if (sigprocmask(SIG_BLOCK, &st, NULL) == -1)
+      errExit("sigprocmask");
+
+    sa.sa_flags = SA_RESTART;
+    sigemptyset(&sa.sa_mask);
+    sa.sa_handler = &sig_handler;
+    sigaction(SIGCHLD, &sa, NULL);
+
+    sigfillset(&st);
+    sigdelset(&st, SIGCHLD);
+    if (sigsuspend(&st) == -1 && errno != EINTR)
+      errExit("sigsuspend");
+    snprintf(cmd, CMD_SIZE, "ps aux | grep %s", basename(argv[0]));
+    system(cmd); /* View zombie child */
+
+    /* Now send the "sure kill" signal to the zombie */
+
+    sigemptyset(&st);
+    sigaddset(&st, SIGCHLD);
+    if (sigprocmask(SIG_BLOCK, &st, NULL) == -1)
+      errExit("sigprocmask");
+
+    if (kill(childPid, SIGKILL) == -1)
+      errMsg("kill");
+
+    sigfillset(&st);
+    sigdelset(&st, SIGCHLD);
+    if (sigsuspend(&st) == -1 && errno != EINTR)
+      errExit("sigsuspend");
+    // sleep(3); /* Give child a chance to react to signal */
+    printf("After sending SIGKILL to zombie (PID=%ld):\n", (long)childPid);
+    system(cmd); /* View zombie child again */
+
+    exit(EXIT_SUCCESS);
+  }
+}
+```
+
+### 第二十七章
+
+### 27-1
+
+![27-1-1](../assets/tlpi/27-1-1.png)
+
+目录 dir1 和 dir2 都被加进了\$PATH，但是 dir1/xyz 没有执行权限，dir2/xyz 有执行权限。
+
+```c
+#include <tlpi_hdr.h>
+
+int main(int argc, char *argv[]) {
+  if (argc != 2 || strcmp(argv[1], "--help") == 0)
+    usageErr("%s pathname\n", argv[0]);
+
+  execlp(argv[1], argv[1], "hello world", (char *)NULL);
+  errExit("execlp");
+}
+```
+
+### 27-2
+
+```c
+#include <limits.h>
+#include <stdarg.h>
+#include <string.h>
+#include <tlpi_hdr.h>
+
+extern char **environ;
+
+int tlpi_execlp(char *filename, ...) {
+  va_list ap;
+  char *tmp[2048];
+  char **argv;
+  size_t argv_size;
+  int tmp_index = 0;
+  char *path;
+  char next_filename[PATH_MAX];
+  int path_index, next_filename_index, path_len;
+
+  tmp[tmp_index++] = strdup(filename);
+  va_start(ap, filename);
+  do {
+    tmp[tmp_index] = va_arg(ap, char *);
+  } while (tmp[tmp_index++]);
+  tmp[tmp_index++] = NULL;
+  argv_size = sizeof(char *) * (tmp_index);
+  argv = malloc(argv_size);
+  memcpy(argv, tmp, argv_size);
+  path = getenv("PATH");
+  path_len = strlen(path);
+  path_index = 0;
+  next_filename_index = 0;
+  memset(next_filename, 0, PATH_MAX);
+  do {
+    if (path[path_index] == ':') {
+      strcat(next_filename, "/");
+      strcat(next_filename, filename);
+      execve(next_filename, argv, environ);
+
+      memset(next_filename, 0, PATH_MAX);
+      next_filename_index = 0;
+    } else {
+      next_filename[next_filename_index++] = path[path_index];
+    }
+  } while ((path_index++) < path_len);
+
+  strcat(next_filename, "/");
+  strcat(next_filename, filename);
+  execve(filename, argv, environ);
+  return -1;
+}
+
+int main() {
+  if (tlpi_execlp("python", "--version", (char *)NULL) == -1)
+    errExit("tlpi_execlp");
+}
+```
+
+### 27-3
+
+![27-3-1](../assets/tlpi/27-3-1.png)
+
+```shell
+#!/bin/cat -n
+Hello world
+```
+
+```c
+#include <tlpi_hdr.h>
+
+int main(int argc, char *argv[]) {
+  if (argc < 2)
+    usageErr("%s script\n", argv[0]);
+  system(argv[1]);
+}
+```
+
+### 27-4
+
+![27-4-1](../assets/tlpi/27-4-1.png)
+
+祖父进程可以常驻后台，父进程无需`wait`子进程，父进程退出后，子进程由`init`接管，子进程结束后由`init`进程进行`wait`，避免僵尸进程产生。
+
+```c
+#include <sys/wait.h>
+#include <tlpi_hdr.h>
+
+int main(int argc, char *argv[]) {
+  pid_t childPid;
+  int status;
+  childPid = fork();
+  if (childPid == -1)
+    errExit("fork1");
+  if (childPid == 0) {
+    switch (fork()) {
+    case -1:
+      errExit("fork2");
+    case 0:
+      sleep(1);
+      exit(EXIT_SUCCESS);
+    default:
+      exit(EXIT_SUCCESS);
+    }
+  }
+  if (waitpid(childPid, &status, 0) == -1)
+    errExit("waitpid");
+  while (1) {
+  }
+}
+```
+
+### 27-5
+
+当 stdout 为终端时，printf 默认的模式为`_IOLBF`，遇到回车才会清空用户空间的缓冲区。但是执行`execlp`后，当前进程的代码会被替换，堆区、栈区、数据区会被重新初始化，所以字符串来不及打印就被清空了。
+
+```c
+#include <tlpi_hdr.h>
+
+int main(int argc, char *argv[]) {
+  printf("Hello world");
+  execlp("sleep", "sleep", "0", (char *)NULL);
+}
+```
+
+### 27-6
+
+```c
+#include <signal.h>
+#include <sys/wait.h>
+#include <tlpi_hdr.h>
+
+void handler(int sig) { printf("%d captured\n", sig); }
+
+int main() {
+  sigset_t ss;
+  pid_t child_pid;
+  struct sigaction sa;
+  int status;
+  char *cmd = "pwd";
+
+  sigemptyset(&ss);
+  sigaddset(&ss, SIGCHLD);
+
+  sa.sa_flags = 0;
+  sigemptyset(&sa.sa_mask);
+  sa.sa_handler = &handler;
+
+  sigprocmask(SIG_BLOCK, &ss, NULL);
+  switch (child_pid = fork()) {
+  case -1:
+    errExit("fork");
+    break;
+  case 0:
+    sigprocmask(SIG_UNBLOCK, &ss, NULL);
+    exit(EXIT_SUCCESS);
+    break;
+  default:
+    sigaction(SIGCHLD, &sa, NULL);
+    sleep(2);
+    system(cmd);
+    if (wait(&status) == -1)
+      errExit("wait");
+    system(cmd);
+
+    printf("status %d\n", WEXITSTATUS(status));
+    sigprocmask(SIG_UNBLOCK, &ss, NULL);
+  }
+}
+```
+
+## 第二十八章
