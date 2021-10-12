@@ -3694,3 +3694,27 @@ int main(int argc, char *argv[]) {
   exit(EXIT_SUCCESS);
 }
 ```
+
+## 第二十九章
+
+### 29-1
+
+![29-1-1](../assets/tlpi/29-1-1.png)
+
+会造成死锁的编译时检查报错。为了避免 join 死锁，需要保证 join 的线程不为当前线程。
+
+```c
+#include <pthread.h>
+#include <tlpi_hdr.h>
+
+int main() {
+  int s;
+  s = pthread_join(pthread_self(), NULL);
+  if (s != 0)
+    errExitEN(s, "thread_join");
+}
+```
+
+### 29-2
+
+子线程没有被主线程 join，主线程的生命周期可能小于子线程，主线程直接 return 相当于调用 exit()，导致子线程的提前退出。

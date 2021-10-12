@@ -3,7 +3,7 @@
   "private": true,
   "description": "ChenKS12138 blog",
   "version": "1.0.0",
-  "author": "ChenKS12138 <749923710@qq.com>",
+  "author": "ChenKS12138 <chenks12138@gmail.com>",
   "dependencies": {
     "@deckdeckgo/highlight-code": "^1.1.4",
     "axios-hooks": "^1.10.0",
