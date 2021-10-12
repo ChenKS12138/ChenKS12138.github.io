@@ -3660,3 +3660,37 @@ int main() {
 ```
 
 ## 第二十八章
+
+### 28-1
+
+![28-1-1](../assets/tlpi/28-1-1.png)
+
+```c
+#include <sys/wait.h>
+#include <tlpi_hdr.h>
+
+int main(int argc, char *argv[]) {
+  int count = 0, is_vfork = 0, status;
+  pid_t child_pid;
+  if (argc < 2)
+    usageErr("%s count [is-vfork]\n", argv[0]);
+  count = getInt(argv[1], 0, "count");
+
+  if (argc > 2)
+    is_vfork = 1;
+  for (int i = 0; i < count; i++) {
+    switch (child_pid = (is_vfork ? vfork() : fork())) {
+    case -1:
+      errExit("fork");
+    case 0:
+      exit(EXIT_SUCCESS);
+      break;
+    default:
+      wait(&status);
+      break;
+    }
+  }
+  printf("done\n");
+  exit(EXIT_SUCCESS);
+}
+```
