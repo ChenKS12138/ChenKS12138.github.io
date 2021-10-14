@@ -3945,3 +3945,146 @@ int main() {
 ## 第三十一章
 
 ### 31-1
+
+```c
+#include <pthread.h>
+#include <tlpi_hdr.h>
+
+typedef struct one_time_init_contorl {
+  bool init;
+  pthread_mutex_t mux;
+} one_time_init_contorl;
+
+void one_time_init_contorl_init(one_time_init_contorl *control) {
+  pthread_mutex_init(&control->mux, NULL);
+  control->init = false;
+}
+
+void one_time_init(one_time_init_contorl *control, void (*init)()) {
+  int s;
+  s = pthread_mutex_lock(&control->mux);
+  if (s != 0)
+    errExitEN(s, "pthread_mutex_lock");
+  if (!control->init) {
+    control->init = true;
+    init();
+  }
+  s = pthread_mutex_unlock(&control->mux);
+  if (s != 0)
+    errExitEN(s, "pthread_mutex_unlock");
+}
+
+void init() {
+  printf("init\n");
+  return;
+}
+
+void *worker(void *arg) {
+  one_time_init_contorl *control = (one_time_init_contorl *)arg;
+  printf("in worker\n");
+  one_time_init(control, init);
+  return NULL;
+};
+
+int main() {
+  one_time_init_contorl control;
+  pthread_t t;
+  int s;
+
+  setbuf(stdout, NULL);
+  one_time_init_contorl_init(&control);
+  s = pthread_create(&t, NULL, worker, (void *)&control);
+  if (s != 0)
+    errExitEN(s, "pthread_create");
+
+  worker((void *)&control);
+  s = pthread_join(t, NULL);
+  if (s != 0)
+    errExitEN(s, "pthread_create");
+}
+```
+
+### 31-2
+
+```c
+#include <libgen.h>
+#include <limits.h>
+#include <pthread.h>
+#include <tlpi_hdr.h>
+
+static pthread_key_t key_dirname;
+static pthread_key_t key_basename;
+
+static pthread_once_t once_dirname = PTHREAD_ONCE_INIT;
+static pthread_once_t once_basename = PTHREAD_ONCE_INIT;
+
+static void destructor(void *buf) { free(buf); }
+
+void init_key_dirname() { pthread_key_create(&key_dirname, &destructor); }
+
+void init_key_basename() { pthread_key_create(&key_basename, &destructor); }
+
+char *dirname_r(char *pathname) {
+  int s;
+  char *buf, *ptr;
+
+  if (pathname == NULL || strlen(pathname) == 0)
+    return ".";
+
+  if ((s = pthread_once(&once_dirname, init_key_dirname)) != 0)
+    errExitEN(s, "pthread_once");
+
+  buf = pthread_getspecific(key_dirname);
+  if (buf == NULL)
+    if ((s = pthread_setspecific(key_dirname, (buf = malloc(PATH_MAX + 1)))) !=
+        0)
+      errExitEN(s, "pthread_setspecific");
+  memcpy(buf, pathname, strlen(pathname) + 1);
+  ptr = buf + strlen(pathname) - 1;
+
+  while ((*ptr) == '/')
+    ptr--;
+  if (ptr == pathname - 1)
+    return ".";
+  while ((*ptr) != '/')
+    ptr--;
+  if (ptr == pathname - 1)
+    return ".";
+  while ((*ptr) == '/')
+    ptr--;
+  *(ptr + 1) = '\0';
+  return buf;
+}
+
+char *basename_r(char *pathname) {
+  int s;
+  char *buf, *ptr;
+  if (pathname == NULL || strlen(pathname) == 0)
+    return ".";
+
+  if (strcmp(pathname, ".") == 0 || strcmp(pathname, "..") == 0 ||
+      strcmp(pathname, "/") == 0)
+    return pathname;
+
+  if ((s = pthread_once(&once_basename, init_key_basename)) != 0)
+    errExitEN(s, "pthread_once");
+
+  buf = pthread_getspecific(key_basename);
+  if (buf == NULL)
+    if ((s = pthread_setspecific(key_basename, (buf = malloc(PATH_MAX + 1)))) !=
+        0)
+      errExitEN(s, "pthread_setspecific");
+  memcpy(buf, pathname, strlen(pathname) + 1);
+  ptr = buf + strlen(pathname) - 1;
+
+  while ((*ptr) != '/')
+    ptr--;
+
+  return ptr + 1;
+}
+
+int main() {
+  char *path = "/home/cattchen/Codes/tlpi-practice";
+  printf("dirname %s\nbasename %s\n", dirname_r(path), basename_r(path));
+}
+```
