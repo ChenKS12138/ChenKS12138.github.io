@@ -3718,3 +3718,230 @@ int main() {
 ### 29-2
 
 子线程没有被主线程 join，主线程的生命周期可能小于子线程，主线程直接 return 相当于调用 exit()，导致子线程的提前退出。
+
+## 第三十章
+
+### 30-1
+
+![30-1-1](../assets/tlpi/30-1-1.png)
+
+```c
+#include "tlpi_hdr.h"
+#include <pthread.h>
+
+static volatile int glob = 0; /* "volatile" prevents compiler optimizations
+                                 of arithmetic operations on 'glob' */
+
+typedef struct func_arg {
+  int *loops;
+  char *thread_name;
+} func_arg;
+
+static void * /* Loop 'arg' times incrementing 'glob' */
+threadFunc(void *arg) {
+  func_arg *fa = (func_arg *)arg;
+  int loc, j;
+
+  for (j = 0; j < *fa->loops; j++) {
+    loc = glob;
+    loc++;
+    glob = loc;
+    printf("%s: %d\n", fa->thread_name, glob);
+  }
+
+  return NULL;
+}
+
+int main(int argc, char *argv[]) {
+  pthread_t t1, t2;
+  int loops, s;
+
+  loops = (argc > 1) ? getInt(argv[1], GN_GT_0, "num-loops") : 10000000;
+
+  func_arg func_arg1 = {&loops, "thread1"}, func_arg2 = {&loops, "thread2"};
+
+  s = pthread_create(&t1, NULL, threadFunc, (void *)&func_arg1);
+  if (s != 0)
+    errExitEN(s, "pthread_create");
+  s = pthread_create(&t2, NULL, threadFunc, (void *)&func_arg2);
+  if (s != 0)
+    errExitEN(s, "pthread_create");
+
+  s = pthread_join(t1, NULL);
+  if (s != 0)
+    errExitEN(s, "pthread_join");
+  s = pthread_join(t2, NULL);
+  if (s != 0)
+    errExitEN(s, "pthread_join");
+
+  printf("glob = %d\n", glob);
+  exit(EXIT_SUCCESS);
+}
+```
+
+### 30-2
+
+可以进一步优化，目前是对整棵树都上锁，可以改进为对每个节点进行上锁
+
+```c
+#include <assert.h>
+#include <pthread.h>
+#include <tlpi_hdr.h>
+
+enum BINARY_TREE_ERROR {
+  OK,        // OK
+  EREPET,    // key repeat
+  ENOTFOUND, // key not found
+};
+
+typedef struct binary_tree_node {
+  void **value;
+  char *key;
+  struct binary_tree_node *left;
+  struct binary_tree_node *right;
+} binary_tree_node;
+
+typedef struct binary_tree {
+  binary_tree_node *root;
+  pthread_mutex_t *mux;
+} binary_tree;
+
+void binary_tree_initialize(binary_tree *tree) {
+  tree->root = NULL;
+  tree->mux = malloc(sizeof(pthread_mutex_t));
+  pthread_mutex_init(tree->mux, NULL);
+}
+
+int binary_tree_add(binary_tree *tree, char *key, void **value) {
+  binary_tree_node **current;
+  int s;
+  s = pthread_mutex_lock(tree->mux);
+  if (s != 0)
+    errExitEN(s, "pthread_mutex_lock");
+  current = &tree->root;
+  while (*current) {
+    s = strcmp((*current)->key, key);
+    if (s == 0) {
+      s = pthread_mutex_unlock(tree->mux);
+      if (s != 0)
+        errExitEN(s, "pthread_mutex_unlock");
+      return EREPET;
+    }
+    current = s < 0 ? &(*current)->left : &(*current)->right;
+  }
+  *current = malloc(sizeof(binary_tree_node));
+  (*current)->key = key;
+  (*current)->value = value;
+  (*current)->left = NULL;
+  (*current)->right = NULL;
+  s = pthread_mutex_unlock(tree->mux);
+  if (s != 0)
+    errExitEN(s, "pthread_mutex_unlock");
+  return OK;
+};
+
+int binary_tree_delete(binary_tree *tree, char *key) {
+  binary_tree_node **current, **to_replace;
+  binary_tree_node *tmp;
+  int s;
+  s = pthread_mutex_lock(tree->mux);
+  if (s != 0)
+    errExitEN(s, "pthread_mutex_lock");
+  current = &tree->root;
+  while (*current) {
+    s = strcmp((*current)->key, key);
+    if (s == 0) {
+      if ((*current)->left) {
+        to_replace = &(*current)->left;
+        while ((*to_replace)->right) {
+          to_replace = &(*to_replace)->right;
+        }
+        (*current)->key = (*to_replace)->key;
+        (*current)->value = (*to_replace)->value;
+        tmp = *to_replace;
+        (*to_replace) = (*to_replace)->left;
+        free(tmp);
+      } else if ((*current)->right) {
+        to_replace = &(*current)->right;
+        while ((*to_replace)->left) {
+          to_replace = &(*to_replace)->left;
+        }
+        (*current)->key = (*to_replace)->key;
+        (*current)->value = (*to_replace)->value;
+        tmp = *to_replace;
+        (*to_replace) = (*to_replace)->right;
+        free(tmp);
+      } else {
+        free(*current);
+        *current = NULL;
+      }
+      s = pthread_mutex_unlock(tree->mux);
+      if (s != 0)
+        errExitEN(s, "pthread_mutex_unlock");
+      return OK;
+    }
+    current = s < 0 ? &(*current)->left : &(*current)->right;
+  }
+  s = pthread_mutex_unlock(tree->mux);
+  if (s != 0)
+    errExitEN(s, "pthread_mutex_unlock");
+  return ENOTFOUND;
+};
+
+Boolean binary_tree_lookup(binary_tree *tree, char *key, void **value) {
+  binary_tree_node **current;
+  int s;
+  Boolean result;
+  s = pthread_mutex_lock(tree->mux);
+  if (s != 0)
+    errExitEN(s, "pthread_mutex_lock");
+  current = &tree->root;
+  while (*current) {
+    s = strcmp((*current)->key, key);
+    if (s == 0) {
+      result = (*current)->value == value;
+      s = pthread_mutex_unlock(tree->mux);
+      if (s != 0)
+        errExitEN(s, "pthread_mutex_unlock");
+      return result;
+    }
+    current = s < 0 ? &(*current)->left : &(*current)->right;
+  }
+  s = pthread_mutex_unlock(tree->mux);
+  if (s != 0)
+    errExitEN(s, "pthread_mutex_unlock");
+  return FALSE;
+};
+
+int main() {
+  char *keys[] = {"key1", "key2", "key3", "key4", "key5",
+                  "key6", "key7", "key8", "key9"};
+  char *unexists_keys[] = {"key11", "123"};
+  int values[] = {11, 22, 33, 44, 55, 66, 77, 88, 99};
+  binary_tree tree;
+  binary_tree_initialize(&tree);
+  binary_tree_add(&tree, keys[3], (void **)(values + 3));
+  binary_tree_add(&tree, keys[4], (void **)(values + 4));
+  binary_tree_add(&tree, keys[5], (void **)(values + 5));
+  binary_tree_add(&tree, keys[0], (void **)(values + 0));
+  binary_tree_add(&tree, keys[2], (void **)(values + 2));
+  binary_tree_add(&tree, keys[6], (void **)(values + 6));
+  binary_tree_add(&tree, keys[1], (void **)(values + 1));
+  binary_tree_add(&tree, keys[8], (void **)(values + 8));
+  binary_tree_add(&tree, keys[7], (void **)(values + 7));
+
+  assert(binary_tree_lookup(&tree, keys[3], (void **)(values + 3)) == TRUE);
+  assert(binary_tree_lookup(&tree, keys[3], (void **)(values + 7)) == FALSE);
+
+  assert(binary_tree_lookup(&tree, unexists_keys[0], (void **)(values + 7)) ==
+         FALSE);
+  assert(binary_tree_lookup(&tree, keys[5], (void **)(values + 5)) == TRUE);
+  binary_tree_delete(&tree, keys[5]);
+  assert(binary_tree_lookup(&tree, keys[5], (void **)(values + 5)) == FALSE);
+  assert(binary_tree_lookup(&tree, keys[6], (void **)(values + 6)) == TRUE);
+}
+```
+
+## 第三十一章
+
+### 31-1
