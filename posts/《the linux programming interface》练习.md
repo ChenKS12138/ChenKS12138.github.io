@@ -4006,8 +4006,7 @@ int main() {
 
 ### 31-2
 
-```c
-#include <libgen.h>
+```#include <libgen.h>
 #include <limits.h>
 #include <pthread.h>
 #include <tlpi_hdr.h>
@@ -4086,5 +4085,120 @@ char *basename_r(char *pathname) {
 int main() {
   char *path = "/home/cattchen/Codes/tlpi-practice";
   printf("dirname %s\nbasename %s\n", dirname_r(path), basename_r(path));
+}
+```
+
+## 第三十二章
+
+## 第三十三章
+
+### 33-1
+
+![33-1-1](../assets/tlpi/33-1-1.png)
+
+```c
+#include <pthread.h>
+#include <signal.h>
+#include <tlpi_hdr.h>
+
+void print_sigset(sigset_t *st, char *alias) {
+  printf("%s sigset: ", alias);
+  for (int i = 1; i < SIGRTMIN; i++) {
+    if (sigismember(st, i)) {
+      printf("%d ", i);
+    }
+  }
+  printf("\n");
+  return;
+}
+
+void *worker(void *arg) {
+  sigset_t st;
+  int s;
+  sigemptyset(&st);
+  sigaddset(&st, SIGUSR1);
+  if ((s = sigprocmask(SIG_BLOCK, &st, NULL)) == -1)
+    errExit("sigprocmask");
+
+  sleep(2);
+  if ((s = sigpending(&st)) == -1)
+    errExit("sigpending");
+  print_sigset(&st, "worker thread");
+  return NULL;
+}
+
+int main() {
+  sigset_t st;
+  pthread_t t;
+  int s;
+  setbuf(stdout, NULL);
+  if ((s = pthread_create(&t, NULL, worker, (void *)NULL)) != 0)
+    errExitEN(s, "pthread_create");
+
+  sleep(1);
+
+  pthread_kill(t, SIGUSR1);
+  pthread_kill(t, SIGUSR1);
+
+  sleep(1);
+
+  if ((s = sigpending(&st)) == -1)
+    errExit("sigpending");
+  print_sigset(&st, "main thread");
+
+  if ((s = pthread_join(t, NULL)) != 0)
+    errExitEN(s, "pthread_join");
+}
+```
+
+### 33-2
+
+![33-2-1](../assets/tlpi/33-2-1.png)
+
+子线程提前退出的话，由子线程创建的信号处理器会由其他线程执行。
+
+```c
+#include <pthread.h>
+#include <signal.h>
+#include <sys/wait.h>
+#include <tlpi_hdr.h>
+
+void sig_handler(int sig) {
+  pthread_t t;
+  t = pthread_self();
+  printf("%d captured %ld\n", sig, t);
+}
+
+void *worker(void *arg) {
+  struct sigaction sa;
+  sa.sa_flags = 0;
+  sigemptyset(&sa.sa_mask);
+  sa.sa_handler = &sig_handler;
+  switch (fork()) {
+  case -1:
+    errExit("fork");
+  case 0:
+    sleep(1);
+    exit(0);
+  default:
+    if (sigaction(SIGCHLD, &sa, NULL) == -1)
+      errExit("sigaction");
+    pthread_exit(NULL);
+  }
+  return NULL;
+}
+
+int main() {
+  pthread_t t;
+  int s;
+  if ((s = pthread_create(&t, NULL, &worker, NULL)) != 0)
+    errExitEN(s, "pthread_create");
+
+  printf("main thread %ld, worker thread %ld\n", pthread_self(), t);
+  if ((s = pthread_join(t, NULL)) != 0)
+    errExitEN(s, "pthread_join");
+  if (wait(NULL) == -1)
+    errExit("wait");
+  return 0;
 }
 ```
