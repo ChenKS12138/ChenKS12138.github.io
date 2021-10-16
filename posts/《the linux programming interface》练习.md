@@ -4202,3 +4202,52 @@ int main() {
   return 0;
 }
 ```
+
+## 第三十四章
+
+### 34-2
+
+![34-2-1](../assets/tlpi/34-2-1.png)
+
+```c
+# 34-2-1.c
+#include <tlpi_hdr.h>
+
+extern char **environ;
+
+int main(int argc, char *argv[]) {
+  pid_t child_pid;
+  switch (child_pid = fork()) {
+  case -1:
+    errExit("fork");
+    break;
+  case 0:
+    printf("process PID=%ld PPID=%ld PGRP=%ld\n", (long)getpid(),
+           (long)getppid(), (long)getpgrp());
+    // sleep(2);
+    // printf("process PID=%ld PPID=%ld PGRP=%ld\n", (long)getpid(),
+    //        (long)getppid(), (long)getpgrp());
+    if (execve("print-id", argv, environ) == -1)
+      errExit("execve");
+    break;
+  default:
+    sleep(1);
+    setpgid(child_pid, child_pid);
+    while (1) {
+    }
+  }
+}
+```
+
+```c
+# 34-2-2.c
+#include <tlpi_hdr.h>
+
+int main() {
+  printf("in other process PID=%ld PPID=%ld PGRP=%ld\n", (long)getpid(),
+         (long)getppid(), (long)getpgrp());
+  sleep(2);
+  printf("in other process PID=%ld PPID=%ld PGRP=%ld\n", (long)getpid(),
+         (long)getppid(), (long)getpgrp());
+}
+```
