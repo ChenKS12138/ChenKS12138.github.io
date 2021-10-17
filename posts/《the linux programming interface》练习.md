@@ -4251,3 +4251,258 @@ int main() {
          (long)getppid(), (long)getpgrp());
 }
 ```
+
+### 34-3
+
+![34-3-1](../assets/tlpi/34-3-1.png)
+
+使用管道创建进程组，当进程非进程组首进程时`setsid`调用成功
+
+```c
+#include <tlpi_hdr.h>
+
+int main() {
+  if (setsid() == -1)
+    errExit("setsid");
+  printf("done\n");
+}
+```
+
+### 34-4
+
+![34-4-1](../assets/tlpi/34-4-1.png)
+
+```c
+#define _GNU_SOURCE /* Get strsignal() declaration from <string.h> */
+#include "tlpi_hdr.h"
+#include <signal.h>
+#include <string.h>
+
+static void /* Handler for SIGHUP */
+handler(int sig) {
+  printf("PID %ld: caught signal %2d (%s)\n", (long)getpid(), sig,
+         strsignal(sig));
+  /* UNSAFE (see Section 21.1.2) */
+}
+
+int main(int argc, char *argv[]) {
+  pid_t parentPid, childPid;
+  int j;
+  struct sigaction sa;
+
+  if (argc < 2 || strcmp(argv[1], "--help") == 0)
+    usageErr("%s {d|s}... [ > sig.log 2>&1 ]\n", argv[0]);
+
+  setbuf(stdout, NULL); /* Make stdout unbuffered */
+
+  parentPid = getpid();
+  printf("PID of parent process is:       %ld\n", (long)parentPid);
+  printf("Foreground process group ID is: %ld\n",
+         (long)tcgetpgrp(STDIN_FILENO));
+
+  // 控制进程捕获SIGHUP
+  signal(SIGHUP, SIG_IGN);
+
+  for (j = 1; j < argc; j++) { /* Create child processes */
+    childPid = fork();
+    if (childPid == -1)
+      errExit("fork");
+
+    if (childPid == 0) {     /* If child... */
+      if (argv[j][0] == 'd') /* 'd' --> to different pgrp */
+        if (setpgid(0, 0) == -1)
+          errExit("setpgid");
+
+      sigemptyset(&sa.sa_mask);
+      sa.sa_flags = 0;
+      sa.sa_handler = handler;
+      if (sigaction(SIGHUP, &sa, NULL) == -1)
+        errExit("sigaction");
+      break; /* Child exits loop */
+    }
+  }
+
+  /* All processes fall through to here */
+
+  alarm(60); /* Ensure each process eventually terminates */
+
+  printf("PID=%ld PGID=%ld\n", (long)getpid(), (long)getpgrp());
+  for (;;)
+    pause(); /* Wait for signals */
+}
+```
+
+### 34-5
+
+执行`SIGHUP`信号处理器时默认是会阻塞`SIGHUP`，如果把接触阻塞`SIGHUP`的代码提前。可能导致信号处理器的递归调用
+
+### 34-6
+
+![34-6-1](../assets/tlpi/34-6-1.png)
+
+```c
+#include <signal.h>
+#include <tlpi_hdr.h>
+
+int main() {
+  if (fork() != 0)
+    exit(EXIT_SUCCESS);
+  char buf[1];
+  int s;
+  setbuf(stdout, NULL);
+  signal(SIGTTIN, SIG_IGN);
+  printf("EIO=%d\n", EIO);
+  while (1) {
+    sleep(1);
+    if (read(STDIN_FILENO, buf, 1) == -1)
+      printf("errno=%d\n", errno);
+  }
+  alarm(10);
+}
+```
+
+### 34-7
+
+![34-7-1](../assets/tlpi/34-7-1.png)
+
+```c
+#define _GNU_SOURCE
+#include <signal.h>
+#include <tlpi_hdr.h>
+
+void sig_handler(int sig) { printf("capture %s\n", strsignal(sig)); }
+
+int main() {
+  struct sigaction sa;
+
+  setbuf(stdout, NULL);
+  switch (fork()) {
+  case -1:
+    errExit("fork");
+    break;
+  case 0:
+    sleep(1);
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = 0;
+#ifdef WITH_HANDLER
+    sa.sa_handler = &sig_handler;
+    printf("with handler\n");
+#else
+    sa.sa_handler = SIG_DFL;
+    printf("default\n");
+#endif
+    if (sigaction(SIGTTIN, &sa, NULL) == -1)
+      errExit("sigaction");
+    alarm(60);
+    while (1) {
+      pause();
+      printf("caught signal\n");
+    }
+
+  default:
+    break;
+  }
+}
+```
+
+## 第三十五章
+
+### 35-1
+
+![35-1-1](../assets/tlpi/35-1-1.png)
+
+```c
+#include <sched.h>
+#include <sys/resource.h>
+#include <tlpi_hdr.h>
+
+extern char **environ;
+
+static void print_usage(char *argv0) {
+  usageErr("%s [-n N] [COMMAND [ARG]...]\n", argv0);
+}
+
+int main(int argc, char *argv[]) {
+  int adjustment = 10;
+  char c;
+  char *command = NULL;
+  char **command_argv;
+  int command_index = 1, command_argc;
+
+  if (argc < 2)
+    print_usage(argv[0]);
+  while ((c = getopt(argc, argv, "n:")) != -1) {
+    switch (c) {
+    case 'n':
+      adjustment = atoi(optarg);
+      command_index = 3;
+      break;
+    default:
+      print_usage(argv[0]);
+    }
+  }
+  command = argv[command_index];
+  command_argc = argc - command_index - 1;
+  command_argv = malloc(sizeof(char *) * (command_argc + 2));
+  memcpy(command_argv, argv + command_index,
+         (command_argc + 1) * sizeof(char *));
+  command_argv[command_argc + 1] = NULL;
+  if (setpriority(PRIO_PROCESS, 0, adjustment) == -1)
+    errExit("setpriotity");
+  printf("%s\n", command);
+  if (execve(command, command_argv, environ) == -1)
+    errExit("execve");
+}
+```
+
+### 35-2
+
+![35-2-1](../assets/tlpi/35-2-1.png)
+
+```c
+#define _GNU_SOURCE
+#include <sched.h>
+#include <tlpi_hdr.h>
+
+extern char **environ;
+
+int main(int argc, char *argv[]) {
+  int policy, command_argc;
+  char *command, **command_argv;
+  struct sched_param sp;
+  uid_t ruid, euid, suid;
+
+  if (argc < 4)
+    usageErr("%s [r|f] priority commmand arg...", argv[0]);
+  switch (argv[1][0]) {
+  case 'r':
+    policy = SCHED_RR;
+    break;
+  case 'f':
+    policy = SCHED_FIFO;
+    break;
+  default:
+    errMsg("unknown policy %s", policy);
+  }
+  sp.sched_priority = atoi(argv[2]);
+  command = argv[3];
+  command_argc = argc - 4;
+  command_argv = malloc(sizeof(char *) * (command_argc + 2));
+  memcpy(command_argv, argv + 3, sizeof(char *) * (command_argc + 1));
+  command_argv[command_argc + 1] = NULL;
+
+  if (getresuid(&ruid, &euid, &suid) == -1)
+    errExit("getresuid");
+  if (seteuid(suid) == -1)
+    errExit("seteuid");
+
+  if (sched_setscheduler(0, policy, &sp) == -1)
+    errExit("sched_setscheduler");
+
+  if (setresuid(ruid, euid, ruid) == -1)
+    errExit("setresuid");
+
+  if (execve(command, command_argv, environ) == -1)
+    errExit("execve");
+}
+```
