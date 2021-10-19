@@ -4506,3 +4506,288 @@ int main(int argc, char *argv[]) {
     errExit("execve");
 }
 ```
+
+### 35-3
+
+![35-3-1](../assets/tlpi/35-3-1.png)
+
+需要将虚拟机配置为单核 CPU
+
+```c
+#include <sched.h>
+#include <sys/times.h>
+#include <time.h>
+#include <tlpi_hdr.h>
+
+int main() {
+  struct tms t1, t2;
+  struct sched_param sp;
+  pid_t this_pid, another_pid, parent_pid, child_pid;
+  int step = 0;
+  int ticks = sysconf(_SC_CLK_TCK);
+
+  setbuf(stdout, NULL);
+  parent_pid = getpid();
+  sp.sched_priority = SCHED_FIFO;
+  if (sched_setscheduler(0, 1, &sp) == -1)
+    errExit("sched_setscheduler");
+
+  switch (child_pid = fork()) {
+  case -1:
+    errExit("fork");
+    break;
+  case 0:
+    another_pid = parent_pid;
+    this_pid = child_pid;
+    break;
+  default:
+    another_pid = child_pid;
+    this_pid = parent_pid;
+  }
+
+  while (step++ < 12) {
+    times(&t1);
+    do {
+      times(&t2);
+    } while (((t2.tms_stime + t2.tms_utime) - (t1.tms_stime + t1.tms_utime)) <
+             0.25 * ticks);
+    printf("PID=%ld step=%d\n", (long)getpid(), step);
+    if (step % 4 == 0) {
+      sched_yield();
+    }
+  }
+}
+```
+
+### 35-4
+
+```c
+// 涉及到了管道，后面补
+```
+
+## 第三十六章
+
+### 36-1
+
+![36-1-1](../assets/tlpi/36-1-1.png)
+
+```c
+#include <sys/resource.h>
+#include <sys/times.h>
+#include <sys/wait.h>
+#include <time.h>
+#include <tlpi_hdr.h>
+
+int main() {
+  pid_t child_pid;
+
+  child_pid = fork();
+  if (child_pid == -1) {
+    errExit("fork");
+  } else if (child_pid == 0) {
+    struct tms t1, t2;
+    int ticks;
+    ticks = sysconf(_SC_CLK_TCK);
+    times(&t1);
+    do {
+      times(&t2);
+    } while ((t2.tms_stime + t1.tms_utime) < 2 * ticks);
+    _exit(EXIT_SUCCESS);
+  } else {
+    struct rusage rs1, rs2;
+    int status;
+    if (getrusage(RUSAGE_CHILDREN, &rs1) == -1)
+      errExit("getrusage");
+    wait(&status);
+    if (getrusage(RUSAGE_CHILDREN, &rs2) == -1)
+      errExit("getrusage");
+    printf("stime: %ld.%09ld -> %ld.%09ld\nutime: %ld.%09ld -> %ld.%09ld\n",
+           rs1.ru_stime.tv_sec, rs1.ru_stime.tv_usec, rs2.ru_stime.tv_sec,
+           rs2.ru_stime.tv_usec, rs1.ru_utime.tv_sec, rs1.ru_utime.tv_usec,
+           rs2.ru_utime.tv_sec, rs2.ru_utime.tv_usec);
+  }
+}
+```
+
+### 36-2
+
+![36-2-1](../assets/tlpi/36-2-1.png)
+
+```c
+#include <sys/resource.h>
+#include <sys/times.h>
+#include <sys/wait.h>
+#include <time.h>
+#include <tlpi_hdr.h>
+
+extern char **environ;
+
+int main(int argc, char *argv[]) {
+  pid_t child_pid;
+  char *command, **command_argv;
+  int command_argc;
+  struct rusage rs1, rs2;
+  int status;
+
+  if (argc < 2)
+    usageErr("%s command arg...");
+
+  setbuf(stdout, NULL);
+
+  command = argv[1];
+  command_argc = argc - 2;
+  command_argv = malloc(sizeof(char *) * (command_argc + 2));
+  memcpy(command_argv, argv + 1, sizeof(char *) * (command_argc + 1));
+  command_argv[command_argc + 2] = NULL;
+
+  child_pid = fork();
+  if (child_pid == -1) {
+    errExit("fork");
+  } else if (child_pid == 0) {
+    if (execve(command, command_argv, environ) == -1)
+      errExit("execve");
+  } else {
+    if (getrusage(RUSAGE_CHILDREN, &rs1) == -1)
+      errExit("getrusage");
+    wait(&status);
+    if (getrusage(RUSAGE_CHILDREN, &rs2) == -1)
+      errExit("getrusage");
+    printf("stime: %ld.%09ld -> %ld.%09ld\nutime: %ld.%09ld -> %ld.%09ld\n",
+           rs1.ru_stime.tv_sec, rs1.ru_stime.tv_usec, rs2.ru_stime.tv_sec,
+           rs2.ru_stime.tv_usec, rs1.ru_utime.tv_sec, rs1.ru_utime.tv_usec,
+           rs2.ru_utime.tv_sec, rs2.ru_utime.tv_usec);
+  }
+}
+```
+
+### 36-3
+
+![36-3-1](../assets/tlpi/36-3-1.png)
+
+```c
+#include <sys/resource.h>
+#include <sys/times.h>
+#include <time.h>
+#include <tlpi_hdr.h>
+
+int main() {
+  struct rlimit r;
+  struct tms t1, t2;
+  int ticks;
+
+  ticks = sysconf(_SC_CLK_TCK);
+  r.rlim_cur = 1;
+  r.rlim_max = 2;
+  if (setrlimit(RLIMIT_CPU, &r) == -1)
+    errExit("setrlimit");
+  times(&t1);
+  do {
+    times(&t2);
+  } while ((t2.tms_stime + t2.tms_utime) - (t1.tms_stime + t1.tms_utime) <
+           ticks * 3);
+}
+```
+
+## 第三十七章
+
+### 37-1
+
+```c
+#include <syslog.h>
+#include <tlpi_hdr.h>
+
+#define BUF_SIZE 2048
+
+int main(int argc, char *argv[]) {
+  char buf[BUF_SIZE];
+  openlog(argv[0], LOG_PID, LOG_LOCAL0);
+  while (1) {
+    if (scanf("%s", buf) == -1)
+      errExit("scanf");
+    syslog(LOG_INFO, "%s", buf);
+  }
+}
+```
+
+## 第三十八章
+
+### 38-1
+
+![38-1-1](../assets/tlpi/38-1-1.png)
+
+尝试修改后，文件的 SUID 位会置为 0
+
+### 38-2
+
+![38-1-1](../assets/tlpi/38-2-1.png)
+
+```c
+#define _GNU_SOURCE
+#include <pwd.h>
+#include <shadow.h>
+#include <tlpi_hdr.h>
+
+#define DEFAULT_USER "root"
+#define PASSWORD_SIZE 2048
+
+extern char **environ;
+
+int main(int argc, char *argv[]) {
+  char *command, **command_argv, c, *password, *encrypted;
+  int command_argc, command_index;
+  struct passwd *user, *curr_user;
+  struct spwd *curr_swpd;
+
+  if (argc < 2)
+    usageErr("%s [-u user] command arg...", argv[0]);
+
+  if ((curr_user = getpwuid(getuid())) == NULL)
+    errExit("getpwuid");
+  if ((curr_swpd = getspnam(curr_user->pw_name)) == NULL)
+    errExit("getspnam");
+
+  curr_user->pw_passwd = curr_swpd->sp_pwdp;
+
+  password = getpass("Enter Current User Password:");
+  if ((encrypted = crypt(password, curr_user->pw_passwd)) == NULL)
+    errExit("crypt");
+  memset(password, 0, strlen(password));
+
+  if (strcmp(encrypted, curr_user->pw_passwd) != 0) {
+    fprintf(stderr, "Wrong Password!\n");
+    exit(EXIT_FAILURE);
+  }
+
+  command_index = 1;
+  user = getpwnam(DEFAULT_USER);
+  while ((c = getopt(argc, argv, "u:")) != -1) {
+    switch (c) {
+    case 'u':
+      user = getpwnam(optarg);
+      command_index += 2;
+      break;
+    }
+  }
+  command = argv[command_index];
+  command_argc = argc - command_index - 1;
+  command_argv = malloc(sizeof(char *) * (command_argc + 2));
+  memcpy(command_argv, argv + command_index,
+         sizeof(char *) * (command_argc + 1));
+  command_argv[command_argc + 2] = NULL;
+  if (setresuid(user->pw_uid, user->pw_uid, user->pw_uid) == -1)
+    errExit("setresuid");
+  // if (setresgid(user->pw_gid, user->pw_gid, user->pw_gid) == -1)
+  //   errExit("setresgid");
+  if (execve(command, command_argv, environ) == -1)
+    errExit("execve");
+  exit(EXIT_SUCCESS);
+}
+```
+
+## 第三十九章
+
+### 39-1
+
+```c
+
+```
