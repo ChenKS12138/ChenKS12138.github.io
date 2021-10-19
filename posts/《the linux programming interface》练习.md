@@ -4788,6 +4788,12 @@ int main(int argc, char *argv[]) {
 
 ### 39-1
 
+![39-1-1](../assets/tlpi/39-1-1.png)
+
+## 第四十章
+
+### 40-1
+
 ```c
 
 ```
