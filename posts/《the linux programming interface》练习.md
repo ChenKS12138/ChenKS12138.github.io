@@ -4949,3 +4949,21 @@ int main() {
 }
 ```
 
+## 第四十一章
+
+### 41-1
+
+![41-1-1](../assets/tlpi/41-1-1.png)
+
+加入`static`编译选项后，文件变大，并且不再引用共享库
+
+```c
+#include <stdio.h>
+
+int main() {
+  // 使用glic中的库函数
+  printf("hello\n");
+  return 0;
+}
+```
+
