@@ -4795,5 +4795,157 @@ int main(int argc, char *argv[]) {
 ### 40-1
 
 ```c
+#include <tlpi_hdr.h>
+#include <utmpx.h>
+
+char *tlpi_getlogin(void) {
+  struct utmpx *curr, condition;
+  pid_t sid;
+
+  condition.ut_type = LOGIN_PROCESS;
+  strcpy(condition.ut_line, ttyname(STDOUT_FILENO) + 5);
+  if ((sid = getpid()) == -1)
+    errExit("getsid");
+  setutxent();
+  while ((curr = getutxline(&condition)) != NULL) {
+    return curr->ut_user;
+  }
+  return NULL;
+}
+
+int main() {
+  char *login_user;
+  login_user = tlpi_getlogin();
+  printf("login: %s\n", login_user);
+  return 0;
+}
+```
+
+### 40-2
+
+![40-2-1](../assets/tlpi/40-2-1.png)
+
+```c
+#define _GNU_SOURCE
+#include "tlpi_hdr.h"
+#include <fcntl.h>
+#include <lastlog.h>
+#include <paths.h> /* Definitions of _PATH_UTMP and _PATH_WTMP */
+#include <pwd.h>
+#include <time.h>
+#include <utmpx.h>
+
+int main(int argc, char *argv[]) {
+  struct utmpx ut;
+  struct lastlog llog;
+  struct passwd *pw;
+  char *devName;
+  int fd, s;
+
+  if (argc < 2 || strcmp(argv[1], "--help") == 0)
+    usageErr("%s username [sleep-time]\n", argv[0]);
+
+  /* Get passwd */
+  if ((pw = getpwnam(argv[1])) == NULL)
+    errExit("getpwnam");
+
+  /* Initialize login record for utmp and wtmp files */
+
+  memset(&ut, 0, sizeof(struct utmpx));
+  ut.ut_type = USER_PROCESS; /* This is a user login */
+  strncpy(ut.ut_user, argv[1], sizeof(ut.ut_user));
+  if (time((time_t *)&ut.ut_tv.tv_sec) == -1)
+    errExit("time"); /* Stamp with current time */
+  ut.ut_pid = getpid();
+
+  /* Set ut_line and ut_id based on the terminal associated with
+     'stdin'. This code assumes terminals named "/dev/[pt]t[sy]*".
+     The "/dev/" dirname is 5 characters; the "[pt]t[sy]" filename
+     prefix is 3 characters (making 8 characters in all). */
+
+  devName = ttyname(STDIN_FILENO);
+  if (devName == NULL)
+    errExit("ttyname");
+  if (strlen(devName) <= 8) /* Should never happen */
+    fatal("Terminal name is too short: %s", devName);
+
+  strncpy(ut.ut_line, devName + 5, sizeof(ut.ut_line));
+  strncpy(ut.ut_id, devName + 8, sizeof(ut.ut_id));
+
+  /* Set lastlog */
+  memset(&llog, 0, sizeof(llog));
+  strncpy(llog.ll_line, devName + 5, strlen(devName + 5) * sizeof(char));
+  llog.ll_time = time(NULL);
+
+  if ((fd = open(_PATH_LASTLOG, O_RDWR)) == -1)
+    errExit("open");
+
+  if ((s = lseek(fd, pw->pw_uid * sizeof(struct lastlog), SEEK_CUR)) == -1)
+    errExit("lseek");
+  if ((s = write(fd, &llog, sizeof(struct lastlog))) == -1)
+    errExit("write");
+
+  printf("Creating login entries in utmp and wtmp\n");
+  printf("        using pid %ld, line %.*s, id %.*s\n", (long)ut.ut_pid,
+         (int)sizeof(ut.ut_line), ut.ut_line, (int)sizeof(ut.ut_id), ut.ut_id);
+
+  setutxent();                 /* Rewind to start of utmp file */
+  if (pututxline(&ut) == NULL) /* Write login record to utmp */
+    errExit("pututxline");
+  updwtmpx(_PATH_WTMP, &ut); /* Append login record to wtmp */
+
+  /* Sleep a while, so we can examine utmp and wtmp files */
+
+  sleep((argc > 2) ? getInt(argv[2], GN_NONNEG, "sleep-time") : 15);
+
+  /* Now do a "logout"; use values from previously initialized 'ut',
+     except for changes below */
+
+  ut.ut_type = DEAD_PROCESS;        /* Required for logout record */
+  time((time_t *)&ut.ut_tv.tv_sec); /* Stamp with logout time */
+  memset(&ut.ut_user, 0, sizeof(ut.ut_user));
+  /* Logout record has null username */
+
+  printf("Creating logout entries in utmp and wtmp\n");
+  setutxent();                 /* Rewind to start of utmp file */
+  if (pututxline(&ut) == NULL) /* Overwrite previous utmp record */
+    errExit("pututxline");
+  updwtmpx(_PATH_WTMP, &ut); /* Append logout record to wtmp */
+
+  endutxent();
+  exit(EXIT_SUCCESS);
+}
+```
+
+### 40-3
+
+```c
 
 ```
+
+### 40-4
+
+```c
+#include <time.h>
+#include <tlpi_hdr.h>
+#include <utmpx.h>
+
+#define BUF_SIZE 2048
+
+int main() {
+  struct utmpx *curr;
+  char buf[BUF_SIZE];
+  setutxent();
+  while ((curr = getutxent()) != NULL) {
+    if (curr->ut_type == USER_PROCESS) {
+      strftime(buf, BUF_SIZE, "%F %T",
+               localtime((time_t *)&curr->ut_tv.tv_sec));
+      printf("%s %s\t%s(%s)\n", curr->ut_user, curr->ut_line, buf,
+             curr->ut_host);
+    }
+  }
+  endutxent();
+  exit(EXIT_SUCCESS);
+}
+```
+
