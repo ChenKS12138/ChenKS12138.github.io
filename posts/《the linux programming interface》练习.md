@@ -5079,8 +5079,233 @@ int main(int argc, char *argv[]) {
 
 ## 第四十三章
 
-### 43-1
+// 先跳过
+
+## 第四十四章
+
+### 44-1
 
 ```c
+#include <ctype.h>
+#include <tlpi_hdr.h>
 
+#define BUF_SIZE 1024
+
+int main(int argc, char *argv[]) {
+  int fds1[2], fds2[2], s;
+  char buf[BUF_SIZE];
+
+  setbuf(stdout, NULL);
+
+  if (pipe(fds1) == -1 || pipe(fds2) == -1)
+    errExit("pipe");
+
+  switch (fork()) {
+  case -1:
+    errExit("fork");
+    break;
+  case 0:
+    if (close(fds1[1]) == -1 || close(fds2[0]) == -1)
+      errExit("close");
+    while ((s = read(fds1[0], &buf, BUF_SIZE)) > 0) {
+      for (int i = 0; i < s; i++) {
+        buf[i] = toupper(buf[i]);
+      }
+      if (write(fds2[1], &buf, s) == -1)
+        errExit("write");
+    }
+    if (close(fds1[0]) == -1 || close(fds2[1]) == -1)
+      errExit("close");
+    break;
+  default:
+    if (close(fds1[0]) == -1 || close(fds2[1]) == -1)
+      errExit("close");
+    while ((s = read(STDIN_FILENO, &buf, BUF_SIZE)) > 0) {
+      if (write(fds1[1], buf, s) == -1)
+        errExit("write");
+      if (read(fds2[0], buf, BUF_SIZE) == -1)
+        errExit("read");
+      printf("%s", buf);
+    }
+    if (close(fds1[1]) == -1 || close(fds2[0]) == -1)
+      errExit("close");
+    break;
+  }
+  exit(EXIT_SUCCESS);
+}
+```
+
+### 44-2
+
+```c
+#include <string.h>
+#include <sys/wait.h>
+#include <tlpi_hdr.h>
+#define BUF_SIZE 1024
+
+enum TLPI_POPEN_MODE { TLPI_POPEN_MODE_R, TLPI_POPEN_MODE_W };
+
+FILE *tlpi_popen(const char *command, const char *mode) {
+  int fds[2];
+  static FILE *f;
+  pid_t child_pid;
+  enum TLPI_POPEN_MODE m;
+  if (pipe(fds) == -1)
+    errExit("pipe");
+
+  if (strchr(mode, 'r') != NULL) {
+    m = TLPI_POPEN_MODE_R;
+  } else if (strchr(mode, 'w') != NULL) {
+    m = TLPI_POPEN_MODE_W;
+  } else {
+    fprintf(stderr, "Invalid mode\n");
+    exit(EXIT_FAILURE);
+  };
+
+  switch ((child_pid = fork())) {
+  case -1:
+    errExit("fork");
+    break;
+  case 0:
+    switch (m) {
+    case TLPI_POPEN_MODE_R:
+      if (close(fds[0]) == -1)
+        errExit("close");
+      if (dup2(fds[1], STDOUT_FILENO) == -1)
+        errExit("dup2");
+      break;
+    case TLPI_POPEN_MODE_W:
+      if (close(fds[1]) == -1)
+        errExit("close");
+      if (dup2(fds[0], STDIN_FILENO) == -1)
+        errExit("dup2");
+      break;
+    default:
+      fprintf(stderr, "Unexpected mode\n");
+      exit(EXIT_FAILURE);
+      break;
+    }
+    system(command);
+    break;
+  default:
+    switch (m) {
+    case TLPI_POPEN_MODE_R:
+      if (close(fds[1]) == -1)
+        errExit("close");
+      if ((f = fdopen(fds[0], "r")) == NULL)
+        errExit("fdopen");
+      break;
+    case TLPI_POPEN_MODE_W:
+      if (close(fds[0]) == -1)
+        errExit("close");
+      if ((f = fdopen(fds[1], "w")) == NULL)
+        errExit("fdopen");
+      break;
+    default:
+      fprintf(stderr, "Unexpected mode\n");
+      exit(EXIT_FAILURE);
+      break;
+    }
+    break;
+  }
+  return f;
+}
+
+int *tlpi_pclose(FILE *fp) {
+  static FILE *f;
+  wait(NULL);
+  if (f != NULL && fclose(f) == -1)
+    errExit("fclose");
+  f = NULL;
+  return 0;
+}
+
+int main() {
+  FILE *p;
+  char buf[BUF_SIZE];
+  int s;
+  setbuf(stdout, NULL);
+  p = tlpi_popen("sleep 1 && ls", "r");
+  while ((s = fread(buf, 1, BUF_SIZE, p)) > 0) {
+    printf("%s", buf);
+  }
+  tlpi_pclose(p);
+}
+```
+
+### 44-3
+
+![44-3-1](../assets/tlpi/44-3-1.png)
+
+```c
+#include "fifo_seqnum.h"
+#include <signal.h>
+
+#define BACKUP_FILE_PATH "/tmp/backup_file"
+
+int main(int argc, char *argv[]) {
+  int serverFd, dummyFd, clientFd, backupFd, s;
+  char clientFifo[CLIENT_FIFO_NAME_LEN];
+  struct request req;
+  struct response resp;
+  int seqNum = 0; /* This is our "service" */
+
+  /* Create well-known FIFO, and open it for reading */
+
+  umask(0); /* So we get the permissions we want */
+  if ((backupFd = open(BACKUP_FILE_PATH, O_RDWR | O_SYNC | O_CREAT, 0755)) ==
+      -1)
+    errExit("open %s", BACKUP_FILE_PATH);
+  if ((s = read(backupFd, &seqNum, sizeof(seqNum))) == -1)
+    errExit("read %s", BACKUP_FILE_PATH);
+  if (mkfifo(SERVER_FIFO, S_IRUSR | S_IWUSR | S_IWGRP) == -1 && errno != EEXIST)
+    errExit("mkfifo %s", SERVER_FIFO);
+  serverFd = open(SERVER_FIFO, O_RDONLY);
+  if (serverFd == -1)
+    errExit("open %s", SERVER_FIFO);
+
+  /* Open an extra write descriptor, so that we never see EOF */
+
+  dummyFd = open(SERVER_FIFO, O_WRONLY);
+  if (dummyFd == -1)
+    errExit("open %s", SERVER_FIFO);
+
+  /* Let's find out about broken client pipe via failed write() */
+
+  if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
+    errExit("signal");
+
+  for (;;) { /* Read requests and send responses */
+    if (read(serverFd, &req, sizeof(struct request)) !=
+        sizeof(struct request)) {
+      fprintf(stderr, "Error reading request; discarding\n");
+      continue; /* Either partial read or error */
+    }
+
+    /* Open client FIFO (previously created by client) */
+
+    snprintf(clientFifo, CLIENT_FIFO_NAME_LEN, CLIENT_FIFO_TEMPLATE,
+             (long)req.pid);
+    clientFd = open(clientFifo, O_WRONLY);
+    if (clientFd == -1) { /* Open failed, give up on client */
+      errMsg("open %s", clientFifo);
+      continue;
+    }
+
+    /* Send response and close FIFO */
+
+    resp.seqNum = seqNum;
+    if (write(clientFd, &resp, sizeof(struct response)) !=
+        sizeof(struct response))
+      fprintf(stderr, "Error writing to FIFO %s\n", clientFifo);
+    if (close(clientFd) == -1)
+      errMsg("close");
+
+    seqNum += req.seqLen; /* Update our sequence number */
+
+    if (lseek(backupFd, 0, SEEK_SET) == -1 ||
+        write(backupFd, &seqNum, sizeof(seqNum)) == -1)
+      errExit("write %s", BACKUP_FILE_PATH);
+  }
+}
 ```
