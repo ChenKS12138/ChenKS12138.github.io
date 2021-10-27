@@ -5309,3 +5309,267 @@ int main(int argc, char *argv[]) {
   }
 }
 ```
+
+### 44-4
+
+![44-4-1](../assets/tlpi/44-4-1.png)
+
+```c
+#include "fifo_seqnum.h"
+#include <signal.h>
+
+void sig_handler(int sig) {
+  if (unlink(SERVER_FIFO) == -1)
+    errExit("unlink");
+  if (signal(sig, SIG_DFL) == SIG_ERR)
+    errExit("signal");
+  raise(sig);
+}
+
+int main(int argc, char *argv[]) {
+  int serverFd, dummyFd, clientFd;
+  char clientFifo[CLIENT_FIFO_NAME_LEN];
+  struct request req;
+  struct response resp;
+  int seqNum = 0; /* This is our "service" */
+
+  /* Create well-known FIFO, and open it for reading */
+
+  umask(0); /* So we get the permissions we want */
+  if (mkfifo(SERVER_FIFO, S_IRUSR | S_IWUSR | S_IWGRP) == -1 && errno != EEXIST)
+    errExit("mkfifo %s", SERVER_FIFO);
+  serverFd = open(SERVER_FIFO, O_RDONLY);
+  if (serverFd == -1)
+    errExit("open %s", SERVER_FIFO);
+
+  /* Open an extra write descriptor, so that we never see EOF */
+
+  dummyFd = open(SERVER_FIFO, O_WRONLY);
+  if (dummyFd == -1)
+    errExit("open %s", SERVER_FIFO);
+
+  /* Let's find out about broken client pipe via failed write() */
+
+  if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
+    errExit("signal");
+
+  if (signal(SIGINT, &sig_handler) == SIG_ERR)
+    errExit("signal");
+
+  if (signal(SIGTERM, &sig_handler) == SIG_ERR)
+    errExit("signal");
+
+  for (;;) { /* Read requests and send responses */
+    if (read(serverFd, &req, sizeof(struct request)) !=
+        sizeof(struct request)) {
+      fprintf(stderr, "Error reading request; discarding\n");
+      continue; /* Either partial read or error */
+    }
+
+    /* Open client FIFO (previously created by client) */
+
+    snprintf(clientFifo, CLIENT_FIFO_NAME_LEN, CLIENT_FIFO_TEMPLATE,
+             (long)req.pid);
+    clientFd = open(clientFifo, O_WRONLY);
+    if (clientFd == -1) { /* Open failed, give up on client */
+      errMsg("open %s", clientFifo);
+      continue;
+    }
+
+    /* Send response and close FIFO */
+
+    resp.seqNum = seqNum;
+    if (write(clientFd, &resp, sizeof(struct response)) !=
+        sizeof(struct response))
+      fprintf(stderr, "Error writing to FIFO %s\n", clientFifo);
+    if (close(clientFd) == -1)
+      errMsg("close");
+
+    seqNum += req.seqLen; /* Update our sequence number */
+  }
+}
+```
+
+### 44-5
+
+在服务端进程关闭`serverFd`和重新打`serverFd`期间，可能存在客户端写打开 FIFO 报错
+
+### 44-6
+
+使用非阻塞 IO 打开客户端的 FIFO
+
+## 第四十五章
+
+### 45-1
+
+当`ftok`传入同一个文件名，proj 时，返回相同的 keyid
+
+![45-1-1](../assets/tlpi/45-1-1.png)
+
+```c
+#include <sys/ipc.h>
+#include <tlpi_hdr.h>
+
+int main(int argc, char *argv[]) {
+  char *filename;
+  key_t ipc_id;
+  int proj;
+  if (argc < 3)
+    usageErr("Usage %s <filename> <proj>\n", argv[0]);
+  filename = argv[1];
+  proj = getInt(argv[2], 0, "proj");
+
+  ipc_id = ftok(filename, proj);
+  printf("ipc_id: %d\n", ipc_id);
+  return 0;
+}
+```
+
+### 45-2
+
+![45-2-1](../assets/tlpi/45-2-1.png)
+
+```c
+#include <sys/stat.h>
+#include <tlpi_hdr.h>
+
+key_t tlpi_ftok(const char *pathname, int proj) {
+  struct stat s;
+  if (stat(pathname, &s) == -1)
+    errExit("stat");
+  return ((proj & 0xff) << 24) + ((s.st_dev & 0xff) << 16) +
+         (s.st_ino & 0xffff);
+}
+
+int main(int argc, char *argv[]) {
+  key_t ipc_key;
+  if (argc < 3)
+    usageErr("Usage %s filename proj", argv[0]);
+  ipc_key = tlpi_ftok(argv[1], getLong(argv[2], 0, "proj"));
+  printf("ipc_key: %d\n", ipc_key);
+  return 0;
+}
+```
+
+## 第四十六章
+
+### 46-1
+
+![46-1-1](../assets/tlpi/46-1-1.png)
+
+```c
+#include <sys/msg.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <tlpi_hdr.h>
+
+#define MSG_MAX_SIZE 1024
+
+int main(int argc, char *argv[]) {
+  key_t ipc_key;
+  int msg_key;
+  void *msg_buf;
+  ipc_key = ftok(argv[0], 1);
+  msg_buf = malloc(MSG_MAX_SIZE);
+  if ((msg_key = msgget(ipc_key, IPC_CREAT | IPC_EXCL | S_IRUSR | S_IWUSR)) ==
+      -1)
+    errExit("msgget");
+  printf("msg_key:%d\n", msg_key);
+  switch (fork()) {
+  case -1:
+    errExit("fork");
+    break;
+  case 0:
+    while (msgrcv(msg_key, msg_buf, MSG_MAX_SIZE, 0, 0) != -1) {
+      printf("%s", (char *)msg_buf);
+    }
+    printf("child process exit\n");
+    _exit(EXIT_SUCCESS);
+    break;
+  default:
+    for (int i = 0; i < 10; i++) {
+      snprintf(msg_buf, MSG_MAX_SIZE, "msg %d\n", i);
+      if (msgsnd(msg_key, msg_buf, MSG_MAX_SIZE, 0) == -1) {
+        errExit("msgsnd");
+        exit(EXIT_FAILURE);
+      }
+    }
+    exit(EXIT_SUCCESS);
+    break;
+  }
+}
+```
+
+### 46-2
+
+![46-2-1](../assets/tlpi/46-2-1.png)
+
+```c
+// server
+
+#include "46-2-comm.h"
+#include <sys/ipc.h>
+#include <sys/msg.h>
+#include <sys/stat.h>
+#include <tlpi_hdr.h>
+
+int main(int argc, char *argv[]) {
+  key_t ipc_key;
+  int msg_key;
+  struct tlpi_msg *msg;
+  if ((ipc_key = ftok(IPC_KEY_FILE, IPC_KEY_PROJ)) == -1)
+    errExit("ftok");
+  if ((msg_key = msgget(ipc_key, IPC_CREAT | S_IRUSR | S_IWUSR)) == -1)
+    errExit("msgget");
+
+  if ((msg = malloc(MSG_MAX_SIZE)) == NULL)
+    errExit("malloc");
+
+  while (1) {
+    if (msgrcv(msg_key, msg, MSG_MAX_SIZE, 1, 0) == -1)
+      errExit("msgrcv");
+    printf("send to %ld, receive client %ld\n", msg->type_id,
+           *((long *)(msg) + 1));
+    if (msgsnd(msg_key, ((long *)msg + 1), MSG_MAX_SIZE - sizeof(long), 0) ==
+        -1)
+      errExit("msgsnd");
+  }
+  exit(EXIT_SUCCESS);
+}
+```
+
+```c
+// server
+
+#include "46-2-comm.h"
+#include <sys/ipc.h>
+#include <sys/msg.h>
+#include <sys/stat.h>
+#include <tlpi_hdr.h>
+
+int main(int argc, char *argv[]) {
+  key_t ipc_key;
+  int msg_key;
+  struct tlpi_msg *msg;
+  if ((ipc_key = ftok(IPC_KEY_FILE, IPC_KEY_PROJ)) == -1)
+    errExit("ftok");
+  if ((msg_key = msgget(ipc_key, IPC_CREAT | S_IRUSR | S_IWUSR)) == -1)
+    errExit("msgget");
+
+  if ((msg = malloc(MSG_MAX_SIZE)) == NULL)
+    errExit("malloc");
+
+  while (1) {
+    if (msgrcv(msg_key, msg, MSG_MAX_SIZE, 1, 0) == -1)
+      errExit("msgrcv");
+    printf("send to %ld, receive client %ld\n", msg->type_id,
+           *((long *)(msg) + 1));
+    if (msgsnd(msg_key, ((long *)msg + 1), MSG_MAX_SIZE - sizeof(long), 0) ==
+        -1)
+      errExit("msgsnd");
+  }
+  exit(EXIT_SUCCESS);
+}
+```
+
+### 46-3
