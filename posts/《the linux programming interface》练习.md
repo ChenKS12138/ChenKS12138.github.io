@@ -5573,3 +5573,80 @@ int main(int argc, char *argv[]) {
 ```
 
 ### 46-3
+
+消息类型还包含有其他含义，作为优先队列时，决定了顺序
+
+### 46-4
+
+//todo
+
+### 46-5
+
+//todo
+
+### 46-6
+
+//todo
+
+## 第四十七章
+
+### 47-1
+
+![47-1-1](../assets/tlpi/47-1-1.png)
+
+### 47-2
+
+![47-2-1](../assets/tlpi/47-2-1.png)
+
+```c
+#include <sys/ipc.h>
+#include <sys/sem.h>
+#include <sys/stat.h>
+#include <time.h>
+#include <tlpi_hdr.h>
+
+int main(int argc, char *argv[]) {
+  key_t ipc_key;
+  int sem_key, s;
+  struct sembuf sops;
+
+  setbuf(stdout, NULL);
+  if ((ipc_key = ftok(argv[0], 0)) == -1)
+    errExit("ftok");
+  if ((sem_key = semget(ipc_key, 1, IPC_CREAT | S_IRUSR | S_IWUSR)) == -1)
+    errExit("semget");
+  if ((s = semctl(sem_key, 0, SETVAL, 0)) == -1)
+    errExit("semctl");
+  switch (fork()) {
+  case -1:
+    errExit("fork");
+    break;
+  case 0:
+    printf("[%ld %ld] Child started - doing some work\n", (long)time(NULL),
+           (long)getpid());
+    sleep(2);
+    printf("[%ld %ld]Child about to notify parent\n", (long)time(NULL),
+           (long)getpid());
+    sops.sem_flg = 0;
+    sops.sem_num = 0;
+    sops.sem_op = 1;
+    if ((semop(sem_key, &sops, 1)) == -1)
+      errExit("semop");
+    _exit(EXIT_SUCCESS);
+    break;
+  default:
+    printf("[%ld %ld] Parent about to wait for notify\n", (long)time(NULL),
+           (long)getpid());
+    sops.sem_flg = 0;
+    sops.sem_num = 0;
+    sops.sem_op = -1;
+    if ((semop(sem_key, &sops, 1)) == -1)
+      errExit("semop");
+    printf("[%ld %ld] Parent got notify\n", (long)time(NULL), (long)getpid());
+    exit(EXIT_SUCCESS);
+    break;
+  }
+}
+```
+
+### 47-3
