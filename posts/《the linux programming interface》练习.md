@@ -5650,3 +5650,751 @@ int main(int argc, char *argv[]) {
 ```
 
 ### 47-3
+
+![47-3-1](../assets/tlpi/47-3-1.png)
+
+`SEM_UNDO`在进程退出时，会执行一次加上`-sem_op`的操作
+
+```c
+#include <sys/ipc.h>
+#include <sys/sem.h>
+#include <tlpi_hdr.h>
+
+int main(int argc, char *argv[]) {
+  int sem_key, sem_num, op, s;
+  struct sembuf sops;
+  if (argc < 3)
+    usageErr("Usage: %s sem-key sem-num op\n", argv[0]);
+  sem_key = getInt(argv[1], 0, "sem-key");
+  sem_num = getInt(argv[2], 0, "sem-num");
+  op = getInt(argv[3], 0, "op");
+  sops.sem_flg = SEM_UNDO;
+  sops.sem_num = sem_num;
+  sops.sem_op = op;
+  if ((s = semop(sem_key, &sops, 1)) == -1)
+    errExit("semop");
+  sleep(60);
+  exit(EXIT_SUCCESS);
+}
+```
+
+### 47-4
+
+```c
+#include <sys/ipc.h>
+#include <sys/sem.h>
+#include <tlpi_hdr.h>
+
+Boolean bsUseSemUndo = FALSE;
+Boolean bsRetryOnEintr = TRUE;
+
+int reserveSemNB(int semId, int semNum) {
+  struct sembuf sops;
+  sops.sem_num = semNum;
+  sops.sem_op = -1;
+  sops.sem_flg = IPC_NOWAIT | (bsUseSemUndo ? SEM_UNDO : 0);
+  while (semop(semId, &sops, 1) == -1)
+    if (errno != EAGAIN || errno != EINTR || !bsRetryOnEintr)
+      return -1;
+  return 0;
+}
+
+int main() {}
+```
+
+### 47-5
+
+![47-5-1](../assets/tlpi/47-5-1.png)
+
+```c
+#include <sys/ipc.h>
+#include <sys/sem.h>
+#include <sys/stat.h>
+#include <time.h>
+#include <tlpi_hdr.h>
+
+enum EventFlag { CLEAR, SET };
+
+int set_event_flag(int sem_key, int sem_num) {
+  return semctl(sem_key, sem_num, SETVAL, SET);
+}
+
+int clear_event_flag(int sem_key, int sem_num) {
+  return semctl(sem_key, sem_num, SETVAL, CLEAR);
+}
+
+int get_flag_state(int sem_key, int sem_num) {
+  return semctl(sem_key, sem_num, GETVAL);
+}
+
+int wait_for_event_flag(int sem_key, int sem_num) {
+  struct sembuf sops;
+  sops.sem_flg = SEM_UNDO;
+  sops.sem_num = sem_num;
+  sops.sem_op = -SET;
+  while (semop(sem_key, &sops, 1) == -1) {
+    if (errno == EINTR)
+      continue;
+    return -1;
+  };
+  sops.sem_op = SET;
+  while (semop(sem_key, &sops, 1) == -1) {
+    if (errno == EINTR)
+      continue;
+    return -1;
+  };
+  return 0;
+}
+
+int main(int argc, char *argv[]) {
+  key_t ipc_key;
+  int sem_key;
+  ipc_key = ftok(argv[0], 1);
+  if ((sem_key = semget(ipc_key, 1, IPC_CREAT | S_IRUSR | S_IWUSR)) == -1)
+    errExit("semget");
+  if ((set_event_flag(sem_key, 0)) == -1)
+    errExit("set_event_flag");
+  printf("event_flag %d\n", get_flag_state(sem_key, 0));
+  if ((clear_event_flag(sem_key, 0)) == -1)
+    errExit("clear_event_flag");
+  printf("event_flag %d\n", get_flag_state(sem_key, 0));
+  switch (fork()) {
+  case -1:
+    errExit("fork");
+    break;
+  case 0:
+    printf("[%ld %ld]child process start\n", (long)time(NULL), (long)getpid());
+    sleep(2);
+    printf("[%ld %ld]child process about to send notify\n", (long)time(NULL),
+           (long)getpid());
+    set_event_flag(sem_key, 0);
+    printf("[%ld %ld]child procee sended notify\n", (long)time(NULL),
+           (long)getpid());
+    break;
+  default:
+    printf("[%ld %ld]parent process wait notify\n", (long)time(NULL),
+           (long)getpid());
+    if ((wait_for_event_flag(sem_key, 0)) == -1)
+      errExit("wait_for_event_flag");
+    printf("[%ld %ld]parent process got notify\n", (long)time(NULL),
+           (long)getpid());
+    break;
+  }
+}
+```
+
+### 47-6
+
+![47-6-1](../assets/tlpi/47-6-1.png)
+
+```c
+#include <fcntl.h>
+#include <sys/ipc.h>
+#include <sys/sem.h>
+#include <sys/stat.h>
+#include <time.h>
+#include <tlpi_hdr.h>
+
+#define FIFO_FILE_PATH "/home/cattchen/Codes/tlpi-practice/fifo"
+
+int reserve_sem(int fifo_read_fd) {
+  // read
+  int s, flag;
+  if ((flag = fcntl(fifo_read_fd, F_GETFL)) == -1)
+    errExit("fcntl");
+  flag &= (~O_NONBLOCK);
+  if (fcntl(fifo_read_fd, F_SETFL, flag) == -1)
+    errExit("fcntl");
+  return read(fifo_read_fd, &s, 1);
+}
+
+int reserve_sem_nb(int fifo_read_fd) {
+  // read noblock
+  int s, flag;
+  if ((flag = fcntl(fifo_read_fd, F_GETFL)) == -1)
+    errExit("fcntl");
+  flag |= O_NONBLOCK;
+  if (fcntl(fifo_read_fd, F_SETFL, flag) == -1)
+    errExit("fcntl");
+  return read(fifo_read_fd, &s, 1);
+}
+
+int release_sem(int fifo_write_fd) {
+  // write
+  int s;
+  return write(fifo_write_fd, &s, 1);
+}
+
+int main() {
+  int fd;
+  if (mkfifo(FIFO_FILE_PATH, S_IRUSR | S_IWUSR) == -1)
+    errExit("mkfifo");
+  switch (fork()) {
+  case -1:
+    errExit("fork");
+    break;
+  case 0:
+    if ((fd = open(FIFO_FILE_PATH, O_WRONLY)) == -1)
+      errExit("open");
+    printf("[%ld %ld]child process start\n", (long)time(NULL), (long)getpid());
+    sleep(2);
+    printf("[%ld %ld]child about to notify parent\n", (long)time(NULL),
+           (long)getpid());
+    if (release_sem(fd) == -1)
+      errExit("release_sem");
+    printf("[%ld %ld]child notified parent\n", (long)time(NULL),
+           (long)getpid());
+    break;
+  default:
+    if ((fd = open(FIFO_FILE_PATH, O_RDONLY)) == -1)
+      errExit("open");
+    printf("[%ld %ld]parent wait for notify\n", (long)time(NULL),
+           (long)getpid());
+    if (reserve_sem(fd) == -1)
+      errExit("reserve_sem");
+    printf("[%ld %ld]parent got notify\n", (long)time(NULL), (long)getpid());
+    break;
+  }
+}
+```
+
+### 47-7
+
+```c
+#include <fcntl.h>
+#include <sys/ipc.h>
+#include <sys/sem.h>
+#include <tlpi_hdr.h>
+
+int main(int argc, char *argv[]) {
+  int maxind, ind, semid;
+  struct seminfo si;
+  struct semid_ds ids;
+  if ((maxind = semctl(0, 0, SEM_INFO, &si)) == -1)
+    errExit("semctl");
+
+  for (ind = 0; ind <= maxind; ind++) {
+    if ((semid = semctl(ind, 0, SEM_STAT, &ids)) == -1) {
+      if (errno != EINVAL && errno != EACCES)
+        errExit("semctl");
+      continue;
+    }
+    printf("%4d %8d  0x%08lx\n", ind, semid, (unsigned long)ids.sem_perm.__key);
+  }
+  exit(EXIT_SUCCESS);
+}
+```
+
+## 第四十八章
+
+### 48-1
+
+![48-1-1](../assets/tlpi/48-1-1.png)
+
+```c
+#include <sched.h>
+#include <sys/ipc.h>
+#include <sys/shm.h>
+#include <sys/stat.h>
+#include <sys/wait.h>
+#include <tlpi_hdr.h>
+
+#define BUF_SIZE 1024
+
+static int shm_key;
+
+enum ReadyRead { WAIT, READY };
+
+struct shmmsg {
+  short ready_read;
+  int size;
+  char buf[BUF_SIZE];
+};
+
+void handle_exit(void) {
+  if (shmctl(shm_key, IPC_RMID, NULL) == -1)
+    errExit("shmctl");
+}
+
+int main(int argc, char *argv[]) {
+  key_t ipc_key;
+  struct shmmsg *msg;
+  if ((ipc_key = ftok(argv[0], 1)) == -1)
+    errExit("ftok");
+  if ((shm_key = shmget(ipc_key, sizeof(struct shmmsg),
+                        IPC_CREAT | S_IRUSR | S_IWUSR)) == -1)
+    errExit("shmget");
+  if ((msg = shmat(shm_key, NULL, 0)) == NULL)
+    errExit("shmat");
+  msg->ready_read = WAIT;
+  if (shmdt(msg) == -1)
+    errExit("shmdt");
+  /**
+   * parent process as writer, child process as reader.
+   */
+  setbuf(stdout, NULL);
+  atexit(&handle_exit);
+  switch (fork()) {
+  case -1:
+    errExit("fork");
+    break;
+  case 0:
+    // reader
+    if ((msg = shmat(shm_key, NULL, 0)) == NULL)
+      errExit("shmat");
+    printf("child process buf %p\n", msg);
+    while (1) {
+      if (msg->ready_read == WAIT) {
+        sched_yield();
+        continue;
+      }
+      while (msg->size > 0) {
+        if ((msg->size -= write(STDOUT_FILENO, msg->buf, msg->size)) == -1)
+          errExit("write");
+      }
+      msg->ready_read = WAIT;
+    }
+    break;
+  default:
+    // writer
+    if ((msg = shmat(shm_key, NULL, 0)) == NULL)
+      errExit("shmat");
+    printf("parent process buf %p\n", msg);
+    while (1) {
+      if (msg->ready_read == READY) {
+        sched_yield();
+        continue;
+      }
+      if ((msg->size = read(STDIN_FILENO, msg->buf, BUF_SIZE)) == -1)
+        errExit("read");
+      msg->ready_read = READY;
+    }
+    break;
+  }
+}
+```
+
+### 48-2
+
+没有对 EOF 的情况进行处理
+
+### 48-3
+
+// TODO, benchmark
+
+### 48-4
+
+![48-4-1](../assets/tlpi/48-4-1.png)
+
+```c
+#include <sys/ipc.h>
+#include <sys/shm.h>
+#include <time.h>
+#include <tlpi_hdr.h>
+
+int main(int argc, char *argv[]) {
+  struct shmid_ds ds;
+
+  int shm_id;
+  if (argc < 2)
+    usageErr("%s shm-id\n", argv[0]);
+  shm_id = getInt(argv[1], 0, "shm-id");
+  if (shmctl(shm_id, SHM_STAT, &ds) == -1)
+    errExit("shmctl");
+  printf("shm changed: %s", ctime(&ds.shm_ctime));
+  printf("Last shmat():\t%s", ctime(&ds.shm_atime));
+  printf("Last shmdt():\t%s", ctime(&ds.shm_dtime));
+}
+```
+
+### 48-5
+
+![48-5-1](../assets/tlpi/48-5-1.png)
+
+```c
+#include <fcntl.h>
+#include <string.h>
+#include <sys/ipc.h>
+#include <sys/sem.h>
+#include <sys/shm.h>
+#include <sys/stat.h>
+#include <tlpi_hdr.h>
+
+#define BUF_SIZE 10240
+
+/**
+* meta segment takes place first few bytes
+* object segment growth from low address to high
+* string segment growth from high address to low
+*/
+struct KVMeta {
+ unsigned int object_offset;
+ unsigned int string_offset;
+};
+
+/**
+* KVObject is in used unless key_offset is point to NULL
+*/
+struct KVObject {
+ unsigned int key_offset;
+ unsigned int value_offset;
+};
+
+struct KVStringMeta {
+ unsigned short in_use : 1;
+ size_t str_size;
+};
+
+enum KVStringMetaInuse { FREE, OCCUPY };
+
+/**
+* string value in low address
+* string meta in high address
+*/
+unsigned int strseg_malloc(void *buf, size_t size) {
+ struct KVMeta *kv_meta;
+ void *strseg_start, *strseg_end;
+ struct KVStringMeta *curr, *target;
+ int split_size;
+
+ kv_meta = buf;
+ strseg_start = buf + BUF_SIZE - sizeof(struct KVStringMeta);
+ strseg_end =
+     buf + BUF_SIZE - kv_meta->string_offset - sizeof(struct KVStringMeta);
+
+ target = NULL;
+ curr = (struct KVStringMeta *)strseg_start;
+ while (curr != strseg_end) {
+   if (curr->in_use == FREE &&
+       (!target ||
+        (curr->str_size >= size && curr->str_size < target->str_size)))
+     target = curr;
+   curr = (void *)curr - sizeof(struct KVStringMeta) - curr->str_size;
+ }
+ if (target == NULL) {
+   if ((sizeof(struct KVMeta) + kv_meta->object_offset +
+        kv_meta->string_offset + size + sizeof(struct KVStringMeta)) >
+       BUF_SIZE)
+     return 0;
+   kv_meta->string_offset += (size + sizeof(struct KVStringMeta));
+   target = (struct KVStringMeta *)strseg_end;
+   target->str_size = size;
+ } else if ((split_size = (target->str_size - size -
+                           sizeof(struct KVStringMeta))) > 0) {
+   curr = (void *)target - size - sizeof(struct KVStringMeta);
+   curr->in_use = FREE;
+   curr->str_size = split_size;
+   target->str_size = size;
+ }
+ target->in_use = OCCUPY;
+ return ((void *)target - target->str_size) - buf;
+}
+
+void strseg_free(void *buf, unsigned int target_offset) {
+ struct KVMeta *kv_meta;
+ void *strseg_start, *strseg_end, *target;
+ struct KVStringMeta *curr, *prev, *seg_end;
+
+ target = buf + target_offset;
+ kv_meta = buf;
+ strseg_start = buf + BUF_SIZE - sizeof(struct KVStringMeta);
+ strseg_end =
+     buf + BUF_SIZE - sizeof(struct KVStringMeta) - kv_meta->string_offset;
+ prev = NULL;
+ curr = strseg_start;
+ seg_end = NULL;
+ while (curr != strseg_end) {
+   if (((void *)curr - curr->str_size) == target)
+     curr->in_use = FREE;
+   if (prev != NULL && curr->in_use == FREE) {
+     prev->str_size += (sizeof(struct KVStringMeta) + curr->str_size);
+   } else {
+     prev = curr;
+   }
+   if (curr->in_use == OCCUPY)
+     seg_end = curr;
+   curr = (void *)curr - sizeof(struct KVStringMeta) - curr->str_size;
+ }
+ if (seg_end == NULL) {
+   seg_end = strseg_start;
+ } else {
+   seg_end =
+       ((void *)seg_end - sizeof(struct KVStringMeta) - seg_end->str_size);
+ }
+ kv_meta->string_offset -= ((void *)seg_end - strseg_end);
+}
+
+unsigned int objseg_malloc(void *buf) {
+ struct KVObject *objseg_end, *curr;
+ struct KVMeta *kv_meta;
+
+ kv_meta = buf;
+ curr = buf + sizeof(struct KVMeta);
+ objseg_end = buf + sizeof(struct KVMeta) + kv_meta->object_offset;
+ while (curr != objseg_end) {
+   if (curr->key_offset == -1)
+     return (void *)curr - buf;
+   curr += 1;
+ }
+ if ((sizeof(struct KVMeta) + kv_meta->object_offset + kv_meta->string_offset +
+      sizeof(struct KVObject)) > BUF_SIZE)
+   return 0;
+ kv_meta->object_offset += sizeof(struct KVObject);
+ return (void *)objseg_end - buf;
+}
+
+void objseg_free(void *buf, unsigned int target_offset) {
+ struct KVMeta *kv_meta;
+ struct KVObject *objseg_start, *objseg_end, *curr, *seg_end;
+
+ kv_meta = buf;
+ objseg_start = buf + sizeof(struct KVMeta);
+ objseg_end = buf + sizeof(struct KVMeta) + kv_meta->object_offset;
+ seg_end = NULL;
+ curr = buf + target_offset;
+ curr->key_offset = -1;
+ curr = objseg_start;
+ while (curr != objseg_end) {
+   if (curr->key_offset != -1)
+     seg_end = curr;
+   curr += 1;
+ }
+ if (seg_end == NULL) {
+   seg_end = objseg_start;
+ } else {
+   seg_end = (void *)seg_end + sizeof(struct KVObject);
+ }
+ kv_meta->object_offset -= ((void *)objseg_end - (void *)seg_end);
+}
+
+int kv_insert(void *buf, const char *key, const char *value) {
+ unsigned int key_size, value_size;
+ struct KVObject *kv_obj;
+ key_size = strlen(key) + 1;
+ value_size = strlen(value) + 1;
+ if (((kv_obj = buf + objseg_malloc(buf)) == buf) ||
+     (kv_obj->key_offset = strseg_malloc(buf, key_size)) == 0 ||
+     (kv_obj->value_offset = strseg_malloc(buf, value_size)) == 0)
+   return -1;
+ memcpy(buf + kv_obj->key_offset, key, key_size);
+ memcpy(buf + kv_obj->value_offset, value, value_size);
+ return 0;
+}
+
+void kv_init(void *buf) {
+ struct KVMeta *kv_meta;
+ kv_meta = buf;
+ kv_meta->object_offset = 0;
+ kv_meta->string_offset = 0;
+}
+
+const char *kv_get(void *buf, const char *key) {
+ struct KVObject *curr, *kv_object_end;
+ struct KVMeta *kv_meta;
+
+ kv_meta = buf;
+ curr = buf + sizeof(struct KVMeta);
+ kv_object_end = buf + sizeof(struct KVMeta) + kv_meta->object_offset;
+ while (curr != kv_object_end) {
+   if (curr->key_offset != -1 && strcmp(key, buf + curr->key_offset) == 0)
+     return buf + curr->value_offset;
+   curr += 1;
+ }
+ return NULL;
+}
+
+int kv_delete(void *buf, const char *key) {
+ struct KVObject *curr, *kv_object_end;
+ struct KVMeta *kv_meta;
+
+ kv_meta = buf;
+ curr = buf + sizeof(struct KVMeta);
+ kv_object_end = buf + sizeof(struct KVMeta) + kv_meta->object_offset;
+ while (curr != kv_object_end) {
+   if (curr->key_offset != -1 && strcmp(key, buf + curr->key_offset) == 0) {
+     strseg_free(buf, curr->key_offset);
+     strseg_free(buf, curr->value_offset);
+     objseg_free(buf, (void *)curr - buf);
+     return 0;
+   }
+   curr += 1;
+ }
+ return -1;
+}
+
+void kv_iter_r(void *buf, struct KVObject **kv_object) {
+ struct KVMeta *kv_meta;
+ kv_meta = buf;
+ if (*kv_object == NULL) {
+   *kv_object = buf + sizeof(struct KVMeta);
+   *kv_object = (*kv_object) - 1;
+ }
+ do {
+   *kv_object = (*kv_object) + 1;
+ } while ((*kv_object)->key_offset == -1);
+ if ((void *)(*kv_object) >=
+     buf + sizeof(struct KVMeta) + kv_meta->object_offset) {
+   *kv_object = NULL;
+ }
+}
+
+void examine_segment(void *buf) {
+ struct KVMeta *kv_meta;
+ void *curr, *end;
+
+ kv_meta = buf;
+ printf("meta:\nobject_offset: %d\nstring_offset:%d\n", kv_meta->object_offset,
+        kv_meta->string_offset);
+ printf("\nobject segment:\n");
+ for (curr = buf + sizeof(struct KVMeta),
+     end = buf + sizeof(struct KVMeta) + kv_meta->object_offset;
+      curr < end; curr += sizeof(struct KVObject)) {
+   if (((struct KVObject *)curr)->key_offset == -1) {
+     continue;
+   }
+   printf("offset: %ld, key_offset: %ld, value_offset: %ld\n", curr - buf,
+          (long)((struct KVObject *)curr)->key_offset,
+          (long)((struct KVObject *)curr)->value_offset);
+ }
+ printf("\nstring segment:\n");
+ for (curr = buf + BUF_SIZE - sizeof(struct KVStringMeta),
+     end = buf + BUF_SIZE - sizeof(struct KVStringMeta) -
+           kv_meta->string_offset;
+      curr > end; curr -= ((struct KVStringMeta *)curr)->str_size +
+                          sizeof(struct KVStringMeta)) {
+   printf("string_offset: %ld, meta_offset: %ld, str_size: %ld, in_used: "
+          "%d, value: %s\n",
+          curr - buf, curr - buf - ((struct KVStringMeta *)curr)->str_size,
+          ((struct KVStringMeta *)curr)->str_size,
+          ((struct KVStringMeta *)curr)->in_use,
+          (char *)(curr - ((struct KVStringMeta *)curr)->str_size));
+ }
+ printf("\n");
+}
+
+static int sem_key;
+
+void handle_exit(void) {
+ struct sembuf sops;
+ sops.sem_flg = 0;
+ sops.sem_num = 0;
+ sops.sem_op = 1;
+ if (semop(sem_key, &sops, 1) == -1)
+   errExit("semop");
+}
+
+int main(int argc, char *argv[]) {
+ key_t ipc_key;
+ int shm_key;
+ void *buf;
+ char *key, *value;
+ int flag;
+ struct KVObject *curr;
+ struct sembuf sops;
+
+ setbuf(stdout, NULL);
+ if (argc < 2)
+   usageErr("%s [g|s|d|l] [key [value]]\n", argv[0]);
+ if ((ipc_key = ftok(argv[0], 1)) == -1)
+   errExit("ftok");
+ flag = IPC_CREAT | IPC_EXCL | S_IRUSR | S_IWUSR;
+ if ((shm_key = shmget(ipc_key, BUF_SIZE, flag)) == -1) {
+   flag &= (~IPC_EXCL);
+   if ((shm_key = shmget(ipc_key, BUF_SIZE, flag)) == -1)
+     errExit("shmget");
+   if ((buf = shmat(shm_key, NULL, 0)) == NULL)
+     errExit("shmat");
+ } else {
+   if ((buf = shmat(shm_key, NULL, 0)) == NULL)
+     errExit("shmat");
+   kv_init(buf);
+ }
+
+ /**
+  * semophore
+  */
+ flag = IPC_CREAT | IPC_EXCL | S_IRUSR | S_IWUSR;
+ if ((sem_key = semget(ipc_key, 1, flag)) == -1) {
+   flag &= (~IPC_EXCL);
+   if ((sem_key = semget(ipc_key, 1, flag)) == -1)
+     errExit("semget");
+ } else {
+   if (semctl(sem_key, 0, SETVAL, 1) == -1)
+     errExit("semctl");
+ }
+ key = argv[2];
+ value = argv[3];
+ sops.sem_flg = 0;
+ sops.sem_num = 0;
+ sops.sem_op = -1;
+ if (semop(sem_key, &sops, 1) == -1)
+   errExit("semop");
+ if (atexit(&handle_exit) == -1)
+   errExit("atexit");
+
+ switch (argv[1][0]) {
+ case 'g':
+   value = (char *)kv_get(buf, key);
+   printf("%s -> %s\n", key, value);
+   break;
+ case 's':
+   kv_delete(buf, key);
+   if (kv_insert(buf, key, value) == -1) {
+     fprintf(stderr, "Insert Fail\n");
+     break;
+   }
+   printf("%s -> %s\n", key, value);
+   break;
+ case 'd':
+   if (kv_delete(buf, key) == -1) {
+     fprintf(stderr, "Delete Fail\n");
+     break;
+   }
+   printf("%s deleted\n", key);
+   break;
+ case 'l':
+   curr = NULL;
+   kv_iter_r(buf, &curr);
+   while (curr != NULL) {
+     printf("%s -> %s\n", (char *)(buf + curr->key_offset),
+            (char *)(buf + curr->value_offset));
+     kv_iter_r(buf, &curr);
+   };
+   break;
+ case 'e':
+   examine_segment(buf);
+   break;
+ default:
+   fprintf(stderr, "Unexpected Command %s\n", argv[1]);
+   exit(EXIT_FAILURE);
+   break;
+ }
+ exit(EXIT_SUCCESS);
+}
+```
+
+### 48-6
+
+```c
+#include <sys/ipc.h>
+#include <sys/shm.h>
+#include <tlpi_hdr.h>
+
+int main(int argc, char *argv[]) {
+  int maxind, ind, shmid;
+  struct shm_info si;
+  struct shmid_ds ids;
+  if ((maxind = shmctl(0, SHM_INFO, (struct shmid_ds *)&si)) == -1)
+    errExit("shminfo");
+
+  for (ind = 0; ind <= maxind; ind++) {
+    if ((shmid = shmctl(ind, SHM_STAT, &ids)) == -1) {
+      if (errno != EINVAL && errno != EACCES)
+        errExit("shmctl");
+      continue;
+    }
+    printf("%4d %8d 0x%08lx %04d\n", ind, shmid, (long)ids.shm_perm.__key,
+           (int)ids.shm_nattch);
+  }
+}
+```
