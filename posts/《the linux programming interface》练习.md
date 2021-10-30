@@ -6398,3 +6398,169 @@ int main(int argc, char *argv[]) {
   }
 }
 ```
+
+## 第四十九章
+
+### 49-1
+
+```c
+#include <fcntl.h>
+#include <sys/mman.h>
+#include <sys/stat.h>
+#include <tlpi_hdr.h>
+
+int main(int argc, char *argv[]) {
+  int fd_src, fd_dest;
+  char *addr_src, *addr_dest;
+  struct stat st;
+  if (argc < 3)
+    usageErr("usage %s src dest\n", argv[0]);
+  if ((fd_src = open(argv[1], O_RDONLY)) == -1)
+    errExit("open");
+  if ((fd_dest = open(argv[2], O_RDWR | O_CREAT, 0755)) == -1)
+    errExit("open");
+  if (fstat(fd_src, &st) == -1)
+    errExit("fstat");
+  if (ftruncate(fd_dest, st.st_size) == -1)
+    errExit("ftruncate");
+  if ((addr_src = mmap(NULL, st.st_size, PROT_READ, MAP_SHARED, fd_src, 0)) ==
+      MAP_FAILED)
+    errExit("mmap");
+  if ((addr_dest = mmap(NULL, st.st_size, PROT_WRITE, MAP_SHARED, fd_dest,
+                        0)) == MAP_FAILED)
+    errExit("mmap");
+  memcpy(addr_dest, addr_src, st.st_size);
+  exit(EXIT_SUCCESS);
+}
+```
+
+### 49-2
+
+```c
+#include <sched.h>
+#include <sys/mman.h>
+#include <tlpi_hdr.h>
+
+#define BUF_SIZE 1024
+
+struct CommMsg {
+  unsigned short ready_read : 1;
+  unsigned int size;
+  char buf[BUF_SIZE];
+};
+
+int main() {
+  struct CommMsg *msg;
+  if ((msg = mmap(NULL, sizeof(struct CommMsg), PROT_READ | PROT_WRITE,
+                  MAP_SHARED | MAP_ANONYMOUS, -1, 0)) == MAP_FAILED)
+    errExit("mmap");
+  msg->ready_read = 0;
+  switch (fork()) {
+  case -1:
+    errExit("fork");
+    break;
+  case 0:
+    while (1) {
+      if (!msg->ready_read) {
+        sched_yield();
+        continue;
+      }
+      while (msg->size > 0) {
+        if ((msg->size -= write(STDOUT_FILENO, msg->buf, msg->size)) == -1)
+          errExit("write");
+      }
+      msg->ready_read = 0;
+    }
+    break;
+  default:
+    while (1) {
+      if (msg->ready_read) {
+        sched_yield();
+        continue;
+      }
+      if ((msg->size = read(STDIN_FILENO, msg->buf, BUF_SIZE)) == -1)
+        errExit("read");
+      msg->ready_read = 1;
+    }
+    break;
+  }
+}
+```
+
+### 49-3
+
+```c
+#include <fcntl.h>
+#include <sys/mman.h>
+#include <sys/signal.h>
+#include <time.h>
+#include <tlpi_hdr.h>
+
+void sig_handler(int sig) {
+  printf("[%ld %ld] %s\n", (long)time(NULL), (long)getpid(), strsignal(sig));
+}
+
+int main() {
+  int page_size, fd;
+  char *addr;
+  page_size = sysconf(_SC_PAGESIZE);
+  if ((fd = open("1.txt", O_RDWR | O_CREAT, 0755)) == -1)
+    errExit("open");
+  if (ftruncate(fd, page_size * 0.5) == -1)
+    errExit("ftruncate");
+  if ((addr = mmap(NULL, page_size * 2, PROT_READ | PROT_WRITE, MAP_SHARED, fd,
+                   0)) == MAP_FAILED)
+    errExit("mmap");
+  signal(SIGBUS, &sig_handler);
+  signal(SIGSEGV, &sig_handler);
+  // *(addr + page_size + 16) = 'a';
+  // *(addr + 2 * page_size + 16) = 'a';
+}
+```
+
+### 49-4
+
+// TODO
+
+## 第五十章
+
+### 50-1
+
+```c
+#include <sys/mman.h>
+#include <tlpi_hdr.h>
+
+int main() {
+  int max_lock_memory;
+  void *buf;
+  max_lock_memory = sysconf(_SC_MEMLOCK);
+  if ((buf = mmap(NULL, max_lock_memory * 2, PROT_READ | PROT_WRITE,
+                  MAP_SHARED | MAP_ANONYMOUS, -1, 0)) == MAP_FAILED)
+    errExit("mmap");
+  if (mlock(buf, max_lock_memory * 2) == -1)
+    errExit("mlock");
+  printf("done\n");
+  exit(EXIT_SUCCESS);
+}
+```
+
+### 50-2
+
+```c
+#include <sys/mman.h>
+#include <tlpi_hdr.h>
+
+#define BUF_SIZE 1024
+
+int main() {
+  void *addr;
+  if ((addr = mmap(NULL, BUF_SIZE, PROT_READ | PROT_WRITE,
+                   MAP_PRIVATE | MAP_ANONYMOUS, -1, 0)) == MAP_FAILED)
+    errExit("mmap");
+  printf("addr: %p\n", addr);
+  if (madvise(addr, BUF_SIZE, MADV_DONTNEED) == -1)
+    errExit("madvise");
+  printf("done\n");
+  exit(EXIT_SUCCESS);
+}
+```
