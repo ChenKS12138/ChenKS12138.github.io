@@ -6564,3 +6564,459 @@ int main() {
   exit(EXIT_SUCCESS);
 }
 ```
+
+## 第五十一章
+
+### 51-1
+
+```c
+#include "tlpi_hdr.h"
+#include <fcntl.h> /* For definition of O_NONBLOCK */
+#include <mqueue.h>
+#include <time.h>
+
+static void usageError(const char *progName) {
+  fprintf(stderr, "Usage: %s [-n] mq-name seconds\n", progName);
+  fprintf(stderr, "    -n           Use O_NONBLOCK flag\n");
+  exit(EXIT_FAILURE);
+}
+
+int main(int argc, char *argv[]) {
+  int flags, opt;
+  mqd_t mqd;
+  unsigned int prio;
+  void *buffer;
+  struct mq_attr attr;
+  ssize_t numRead;
+  struct timespec ts;
+
+  flags = O_RDONLY;
+  while ((opt = getopt(argc, argv, "n")) != -1) {
+    switch (opt) {
+    case 'n':
+      flags |= O_NONBLOCK;
+      break;
+    default:
+      usageError(argv[0]);
+    }
+  }
+
+  if (optind + 1 >= argc)
+    usageError(argv[0]);
+
+  mqd = mq_open(argv[optind], flags);
+  if (mqd == (mqd_t)-1)
+    errExit("mq_open");
+
+  clock_gettime(CLOCK_REALTIME, &ts);
+  ts.tv_sec += getInt(argv[optind + 1], 0, "seconds");
+
+  /* We need to know the 'mq_msgsize' attribute of the queue in
+     order to determine the size of the buffer for mq_receive() */
+
+  if (mq_getattr(mqd, &attr) == -1)
+    errExit("mq_getattr");
+
+  buffer = malloc(attr.mq_msgsize);
+  if (buffer == NULL)
+    errExit("malloc");
+
+  numRead = mq_timedreceive(mqd, buffer, attr.mq_msgsize, &prio, &ts);
+  if (numRead == -1)
+    errExit("mq_receive");
+
+  printf("Read %ld bytes; priority = %u\n", (long)numRead, prio);
+  /*FIXME: above: should use %zd here, and remove (long) cast */
+  if (write(STDOUT_FILENO, buffer, numRead) == -1)
+    errExit("write");
+  write(STDOUT_FILENO, "\n", 1);
+
+  exit(EXIT_SUCCESS);
+}
+```
+
+### 52-2
+
+```c
+// 52-2-comm
+#ifndef _CH522COMM
+#define _CH522COMM
+
+#include <mqueue.h>
+#define MQ_SERVER_PATH "/mq-server"
+#define MQ_CLIENT_TEMPLATE "/mq-client-%ld"
+#define BUF_SIZE 1024
+struct MqMsg {
+  long id;
+  char buf[BUF_SIZE];
+};
+
+#endif
+```
+
+```c
+// 52-2-client.c
+#include "52-2-comm.h"
+#include <limits.h>
+#include <mqueue.h>
+#include <time.h>
+#include <tlpi_hdr.h>
+
+int main(int argc, char *argv[]) {
+  mqd_t send_fd, receive_fd;
+  char send_path[PATH_MAX];
+  struct MqMsg msg;
+  struct mq_attr attr;
+  attr.mq_flags = 0;
+  attr.mq_maxmsg = 1;
+  attr.mq_msgsize = sizeof(struct MqMsg);
+  if (argc < 2)
+    usageErr("%s text\n", argv[0]);
+  msg.id = time(NULL);
+  strcpy(msg.buf, argv[1]);
+  snprintf(send_path, PATH_MAX, MQ_CLIENT_TEMPLATE, msg.id);
+  if ((receive_fd = mq_open(send_path, O_CREAT | O_RDONLY, 0755, &attr)) == -1)
+    errExit("mq_open");
+  if ((send_fd = mq_open(MQ_SERVER_PATH, O_WRONLY)) == -1)
+    errExit("mq_open");
+  if (mq_send(send_fd, (char *)&msg, sizeof(struct MqMsg), 0) == -1)
+    errExit("write");
+  if (mq_receive(receive_fd, (char *)&msg, sizeof(struct MqMsg), 0) == -1)
+    errExit("read");
+  printf("%s\n", msg.buf);
+  exit(EXIT_SUCCESS);
+}
+```
+
+```c
+// 52-2-server
+#include "52-2-comm.h"
+#include <limits.h>
+#include <mqueue.h>
+#include <time.h>
+#include <tlpi_hdr.h>
+
+int main() {
+  mqd_t receive_fd, send_fd;
+  struct MqMsg msg;
+  struct mq_attr attr;
+  char send_path[PATH_MAX];
+  attr.mq_flags = 0;
+  attr.mq_maxmsg = 1;
+  attr.mq_msgsize = sizeof(struct MqMsg);
+  if ((receive_fd = mq_open(MQ_SERVER_PATH, O_CREAT | O_RDONLY | O_TRUNC, 0755,
+                            &attr)) == -1)
+    errExit("mq_open");
+  while (mq_receive(receive_fd, (char *)&msg, sizeof(struct MqMsg), NULL) !=
+         -1) {
+    if (snprintf(send_path, PATH_MAX, MQ_CLIENT_TEMPLATE, msg.id) == -1)
+      errExit("snprintf");
+    printf("[%ld %ld]open %s\n", (long)time(NULL), (long)getpid(), send_path);
+    if ((send_fd = mq_open(send_path, O_WRONLY, 0755, &attr)) == -1)
+      errExit("mq_open");
+    if (mq_send(send_fd, (char *)&msg, sizeof(struct MqMsg), 0) == -1)
+      errExit("mq_send");
+  }
+  errExit("msg_receive");
+}
+```
+
+### 52-3
+
+// TODO
+
+### 52-4
+
+// TODO
+
+### 52-5
+
+![52-5-1](../assets/tlpi/52-5-1.png)
+
+```shell
+#!/usr/bin/env bash
+
+DIR='/home/cattchen/Codes/tlpi-dist/pmsg'
+
+NOTIFY='/home/cattchen/Codes/tlpi-practice/notify'
+
+# Create posix-mq
+rm /dev/mqueue/* >> /dev/null 2>&1
+${DIR}/pmsg_create -c /mq -s 6
+
+if [ $? != 0 ];then
+  exit $?
+fi
+
+# Set posix-mq notify
+${NOTIFY} /mq &
+
+# Send notify twice
+${DIR}/pmsg_send /mq hello\
+&& echo 'write msg1 done'\
+&& sleep 1\
+&& ${DIR}/pmsg_send /mq hello\
+&& echo 'write msg2 done'
+
+wait
+```
+
+### 52-6
+
+```c
+#include "tlpi_hdr.h"
+#include <fcntl.h> /* For definition of O_NONBLOCK */
+#include <mqueue.h>
+#include <signal.h>
+
+#define NOTIFY_SIG SIGUSR1
+
+static void handler(int sig) { /* Just interrupt sigsuspend() */
+}
+
+/* This program does not handle the case where a message already exists on
+   the queue by the time the first attempt is made to register for message
+   notification. In that case, the program would never receive a notification.
+   See mq_notify_via_signal.c for an example of how to deal with that case. */
+
+int main(int argc, char *argv[]) {
+  struct sigevent sev;
+  mqd_t mqd;
+  struct mq_attr attr;
+  void *buffer;
+  ssize_t numRead;
+  sigset_t blockMask, emptyMask;
+  struct sigaction sa;
+  siginfo_t info;
+
+  if (argc != 2 || strcmp(argv[1], "--help") == 0)
+    usageErr("%s mq-name\n", argv[0]);
+
+  mqd = mq_open(argv[1], O_RDONLY | O_NONBLOCK);
+  printf("mqd: %d\n", mqd);
+  if (mqd == (mqd_t)-1)
+    errExit("mq_open");
+
+  /* Determine mq_msgsize for message queue, and allocate an input buffer
+     of that size */
+
+  if (mq_getattr(mqd, &attr) == -1)
+    errExit("mq_getattr");
+
+  buffer = malloc(attr.mq_msgsize);
+  if (buffer == NULL)
+    errExit("malloc");
+
+  /* Block the notification signal and establish a handler for it */
+
+  sigemptyset(&blockMask);
+  sigaddset(&blockMask, NOTIFY_SIG);
+  if (sigprocmask(SIG_BLOCK, &blockMask, NULL) == -1)
+    errExit("sigprocmask");
+
+  sigemptyset(&sa.sa_mask);
+  sa.sa_flags = 0;
+  sa.sa_handler = handler;
+  if (sigaction(NOTIFY_SIG, &sa, NULL) == -1)
+    errExit("sigaction");
+
+  /* Register for message notification via a signal */
+
+  sev.sigev_notify = SIGEV_SIGNAL;
+  sev.sigev_signo = NOTIFY_SIG;
+  if (mq_notify(mqd, &sev) == -1)
+    errExit("mq_notify");
+
+  sigemptyset(&emptyMask);
+
+  for (;;) {
+    // sigsuspend(&emptyMask); /* Wait for notification signal */
+    if (sigwaitinfo(&blockMask, &info) == -1)
+      errExit("sigwaitinfo");
+    printf("si_code(SI_MESGQ is %d): %d signo: %d\n", SI_MESGQ, info.si_code,
+           info.si_signo);
+
+    /* Reregister for message notification */
+
+    if (mq_notify(mqd, &sev) == -1)
+      errExit("mq_notify");
+
+    while ((numRead = mq_receive(mqd, buffer, attr.mq_msgsize, NULL)) >= 0)
+      printf("Read %ld bytes\n", (long)numRead);
+    /*FIXME: above: should use %zd here, and remove (long) cast */
+
+    if (errno != EAGAIN) /* Unexpected error */
+      errExit("mq_receive");
+  }
+}
+```
+
+### 52-7
+
+不行，多个线程会共享进程的全局变量，产生竞态问题
+
+## 第五十三章
+
+### 53-1
+
+```c
+#include <pthread.h>
+#include <semaphore.h>
+#include <tlpi_hdr.h>
+
+#define BUF_SIZE 1024
+
+static sem_t read_ready, write_ready;
+static char buf[BUF_SIZE];
+static int size;
+
+static void *read_worker(void *arg) {
+  while (1) {
+    if (sem_wait(&read_ready) == -1)
+      errExit("sem_wait");
+    while ((size -= write(STDOUT_FILENO, buf, size)) > 0) {
+    }
+    if (size == -1)
+      errExit("write");
+
+    if (sem_post(&write_ready) == -1)
+      errExit("sem_post");
+  }
+  return NULL;
+}
+
+static void *write_worker(void *arg) {
+  while (1) {
+    if (sem_wait(&write_ready) == -1)
+      errExit("sem_wait");
+    if ((size = read(STDIN_FILENO, buf, BUF_SIZE)) == -1)
+      errExit("read");
+    if (sem_post(&read_ready) == -1)
+      errExit("sem_post");
+  }
+  return NULL;
+}
+
+int main() {
+  pthread_t thread_reader, thread_writer;
+  int s;
+  if (sem_init(&read_ready, 0, 0) == -1 || sem_init(&write_ready, 0, 1) == -1)
+    errExit("sem_init");
+  if ((s = pthread_create(&thread_reader, NULL, read_worker, NULL)) != 0)
+    errExitEN(s, "pthread_create");
+  if ((s = pthread_create(&thread_writer, NULL, write_worker, NULL)) != 0)
+    errExitEN(s, "pthread_create");
+  if ((s = pthread_join(thread_reader, NULL)) != 0)
+    errExitEN(s, "pthread_join");
+  if ((s = pthread_join(thread_writer, NULL)) != 0)
+    errExitEN(s, "pthread_join");
+  return 0;
+}
+```
+
+### 53-2
+
+```c
+#include "tlpi_hdr.h"
+#include <semaphore.h>
+#include <time.h>
+
+int main(int argc, char *argv[]) {
+  sem_t *sem;
+  struct timespec ts;
+
+  if (argc < 3 || strcmp(argv[1], "--help") == 0)
+    usageErr("%s sem-name timeout-seconds\n", argv[0]);
+
+  clock_gettime(CLOCK_REALTIME, &ts);
+  ts.tv_sec += getInt(argv[2], 0, "timeout-seconds");
+
+  sem = sem_open(argv[1], 0);
+  if (sem == SEM_FAILED)
+    errExit("sem_open");
+
+  if (sem_timedwait(sem, &ts) == -1)
+    errExit("sem_wait");
+
+  printf("%ld sem_wait() succeeded\n", (long)getpid());
+  exit(EXIT_SUCCESS);
+}
+```
+
+### 53-3
+
+// TODO
+
+### 53-4
+
+// TODO
+
+## 第五十四章
+
+### 54-1
+
+```c
+#include <fcntl.h>
+#include <sched.h>
+#include <sys/mman.h>
+#include <sys/wait.h>
+#include <tlpi_hdr.h>
+
+#define SHM_FILE "/read-writer-shm"
+#define BUF_SIZE 1024
+
+struct ShmMsg {
+  unsigned short read_ready : 1;
+  int size;
+  char buf[BUF_SIZE];
+};
+
+int main() {
+  int fd;
+  struct ShmMsg *msg;
+  if ((fd = shm_open(SHM_FILE, O_CREAT | O_RDWR, 0755)) == -1)
+    errExit("shm_open");
+  if (ftruncate(fd, sizeof(struct ShmMsg)) == -1)
+    errExit("ftruncate");
+  if ((msg = mmap(NULL, sizeof(struct ShmMsg), PROT_READ | PROT_WRITE,
+                  MAP_SHARED, fd, 0)) == MAP_FAILED)
+    errExit("mmap");
+
+  switch (fork()) {
+  case -1:
+    errExit("fork");
+    break;
+  case 0:
+    while (1) {
+      if (!msg->read_ready) {
+        sched_yield();
+        continue;
+      }
+      if (write(STDOUT_FILENO, msg->buf, msg->size) == -1)
+        errExit("write");
+      msg->read_ready = 0;
+    }
+    break;
+  default:
+    while (1) {
+      if (msg->read_ready) {
+        sched_yield();
+        continue;
+      }
+      if ((msg->size = read(STDIN_FILENO, msg->buf, BUF_SIZE)) == -1)
+        errExit("read");
+      msg->read_ready = 1;
+    }
+    break;
+  }
+  wait(NULL);
+}
+```
+
+## 第五十五章
+
+### 55-1
+
+```c
+
+```
