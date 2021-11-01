@@ -7017,6 +7017,102 @@ int main() {
 
 ### 55-1
 
-```c
+// TODO
 
+### 55-2
+
+![55-2-1](../assets/tlpi/55-2-1.png)
+
+是会发生死锁的，需要注意父子进程需要单独打开 fd，如果进行 dup，会引用同一个锁
+
+```c
+#include <fcntl.h>
+#include <sys/file.h>
+#include <time.h>
+#include <tlpi_hdr.h>
+
+int main(int argc, char *argv[]) {
+  int fd1, fd2;
+  switch (fork()) {
+  case -1:
+    errExit("fork");
+    break;
+  case 0:
+    alarm(5);
+    if ((fd1 = open("1.txt", O_RDWR | O_CREAT, 0755)) == -1)
+      errExit("open");
+    if ((fd2 = open("2.txt", O_RDWR | O_CREAT, 0755)) == -1)
+      errExit("open");
+    printf("[%ld %ld] start\n", (long)time(NULL), (long)getpid());
+    if (flock(fd1, LOCK_EX) == -1)
+      errExit("flock");
+    printf("[%ld %ld] fd1\n", (long)time(NULL), (long)getpid());
+    sleep(1);
+    if (flock(fd2, LOCK_EX) == -1)
+      errExit("flock");
+    printf("[%ld %ld] fd2\n", (long)time(NULL), (long)getpid());
+    sleep(3);
+    break;
+  default:
+    alarm(5);
+    if ((fd1 = open("1.txt", O_RDWR | O_CREAT, 0755)) == -1)
+      errExit("open");
+    if ((fd2 = open("2.txt", O_RDWR | O_CREAT, 0755)) == -1)
+      errExit("open");
+    printf("[%ld %ld] start\n", (long)time(NULL), (long)getpid());
+    if (flock(fd2, LOCK_EX) == -1)
+      errExit("flock");
+    printf("[%ld %ld] fd2\n", (long)time(NULL), (long)getpid());
+    sleep(1);
+    if (flock(fd1, LOCK_EX) == -1)
+      errExit("flock");
+    printf("[%ld %ld] fd1\n", (long)time(NULL), (long)getpid());
+    sleep(3);
+    break;
+  }
+  exit(EXIT_SUCCESS);
+}
 ```
+
+### 55-3
+
+```c
+#include <fcntl.h>
+#include <sys/file.h>
+#include <sys/wait.h>
+#include <tlpi_hdr.h>
+
+int main() {
+  int fd;
+  if ((fd = open("1.txt", O_CREAT | O_RDWR, 0755)) == -1)
+    errExit("open");
+  if (flock(fd, LOCK_EX) == -1)
+    errExit("flock");
+  switch (fork()) {
+  case -1:
+    errExit("fork");
+    break;
+  case 0:
+    if (flock(fd, LOCK_EX) == -1)
+      errExit("flock");
+    printf("get lock\n");
+    break;
+  default:
+    break;
+  }
+}
+```
+
+### 55-4
+
+![55-4-1](../assets/tlpi/55-4-1.png)
+
+`flock`和`fcntl`是互相不可见的
+
+### // TODO
+
+## 第五十六章
+
+## 第五十七章
+
+### 57-1
