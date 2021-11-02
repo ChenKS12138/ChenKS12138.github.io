@@ -7116,3 +7116,260 @@ int main() {
 ## 第五十七章
 
 ### 57-1
+
+![57-1-1](../assets/tlpi/57-1-1.png)
+
+```c
+#include <sys/socket.h>
+#include <sys/un.h>
+#include <sys/wait.h>
+#include <time.h>
+#include <tlpi_hdr.h>
+
+#define SOCKET_SERVER "/tmp/echo-socket-server"
+#define SOCKET_CLIENT "/tmp/echo-socket-client"
+#define BUF_SIZE 1024
+
+int main() {
+  if (access(SOCKET_SERVER, F_OK) == 0)
+    if (unlink(SOCKET_SERVER) == -1)
+      errExit("unlink");
+  if (access(SOCKET_CLIENT, F_OK) == 0)
+    if (unlink(SOCKET_CLIENT) == -1)
+      errExit("unlink");
+
+  int fdl, fdr, size;
+  struct sockaddr_un addr_s, addr_c;
+  char buf[BUF_SIZE];
+
+  memset(&addr_s, 0, sizeof(struct sockaddr_un));
+  strcpy(addr_s.sun_path, SOCKET_SERVER);
+  addr_s.sun_family = AF_UNIX;
+
+  memset(&addr_c, 0, sizeof(struct sockaddr_un));
+  strcpy(addr_c.sun_path, SOCKET_CLIENT);
+  addr_c.sun_family = AF_UNIX;
+
+  setbuf(stdout, NULL);
+
+  switch (fork()) {
+  case -1:
+    errExit("fork");
+    break;
+  case 0:
+    if ((fdl = socket(AF_UNIX, SOCK_DGRAM, 0)) == -1)
+      errExit("socket");
+    if (bind(fdl, (struct sockaddr *)(&addr_c), sizeof(addr_c)) == -1)
+      errExit("bind");
+    while (1) {
+      if ((size = recvfrom(fdl, buf, BUF_SIZE, 0, NULL, NULL)) == -1)
+        errExit("recvfrom");
+      printf("[%ld %ld]%s", (long)time(NULL), (long)getpid(), buf);
+      memset(buf, 0, BUF_SIZE);
+      sleep(1);
+    }
+    break;
+  default:
+    if ((fdl = socket(AF_UNIX, SOCK_DGRAM, 0)) == -1)
+      errExit("socket");
+    if (bind(fdl, (struct sockaddr *)(&addr_s), sizeof(addr_s)) == -1)
+      errExit("bind");
+    for (int i = 0; i < 5; i++) {
+      memset(buf, 0, BUF_SIZE);
+      snprintf(buf, BUF_SIZE, "msg-%d\n", i);
+      if (sendto(fdl, buf, BUF_SIZE, 0, (struct sockaddr *)&addr_c,
+                 sizeof(addr_c)) == -1)
+        errExit("sendto");
+    }
+    wait(NULL);
+    break;
+  }
+}
+```
+
+### 57-2
+
+```c
+#include <sys/socket.h>
+#include <sys/un.h>
+#include <tlpi_hdr.h>
+
+#define SOCKET_SERVER "123456"
+#define BUF_SIZE 1024
+
+int main() {
+  int fdl, fdr, size;
+  struct sockaddr_un addr;
+  char buf[BUF_SIZE];
+
+  if (access(SOCKET_SERVER, F_OK) == 0)
+    if (unlink(SOCKET_SERVER) == -1)
+      errExit("unlink");
+  memset(&addr, 0, sizeof(struct sockaddr_un));
+  addr.sun_family = AF_UNIX;
+  strcpy(addr.sun_path + 1, SOCKET_SERVER);
+  switch (fork()) {
+  case -1:
+    errExit("fork");
+    break;
+  case 0:
+    if ((fdl = socket(AF_UNIX, SOCK_STREAM, 0)) == -1)
+      errExit("socket");
+    if ((fdr = connect(fdl, (struct sockaddr *)(&addr), sizeof(addr))) == -1)
+      errExit("bind");
+    while ((size = read(STDIN_FILENO, buf, BUF_SIZE)) > 0)
+      while ((size -= write(fdr, buf, size)) != 0)
+        if (size == -1)
+          errExit("write");
+    break;
+  default:
+    if ((fdl = socket(AF_UNIX, SOCK_STREAM, 0)) == -1)
+      errExit("socket");
+    if (bind(fdl, (struct sockaddr *)(&addr), sizeof(addr)) == -1)
+      errExit("bind");
+    if (listen(fdl, 0) == -1)
+      errExit("listen");
+    while (1) {
+      if ((fdr = accept(fdl, NULL, NULL)) == -1) {
+        fprintf(stderr, "[accept] %s\n", strerror(errno));
+        continue;
+      };
+      while ((size = read(fdr, buf, BUF_SIZE)) > 0)
+        while ((size -= write(fdr, buf, size)) != 0)
+          if (size == -1)
+            errExit("write");
+      close(fdr);
+    }
+    break;
+  }
+}
+```
+
+### 57-3
+
+```c
+#include <sys/socket.h>
+#include <sys/un.h>
+#include <tlpi_hdr.h>
+
+#define SOCKET_PATH "/tmp/num-socket-server"
+#define BUF_SIZE 1024
+
+int main() {
+  int fdl, fdr, size, index;
+  struct sockaddr_un addr;
+  char buf[BUF_SIZE];
+
+  if (access(SOCKET_PATH, F_OK) == 0)
+    if (unlink(SOCKET_PATH) == -1)
+      errExit("unlink");
+
+  setbuf(stdout, NULL);
+  memset(&addr, 0, sizeof(struct sockaddr_un));
+  addr.sun_family = AF_UNIX;
+  strcpy(addr.sun_path, SOCKET_PATH);
+
+  switch (fork()) {
+  case -1:
+    errExit("fork");
+    break;
+  case 0:
+    for (index = 0; index < 10; index++) {
+      if ((fdl = socket(AF_UNIX, SOCK_STREAM, 0)) == -1)
+        errExit("socket");
+      if (connect(fdl, (struct sockaddr *)&addr, sizeof(struct sockaddr_un)) ==
+          -1)
+        errExit("connect");
+      memset(buf, 0, BUF_SIZE);
+      if ((size = read(fdl, buf, BUF_SIZE)) == -1)
+        errExit("read");
+      write(STDOUT_FILENO, buf, size + 1);
+      close(fdl);
+    }
+    break;
+  default:
+    index = 0;
+    if ((fdl = socket(AF_UNIX, SOCK_STREAM, 0)) == -1)
+      errExit("socket");
+    if (bind(fdl, (struct sockaddr *)&addr, sizeof(struct sockaddr_un)) == -1)
+      errExit("bind");
+    if (listen(fdl, 0) == -1)
+      errExit("listen");
+    for (;;) {
+      if ((fdr = accept(fdl, NULL, NULL)) == -1)
+        errExit("accept");
+      memset(buf, 0, BUF_SIZE);
+      snprintf(buf, BUF_SIZE, "%d\n", index);
+      size = strlen(buf);
+      if (write(fdr, buf, size) != size)
+        errExit("write");
+      close(fdr);
+      index++;
+    }
+    break;
+  }
+}
+```
+
+### 57-4
+
+![57-4-1](../assets/tlpi/57-4-1.png)
+
+一个地址同一个时刻只能被一个 socket bind
+
+```c
+#include <sys/socket.h>
+#include <sys/un.h>
+#include <sys/wait.h>
+#include <tlpi_hdr.h>
+
+#define SOCKET_A "/tmp/socket-a"
+#define SOCKET_B "/tmp/socket-b"
+
+int main() {
+  int fdl;
+  struct sockaddr_un addr_a, addr_b;
+
+  memset(&addr_a, 0, sizeof(addr_a));
+  addr_a.sun_family = AF_UNIX;
+  strcpy(addr_a.sun_path, SOCKET_A);
+
+  memset(&addr_b, 0, sizeof(addr_b));
+  addr_b.sun_family = AF_UNIX;
+  strcpy(addr_b.sun_path, SOCKET_B);
+
+  switch (fork()) {
+  case -1:
+    errExit("fork");
+    break;
+  case 0:
+    if ((fdl = socket(AF_UNIX, SOCK_DGRAM, 0)) == -1)
+      errExit("socket");
+    if (bind(fdl, (struct sockaddr *)&addr_a, sizeof(addr_a)) == -1)
+      errExit("bind");
+    break;
+  default:
+    switch (fork()) {
+    case -1:
+      errExit("fork");
+      break;
+    case 0:
+      if ((fdl = socket(AF_UNIX, SOCK_DGRAM, 0)) == -1)
+        errExit("socket");
+      if (bind(fdl, (struct sockaddr *)&addr_b, sizeof(addr_b)) == -1)
+        errExit("bind");
+      break;
+    default:
+      if ((fdl = socket(AF_UNIX, SOCK_DGRAM, 0)) == -1)
+        errExit("socket");
+      if (bind(fdl, (struct sockaddr *)&addr_a, sizeof(addr_a)) == -1)
+        errExit("bind");
+      break;
+      wait(NULL);
+    }
+    wait(NULL);
+    break;
+  }
+  exit(EXIT_SUCCESS);
+}
+```
