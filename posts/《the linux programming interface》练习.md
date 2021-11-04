@@ -7373,3 +7373,458 @@ int main() {
   exit(EXIT_SUCCESS);
 }
 ```
+
+## 第五十八章
+
+## 第五十九章
+
+### 59-1
+
+```c
+#include <tlpi_hdr.h>
+
+struct ReadlineBuf {
+  char *buf;
+  ssize_t cap;
+  ssize_t pos;
+};
+
+int readline_buf_init(struct ReadlineBuf *rlbuf, ssize_t cap) {
+  rlbuf->pos = cap + 1;
+  rlbuf->cap = cap;
+  rlbuf->buf = malloc(cap + 1);
+  return 0;
+}
+
+int readline_buf_rl(int fd, struct ReadlineBuf *rlbuf) {
+  int size;
+  ssize_t i;
+  memcpy(rlbuf->buf, rlbuf->buf + rlbuf->pos, rlbuf->cap + 1 - rlbuf->pos);
+  rlbuf->pos %= (rlbuf->cap + 1);
+  if ((size = read(fd, rlbuf->buf + rlbuf->pos, rlbuf->cap - rlbuf->pos)) == -1)
+    return -1;
+  size += rlbuf->pos;
+  for (i = 0; i < size; i++) {
+    if (rlbuf->buf[i] == '\n') {
+      memcpy(rlbuf->buf + i + 2, rlbuf->buf + i + 1, rlbuf->cap - i - 1);
+      rlbuf->pos = i + 2;
+      rlbuf->buf[i + 1] = 0;
+      return i + 1;
+    }
+  }
+  rlbuf->pos = size + 1;
+  rlbuf->buf[size] = 0;
+  return size;
+}
+
+int readline_buf_destory(struct ReadlineBuf *rlbuf) {
+  if (rlbuf->buf) {
+    free(rlbuf->buf);
+    rlbuf->buf = NULL;
+  }
+  return 0;
+}
+
+int main() {
+  int size;
+  struct ReadlineBuf rlbuf;
+  readline_buf_init(&rlbuf, 1024);
+  while ((size = readline_buf_rl(STDIN_FILENO, &rlbuf)) != 0) {
+    if (size == -1)
+      errExit("read");
+    if (write(STDOUT_FILENO, rlbuf.buf, size) == -1)
+      errExit("write");
+  }
+  readline_buf_destory(&rlbuf);
+}
+```
+
+### 59-2
+
+// TODO
+
+### 59-3
+
+```c
+#include <fcntl.h>
+#include <limits.h>
+#include <sys/socket.h>
+#include <sys/un.h>
+#include <tlpi_hdr.h>
+
+int un_bind(const char *socket_path, int type);
+int un_listen(const char *socket_path, int backlog);
+int un_connect(const char *socket_path, int type);
+
+int un_bind(const char *socket_path, int type) {
+  struct sockaddr_un addr;
+  int fd;
+  addr.sun_family = AF_UNIX;
+  strcpy(addr.sun_path, socket_path);
+  if ((fd = socket(AF_UNIX, type, 0)) == -1)
+    return -1;
+  if (bind(fd, (struct sockaddr *)&addr, sizeof(struct sockaddr_un)) == -1)
+    return -1;
+  return fd;
+}
+
+int un_listen(const char *socket_path, int backlog) {
+  int fd;
+  if ((fd = un_bind(socket_path, SOCK_DGRAM)) == -1)
+    return -1;
+  if (listen(fd, backlog) == -1)
+    return -1;
+  return fd;
+}
+
+int un_connect(const char *socket_path, int type) {
+  int fd;
+  struct sockaddr_un addr;
+  if ((fd = un_bind(socket_path, type)) == -1)
+    return -1;
+  if (type == SOCK_DGRAM) {
+    addr.sun_family = AF_UNIX;
+    strcpy(addr.sun_path, socket_path);
+    if (connect(fd, (struct sockaddr *)(&addr), sizeof(struct sockaddr_un)) ==
+        -1)
+      return -1;
+  }
+  return fd;
+}
+
+int main() {}
+```
+
+### 59-4
+
+![59-4-1](../assets/tlpi/59-4-1.png)
+
+```c
+#include <arpa/inet.h>
+#include <netdb.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <tlpi_hdr.h>
+
+#define BUFFER_SIZE 10240
+#define IO_BUF_SIZE 1024
+
+#define KV_STR_DEREF(meta)                                                     \
+  (char *)((void *)(meta) - ((struct KVStringMeta *)(meta))->str_size)
+
+#define USAGE "Usage:\nget <key>\nset <key> <value>\ndel <key>\nkeys\n"
+
+static char buffer[BUFFER_SIZE];
+
+struct KVMeta {
+  ssize_t cap;
+  ssize_t object_offset;
+  ssize_t string_offset;
+};
+
+struct KVObject {
+  ssize_t key_string_offset;
+  ssize_t value_string_offset;
+};
+
+struct KVStringMeta {
+  unsigned short in_used : 1;
+  ssize_t str_size;
+};
+
+/* Init/Destory kv */
+void kv_init(void *buf, ssize_t size);
+void kv_destory(void *buf);
+
+/* kv object */
+struct KVObject *kv_object_malloc(void *buf);
+void kv_object_free(void *buf, struct KVObject *obj);
+
+/* kv string */
+struct KVStringMeta *kv_string_malloc(void *buf, ssize_t str_size);
+void kv_string_free(void *buf, struct KVStringMeta *str_meta);
+
+/* operate key/value */
+char *kv_get(void *buf, const char *key);
+void kv_set(void *buf, const char *key, const char *value);
+void kv_iter_r(void *buf, struct KVObject **curr);
+
+/* do with command */
+void tokenize(char *command, char ***tokens);
+void do_work(char *command, char *query_result);
+
+int main(int argc, char *argv[]) {
+  char *command, *query_result;
+  int fd_l, fd_r, optval, size;
+  struct addrinfo hints, *curr, *result;
+
+  if (argc < 3)
+    usageErr("%s [ip|host] [port|service]\n", argv[0]);
+  memset(&hints, 0, sizeof(struct addrinfo));
+  hints.ai_family = AF_INET;
+  hints.ai_socktype = SOCK_STREAM;
+  if (getaddrinfo(argv[1], argv[2], &hints, &result) == -1)
+    errExit("getaddrinfo");
+
+  if ((fd_l = socket(AF_INET, SOCK_STREAM, 0)) == -1)
+    errExit("socket");
+
+  optval = 1;
+  if (setsockopt(fd_l, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval)) == -1)
+    errExit("setsockopt");
+
+  for (curr = result; curr != NULL; curr = curr->ai_next) {
+    if ((bind(fd_l, curr->ai_addr, curr->ai_addrlen)) == -1) {
+      continue;
+    }
+    if (listen(fd_l, 0) == -1) {
+      continue;
+    }
+    result = NULL;
+    break;
+  }
+
+  command = malloc(IO_BUF_SIZE);
+  query_result = malloc(IO_BUF_SIZE);
+
+  kv_init(buffer, BUFFER_SIZE);
+  for (;;) {
+    if ((fd_r = accept(fd_l, NULL, NULL)) == -1) {
+      fprintf(stderr, "[accept] %s\n", strerror(errno));
+      continue;
+    }
+    for (;;) {
+      send(fd_r, ">", 1, 0);
+      memset(command, 0, IO_BUF_SIZE);
+      if ((size = recv(fd_r, command, IO_BUF_SIZE, 0)) == -1) {
+        fprintf(stderr, "[recv] %s\n", strerror(errno));
+        break;
+      }
+      memset(query_result, 0, IO_BUF_SIZE);
+      do_work(command, query_result);
+      if ((size = send(fd_r, query_result, strlen(query_result), 0)) == -1) {
+        fprintf(stderr, "[send] %s\n", strerror(errno));
+        break;
+      }
+    }
+    close(fd_r);
+  }
+  kv_destory(buffer);
+  free(command);
+  free(query_result);
+}
+
+void kv_init(void *buf, ssize_t size) {
+  struct KVMeta *meta;
+  meta = buf;
+  meta->cap = size;
+  meta->object_offset = 0;
+  meta->string_offset = 0;
+}
+
+void kv_destory(void *buf) {
+  struct KVMeta *meta;
+  meta = buf;
+  meta->cap = 0;
+  meta->object_offset = 0;
+  meta->string_offset = 0;
+}
+
+struct KVObject *kv_object_malloc(void *buf) {
+  struct KVMeta *meta;
+  struct KVObject *curr, *end;
+  meta = buf;
+  for (curr = buf + sizeof(struct KVMeta),
+      end = (void *)curr + meta->object_offset;
+       curr != end; curr++) {
+    if (curr->key_string_offset == 0) {
+      return curr;
+    }
+  }
+  if ((sizeof(struct KVMeta) + meta->object_offset + meta->string_offset +
+       sizeof(struct KVObject)) > meta->cap) {
+    return NULL;
+  }
+  meta->object_offset += sizeof(struct KVObject);
+  return end;
+}
+
+void kv_object_free(void *buf, struct KVObject *obj) {
+  struct KVMeta *meta;
+  struct KVObject *curr, *end, *next_end;
+  meta = buf;
+  obj->key_string_offset = 0;
+  for (curr = buf + sizeof(struct KVMeta),
+      end = (void *)curr + meta->object_offset, next_end = end;
+       curr != end; curr++) {
+    if (curr->key_string_offset != 0)
+      next_end = curr + 1;
+  }
+  meta->object_offset -= ((end - next_end) * sizeof(struct KVObject));
+}
+
+struct KVStringMeta *kv_string_malloc(void *buf, ssize_t str_size) {
+  struct KVMeta *meta;
+  struct KVStringMeta *curr, *end, *target, *fragment;
+  int fragment_size;
+  meta = buf;
+  target = NULL;
+  for (curr = buf + meta->cap - sizeof(struct KVStringMeta),
+      end = (void *)curr - meta->string_offset;
+       curr != end;
+       curr = (void *)curr - curr->str_size - sizeof(struct KVStringMeta)) {
+    if (!curr->in_used && curr->str_size >= str_size &&
+        (!target || curr->str_size < target->str_size))
+      target = curr;
+  }
+  if (!target) {
+    if ((sizeof(struct KVMeta) + meta->object_offset + meta->string_offset +
+         sizeof(struct KVStringMeta)) > meta->cap) {
+      return NULL;
+    }
+    meta->string_offset += (str_size + sizeof(struct KVStringMeta));
+    target = end;
+    target->str_size = str_size;
+  } else if ((fragment_size = target->str_size - str_size -
+                              sizeof(struct KVStringMeta)) > 0) {
+    fragment = (void *)target - str_size - sizeof(struct KVStringMeta);
+    fragment->in_used = 0;
+    fragment->str_size = fragment_size;
+  }
+  target->in_used = 1;
+  return target;
+}
+
+void kv_string_free(void *buf, struct KVStringMeta *str_meta) {
+  struct KVMeta *meta;
+  struct KVStringMeta *curr, *end, *next_end;
+  meta = buf;
+  str_meta->in_used = 0;
+  for (curr = buf + meta->cap - sizeof(struct KVStringMeta),
+      end = (void *)curr - meta->string_offset;
+       curr != end;
+       curr = ((void *)curr - curr->str_size - sizeof(struct KVStringMeta))) {
+    if (curr->in_used != 0)
+      next_end = (void *)curr - curr->str_size - sizeof(struct KVStringMeta);
+  }
+  meta->string_offset -= ((void *)next_end - (void *)end);
+}
+
+void kv_iter_r(void *buf, struct KVObject **curr) {
+  struct KVMeta *meta;
+  struct KVObject *end;
+  meta = buf;
+  end = buf + sizeof(struct KVMeta) + meta->object_offset;
+  if (*curr == NULL) {
+    *curr = buf + sizeof(struct KVMeta);
+  } else {
+    *curr = (void *)(*curr) + sizeof(struct KVObject);
+  }
+  while (*curr != end && (*curr)->key_string_offset == 0) {
+    *curr = (void *)(*curr) + sizeof(struct KVObject);
+  }
+  if (*curr == end) {
+    *curr = NULL;
+  }
+};
+
+char *kv_get(void *buf, const char *key) {
+  struct KVObject *curr;
+  curr = NULL;
+  kv_iter_r(buf, &curr);
+  while (curr != NULL) {
+    if (strcmp(key, KV_STR_DEREF(buf + curr->key_string_offset)) == 0) {
+      return KV_STR_DEREF(buf + curr->value_string_offset);
+    }
+    kv_iter_r(buf, &curr);
+  }
+  return NULL;
+};
+
+void kv_set(void *buf, const char *key, const char *value) {
+  struct KVObject *curr;
+  struct KVStringMeta *key_meta, *value_meta;
+  curr = NULL;
+  kv_iter_r(buf, &curr);
+  while (curr != NULL) {
+    if (strcmp(key, KV_STR_DEREF(buf + curr->key_string_offset)) == 0) {
+      kv_string_free(buf, buf + curr->key_string_offset);
+      kv_string_free(buf, buf + curr->value_string_offset);
+      kv_object_free(buf, curr);
+      break;
+    }
+    kv_iter_r(buf, &curr);
+  }
+  if (value != NULL) {
+    curr = kv_object_malloc(buf);
+    key_meta = kv_string_malloc(buf, strlen(key) + 1);
+    value_meta = kv_string_malloc(buf, strlen(value) + 1);
+    strcpy(KV_STR_DEREF(key_meta), key);
+    strcpy(KV_STR_DEREF(value_meta), value);
+    curr->key_string_offset = (void *)key_meta - buf;
+    curr->value_string_offset = (void *)value_meta - buf;
+  }
+}
+
+void tokenize(char *command, char ***tokens) {
+  ssize_t command_len, space_count, token_index;
+  char *curr, *end;
+  command_len = strlen(command);
+  if (command_len == 0) {
+    *tokens = NULL;
+    return;
+  }
+  space_count = 0;
+  for (curr = command + 1, end = command + command_len; curr != end; curr++) {
+    if (*curr == ' ' && *(curr - 1) != ' ')
+      space_count++;
+    if (*curr == ' ' || *curr == '\n' || *curr == 13)
+      *curr = 0;
+  }
+  *tokens = malloc((space_count + 2) * sizeof(char *));
+  token_index = 0;
+  (*tokens)[token_index++] = command;
+  for (curr = command + 2, end = curr + command_len; curr != end; curr++) {
+    if (*curr != 0 && *(curr - 1) == 0)
+      (*tokens)[token_index++] = curr;
+  }
+  (*tokens)[token_index] = NULL;
+}
+
+void do_work(char *command, char *query_result) {
+  char **tokens;
+  char *value;
+  struct KVObject *curr;
+  tokenize(command, &tokens);
+  if (strncmp("get", tokens[0], 3) == 0 && tokens[1] != NULL) {
+    // pass
+  } else if (strncmp("set", tokens[0], 3) == 0 && tokens[1] != NULL &&
+             tokens[2] != NULL) {
+    kv_set(buffer, tokens[1], tokens[2]);
+  } else if (strncmp("del", tokens[0], 3) == 0 && tokens[1] != NULL) {
+    kv_set(buffer, tokens[1], NULL);
+  } else if (strncmp("keys", tokens[0], 4) == 0) {
+    curr = NULL;
+    kv_iter_r(buffer, &curr);
+    while (curr != NULL) {
+      snprintf(query_result + strlen(query_result), IO_BUF_SIZE, "%s -> %s\n",
+               KV_STR_DEREF(buffer + curr->key_string_offset),
+               KV_STR_DEREF(buffer + curr->value_string_offset));
+      kv_iter_r(buffer, &curr);
+    }
+    return;
+  } else {
+    strcpy(query_result, USAGE);
+    return;
+  }
+  value = kv_get(buffer, tokens[1]);
+  snprintf(query_result, IO_BUF_SIZE, "%s -> %s\n", tokens[1],
+           value == NULL ? "(nil)" : value);
+};
+```
+
+### 59-5
+
+```c
+
+```
