@@ -7825,6 +7825,518 @@ void do_work(char *command, char *query_result) {
 
 ### 59-5
 
-```c
+// TODO
 
+## 第六十章
+
+### 60-1
+
+```c
+#include <fcntl.h>
+#include <netdb.h>
+#include <semaphore.h>
+#include <signal.h>
+#include <sys/wait.h>
+#include <tlpi_hdr.h>
+
+#define IO_BUF_SIZE 1024
+
+sem_t limit_sem;
+
+void sig_handler(int sig) {
+  wait(NULL);
+  sem_post(&limit_sem);
+}
+
+int main(int argc, char *argv[]) {
+  char c, buf[IO_BUF_SIZE];
+  ssize_t limit, opt_count;
+  char *host, *port;
+  struct addrinfo hints, *result, *curr;
+  int optval, fd_l, fd_r, size;
+  struct sigaction sig;
+
+  if (argc < 3)
+    usageErr("%s [-n limit] host port\n", argv[0]);
+  limit = 1;
+  opt_count = 0;
+  while ((c = getopt(argc, argv, "n:")) != -1) {
+    switch (c) {
+    case 'n':
+      limit = getLong(optarg, 0, "limit");
+      opt_count += 1;
+      break;
+    default:
+      errExit("getopt");
+    }
+  };
+  memset(&hints, 0, sizeof(struct addrinfo));
+  if (getaddrinfo(argv[1 + opt_count * 2], argv[2 + opt_count * 2], &hints,
+                  &result) == -1)
+    errExit("getaddrinfo");
+  if ((fd_l = socket(AF_INET, SOCK_STREAM, 0)) == -1)
+    errExit("socket");
+  optval = 1;
+  if (setsockopt(fd_l, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval)) == -1)
+    errExit("setsockopt");
+  hints.ai_family = AF_INET;
+  hints.ai_socktype = SOCK_STREAM;
+  for (curr = result; curr != NULL; curr = curr->ai_next) {
+    if ((bind(fd_l, curr->ai_addr, curr->ai_addrlen)) == -1)
+      continue;
+    if (listen(fd_l, 0) == -1)
+      continue;
+    result = NULL;
+    break;
+  }
+  if (result != NULL)
+    errExit("bind/listen");
+
+  // TODO handle SIGCHLD
+  memset(&sig, 0, sizeof(sig));
+  sig.sa_handler = &sig_handler;
+  sig.sa_flags = SA_RESTART;
+  if (sigemptyset(&sig.sa_mask) == -1)
+    errExit("sigemptyset");
+  if (sigaction(SIGCHLD, &sig, NULL) == -1)
+    errExit("sigaction");
+
+  printf("child process limit %ld\n", limit);
+  if (sem_init(&limit_sem, 1, limit) == -1)
+    errExit("sem_init");
+
+  for (;;) {
+    if ((fd_r = accept(fd_l, NULL, NULL)) == -1) {
+      fprintf(stderr, "[accept] %s\n", strerror(errno));
+      continue;
+    }
+    sem_wait(&limit_sem);
+    switch (fork()) {
+    case -1:
+      fprintf(stderr, "[fork] %s\n", strerror(errno));
+      close(fd_r);
+      continue;
+    case 0:
+      for (;;) {
+        memset(buf, 0, IO_BUF_SIZE);
+        if ((size = recv(fd_r, buf, IO_BUF_SIZE, 0)) == -1) {
+          fprintf(stderr, "[recv] %s\n", strerror(errno));
+          break;
+        }
+        if (size == 0)
+          break;
+        if ((size = send(fd_r, buf, strlen(buf), 0)) == -1) {
+          fprintf(stderr, "[send] %s\n", strerror(errno));
+          break;
+        }
+      }
+      close(fd_r);
+      _exit(EXIT_SUCCESS);
+      break;
+    default:
+      close(fd_r);
+      break;
+    }
+  }
+  sem_destroy(&limit_sem);
+}
 ```
+
+### 60-2
+
+//TODO
+
+## 第六十一章
+
+### 61-1
+
+这是个迭代式的服务器，一次时刻是能处理一个请求
+
+```c
+#include <netdb.h>
+#include <tlpi_hdr.h>
+
+#define IO_BUF_SIZE 1024
+
+int main(int argc, char* argv[]) {
+    int fd_l, fd_r, optval, size;
+    struct addrinfo hints, *result, *curr;
+    char buf[IO_BUF_SIZE];
+    if (argc < 3)
+        usageErr("%s host port\n", argv[0]);
+    memset(&hints, 0, sizeof(hints));
+    hints.ai_family = AF_INET;
+    hints.ai_socktype = SOCK_STREAM;
+    if (getaddrinfo(argv[1], argv[2], &hints, &result) == -1)
+        errExit("getaddrinfo");
+    if ((fd_l = socket(AF_INET, SOCK_STREAM, 0)) == -1)
+        errExit("socket");
+    optval = 1;
+    if (setsockopt(fd_l, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval)) ==
+        -1)
+        errExit("setsockopt");
+    for (curr = result; curr != NULL; curr = curr->ai_next) {
+        if (bind(fd_l, curr->ai_addr, curr->ai_addrlen) == -1)
+            continue;
+        if (listen(fd_l, 0))
+            continue;
+        result = NULL;
+        break;
+    }
+    if (result != NULL)
+        errExit("bind/listen");
+    for (;;) {
+        if ((fd_r = accept(fd_l, NULL, NULL)) == -1) {
+            fprintf(stderr, "[accept] %s\n", strerror(errno));
+            continue;
+        }
+        for (;;) {
+            memset(buf, 0, IO_BUF_SIZE);
+            if ((size = read(STDIN_FILENO, buf, IO_BUF_SIZE)) == -1) {
+                fprintf(stderr, "[read] %s\n", strerror(errno));
+                break;
+            };
+            if (size == 0)
+                break;
+            if ((size = write(fd_r, buf, size)) == -1) {
+                fprintf(stderr, "[write] %s\n", strerror(errno));
+                break;
+            }
+        }
+        if (shutdown(fd_r, SHUT_RDWR) == -1) {
+            fprintf(stderr, "[shutdown] %s\n", strerror(errno));
+        };
+    }
+}
+```
+
+### 61-2
+
+```c
+#include <sys/socket.h>
+#include <sys/wait.h>
+#include <tlpi_hdr.h>
+
+int tlpi_pipe(int fds[2]) {
+    if (socketpair(AF_UNIX, SOCK_STREAM, 0, fds) == -1)
+        return -1;
+    if (shutdown(fds[0], SHUT_WR) == -1 || shutdown(fds[1], SHUT_RD))
+        return -1;
+    return 0;
+}
+
+#define IO_BUF_SIZE 1024
+
+int main() {
+    int fds[2], size;
+    char buf[IO_BUF_SIZE];
+    if (tlpi_pipe(fds) == -1)
+        errExit("tlpi_pipe");
+    switch (fork()) {
+    case -1:
+        errExit("fork");
+        break;
+    case 0:
+        if (close(fds[1]) == -1)
+            errExit("close");
+        if ((size = read(fds[0], buf, IO_BUF_SIZE)) == -1)
+            errExit("read");
+        if (write(STDOUT_FILENO, buf, size) == -1)
+            errExit("write");
+        break;
+    default:
+        if (close(fds[0]) == -1)
+            errExit("close");
+        memset(buf, 0, IO_BUF_SIZE);
+        strcpy(buf, "hello\n");
+        if (write(fds[1], buf, strlen(buf) + 1) == -1)
+            errExit("write");
+        wait(NULL);
+    }
+}
+```
+
+### 61-3
+
+```c
+#include <sys/mman.h>
+#include <tlpi_hdr.h>
+
+ssize_t tlpi_sendfile(int out_fd, int in_fd, off_t* offset, size_t count) {
+    void* addr;
+    ssize_t written_count;
+    if ((addr = mmap(NULL, count, PROT_READ, MAP_PRIVATE, in_fd,
+                     offset != NULL ? *offset : 0)) == MAP_FAILED)
+        return -1;
+    return write(out_fd, addr, count);
+}
+
+int mian() {}
+```
+
+### 61-4
+
+![61-4-1](../assets/tlpi/61-4-1.png)
+
+```c
+#include <netdb.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <tlpi_hdr.h>
+
+#define BUF_SIZE 1024
+
+int main() {
+    int fd;
+    struct sockaddr_in addr;
+    socklen_t sock_len;
+    char host[BUF_SIZE], service[BUF_SIZE];
+    if ((fd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
+        errExit("socket");
+    if (listen(fd, 0) == -1)
+        errExit("listen");
+    sock_len = sizeof(addr);
+    if (getsockname(fd, (struct sockaddr*)&addr, &sock_len) == -1)
+        errExit("getsockname");
+    if (getnameinfo((struct sockaddr*)&addr, sock_len, host, BUF_SIZE, service,
+                    BUF_SIZE, 0) == -1)
+        errExit("getnameinfo");
+    printf("host: %s\nservice: %s\n", host, service);
+}
+```
+
+### 61-5
+
+![61-5-1](../assets/tlpi/61-5-1.png)
+
+```c
+#include <netdb.h>
+#include <signal.h>
+#include <sys/wait.h>
+#include <tlpi_hdr.h>
+
+void sig_handler(int sig) { wait(NULL); }
+
+#define IO_BUF_SIZE 1024
+
+int main(int argc, char* argv[]) {
+    int fd_l, fd_r, optval, size;
+    struct addrinfo hints, *result, *curr;
+    char buf[IO_BUF_SIZE];
+    struct sigaction sa;
+
+    if (argc < 3)
+        usageErr("%s host port\n", argv[0]);
+    memset(&hints, 0, sizeof(hints));
+    hints.ai_family = AF_INET;
+    hints.ai_socktype = SOCK_STREAM;
+    if (getaddrinfo(argv[1], argv[2], &hints, &result) == -1)
+        errExit("getaddrinfo");
+    if ((fd_l = socket(AF_INET, SOCK_STREAM, 0)) == -1)
+        errExit("socket");
+    optval = 1;
+    if (setsockopt(fd_l, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval)) ==
+        -1)
+        errExit("setsockopt");
+    for (curr = result; curr != NULL; curr = curr->ai_next) {
+        if (bind(fd_l, curr->ai_addr, curr->ai_addrlen) == -1)
+            continue;
+        if (listen(fd_l, 0) == -1)
+            continue;
+        result = NULL;
+        break;
+    }
+    if (result != NULL)
+        errExit("bind/listen");
+
+    memset(&sa, 0, sizeof(sa));
+    sa.sa_flags = SA_RESTART;
+    sigemptyset(&sa.sa_mask);
+    sa.sa_handler = &sig_handler;
+    if (sigaction(SIGCHLD, &sa, NULL) == -1)
+        errExit("sigaction");
+    for (;;) {
+        if ((fd_r = accept(fd_l, NULL, NULL)) == -1) {
+            fprintf(stderr, "[accpt] %s\n", strerror(errno));
+            continue;
+        }
+        switch (fork()) {
+        case -1:
+            errExit("fork");
+        case 0:
+            if (dup2(fd_r, STDOUT_FILENO) == -1)
+                errExit("dup2");
+            for (;;) {
+                if (send(fd_r, "> ", 2, 0) == -1) {
+                    fprintf(stderr, "[send] %s\n", strerror(errno));
+                    break;
+                }
+                memset(buf, 0, IO_BUF_SIZE);
+                if ((size = read(fd_r, buf, IO_BUF_SIZE)) == -1) {
+                    fprintf(stderr, "[read] %s\n", strerror(errno));
+                    break;
+                }
+                for (size_t i = 0; i < size; i++) {
+                    if (buf[i] == '\n' || buf[i] == 13)
+                        buf[i] = 0;
+                }
+                if (system(buf) == -1)
+                    errExit("system");
+            }
+            if (shutdown(fd_r, SHUT_RDWR) == -1)
+                errExit("shutdown");
+            break;
+        default:
+            close(fd_r);
+            break;
+        }
+    }
+}
+```
+
+### 61-6
+
+// TODO
+
+## 第六十二章
+
+// TODO
+
+## 第六十三章
+
+### 63-1
+
+### 63-2
+
+UDP 的`recvfrom`需要使用 inet6 的地址接收
+
+```c
+#include <netdb.h>
+#include <pthread.h>
+#include <sys/epoll.h>
+#include <tlpi_hdr.h>
+
+#define IO_BUF_SIZE 1024
+
+static int epollfd, fd_udp_l;
+
+static void* echo_worker(void* arg) {
+    int s;
+    char buf[IO_BUF_SIZE];
+    struct sockaddr_in6 addr;
+    socklen_t addr_len;
+    struct epoll_event epevt;
+    for (;;) {
+        if ((s = epoll_wait(epollfd, &epevt, 1, -1)) == -1)
+            errExit("epoll_wait");
+        if (s == 0)
+            continue;
+        if (epevt.data.fd != fd_udp_l) {
+            if ((s = read(epevt.data.fd, buf, IO_BUF_SIZE)) == -1)
+                errExit("read");
+            if (s == 0) {
+                if (epoll_ctl(epollfd, EPOLL_CTL_DEL, epevt.data.fd, NULL) ==
+                    -1)
+                    errExit("epoll_ctl");
+            }
+            if (send(epevt.data.fd, buf, s, 0) == -1)
+                errExit("send");
+        } else {
+            if ((s = recvfrom(epevt.data.fd, buf, IO_BUF_SIZE, 0,
+                              (struct sockaddr*)&addr, &addr_len)) == -1)
+                errExit("recvfrom");
+            if (sendto(epevt.data.fd, buf, s, 0, (struct sockaddr*)&addr,
+                       addr_len) == -1)
+                errExit("sendto");
+        }
+    }
+    return NULL;
+}
+
+int main(int argc, char* argv[]) {
+    int fd_tcp_l, fd_r, optval, s;
+    struct addrinfo hints, *result, *curr;
+    struct epoll_event evt;
+    pthread_t echo_thread;
+
+    if (argc < 3)
+        usageErr("%s host port\n", argv[0]);
+
+    if ((fd_tcp_l = socket(AF_INET, SOCK_STREAM, 0)) == -1)
+        errExit("socket");
+    optval = 1;
+    if (setsockopt(fd_tcp_l, SOL_SOCKET, SO_REUSEADDR, &optval,
+                   sizeof(optval)) == -1)
+        errExit("setsockopt");
+    memset(&hints, 0, sizeof(hints));
+    hints.ai_family = AF_INET;
+    hints.ai_socktype = SOCK_STREAM;
+    if (getaddrinfo(argv[1], argv[2], &hints, &result) == -1)
+        errExit("getaddrinfo");
+    for (curr = result; curr != NULL; curr = curr->ai_next) {
+        if (bind(fd_tcp_l, curr->ai_addr, curr->ai_addrlen) == -1)
+            continue;
+        if (listen(fd_tcp_l, 0) == -1)
+            continue;
+        result = NULL;
+        break;
+    }
+    if (result != NULL)
+        errExit("bind/listen");
+
+    if ((fd_udp_l = socket(AF_INET, SOCK_DGRAM, 0)) == -1)
+        errExit("socket");
+    optval = 1;
+    if (setsockopt(fd_udp_l, SOL_SOCKET, SO_REUSEADDR, &optval,
+                   sizeof(optval)) == -1)
+        errExit("setsockopt");
+    memset(&hints, 0, sizeof(hints));
+    hints.ai_family = AF_INET;
+    hints.ai_socktype = SOCK_DGRAM;
+    if (getaddrinfo(argv[1], argv[2], &hints, &result) == -1)
+        errExit("getaddrinfo");
+    for (curr = result; curr != NULL; curr = curr->ai_next) {
+        if (bind(fd_udp_l, curr->ai_addr, curr->ai_addrlen) == -1)
+            continue;
+        result = NULL;
+        break;
+    }
+    if (result != NULL)
+        errExit("bind/listen");
+
+    if ((epollfd = epoll_create(1)) == -1)
+        errExit("epoll_create");
+    if ((s = pthread_create(&echo_thread, NULL, &echo_worker, NULL)) != 0)
+        errExitEN(s, "pthread_create");
+    if ((s = pthread_detach(echo_thread)) != 0)
+        errExitEN(s, "pthread_detach");
+    memset(&evt, 0, sizeof(evt));
+    evt.events = EPOLLIN;
+    evt.data.fd = fd_udp_l;
+    if (epoll_ctl(epollfd, EPOLL_CTL_ADD, fd_udp_l, &evt) == -1)
+        errExit("epoll_ctl");
+    for (;;) {
+        if ((fd_r = accept(fd_tcp_l, NULL, NULL)) == -1) {
+            fprintf(stderr, "[accept] %s\n", strerror(errno));
+            continue;
+        }
+        memset(&evt, 0, sizeof(evt));
+        evt.events = EPOLLIN;
+        evt.data.fd = fd_r;
+        if (epoll_ctl(epollfd, EPOLL_CTL_ADD, fd_r, &evt) == -1) {
+            fprintf(stderr, "[epoll_ctl] %s\n", strerror(errno));
+            continue;
+        }
+    }
+}
+```
+
+### 63-3
+
+// TODO
+
+// TODO
+
+## 第六十四章
+
+//TODO
