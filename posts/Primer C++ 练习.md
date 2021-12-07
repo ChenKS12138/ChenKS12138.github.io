@@ -765,3 +765,205 @@ int main() {
 ### 6-17
 
 不一样，前者可以传递常量引用，后者不能
+
+## 第七章
+
+### 7-5
+
+这些函数应该是 const，函数并不修改类内对象，使用 const 成员函数可以同时兼容 const 和非 const Person 对象
+
+### 7-16
+
+无限制
+
+### 7-17
+
+使用 class 和 struct 唯一的区别是默认的访问权限，class 默认是 private，struct 默认是 public
+
+### 7-18
+
+封装通过访问说明符隐藏了类的实现细节，确保用户代码不会无意间破坏封装对象的状态
+
+### 7-19
+
+对外暴露的成员函数为 public，私有的成员变量为 private
+
+## 第八章
+
+### 8-1
+
+```cpp
+istream& read_all(istream& in) {
+    char c;
+    while (!in.eof()) {
+        in >> c;
+        cout << c << endl;
+    }
+    in.clear();
+    return in;
+}
+```
+
+### 8-3
+
+用于确定流对象状态是否良好
+
+### 8-4
+
+```cpp
+int main() {
+    using namespace std;
+    vector<string> lines;
+    string line;
+    ifstream in("in.txt");
+    while (in >> line)
+        lines.push_back(line);
+    return 0;
+}
+```
+
+### 8-5
+
+```cpp
+int main() {
+    using namespace std;
+    vector<string> lines;
+    string line;
+    ifstream in("in.txt");
+    while (getline(in, line, ' '))
+        lines.push_back(line);
+    return 0;
+}
+```
+
+### 8-6
+
+```cpp
+int main(int argc, const char* argv[]) {
+    using namespace std;
+    fstream f(argv[1]);
+    string s;
+    while (getline(f, s))
+        cout << s << endl;
+    return 0;
+}
+```
+
+### 8-7
+
+```cpp
+int main(int argc, const char* argv[]) {
+    using namespace std;
+    ifstream inf(argv[1]);
+    ofstream outf(argv[2]);
+
+    string s;
+    while (inf >> s) {
+        transform(s.begin(), s.end(), s.begin(), ::toupper);
+        outf << s << endl;
+    }
+    return 0;
+}
+```
+
+### 8-8
+
+```cpp
+int main(int argc, const char* argv[]) {
+    using namespace std;
+    ifstream inf(argv[1]);
+    ofstream outf(argv[2], ios_base::app);
+
+    string s;
+    while (inf >> s) {
+        transform(s.begin(), s.end(), s.begin(), ::toupper);
+        outf << s << endl;
+    }
+    return 0;
+}
+```
+
+### 8-9
+
+```cpp
+istringstream& read_all(istringstream& in) {
+    char c;
+    while (!in.eof()) {
+        in >> c;
+        cout << c << endl;
+    }
+    in.clear();
+    return in;
+}
+```
+
+### 8-10
+
+```cpp
+int main(int argc, const char* argv[]) {
+    using namespace std;
+    ifstream fin(argv[1]);
+    vector<string> lines;
+    string s;
+    while (fin >> s)
+        lines.push_back(s);
+
+    for (const auto& line : lines) {
+        istringstream is(line);
+        while (is >> s) {
+            cout << s << endl;
+        }
+    }
+    return 0;
+}
+```
+
+## 第九章
+
+### 9-1
+
+(a) 使用 list 或者是 forward_list，因为可能需要频繁地中间插入
+
+(b) 使用 deque 或者 list，因为需要两端的插入/删除
+
+(c) 使用 vector，没有中间插入或者两端的插入/删除
+
+### 9-2
+
+```cpp
+int main(int argc, const char* argv[]) {
+    using namespace std;
+    list<deque<int>> s;
+}
+```
+
+### 9-3
+
+end 不提前于 begin
+
+### 9-4
+
+```cpp
+bool my_find(std::vector<int>::const_iterator begin,
+             std::vector<int>::const_iterator end, int target) {
+    while (begin != end) {
+        if (*(begin++) == target)
+            return true;
+    }
+    return false;
+}
+```
+
+### 9-5
+
+```cpp
+std::vector<int>::const_iterator&
+my_find(std::vector<int>::const_iterator& begin,
+        std::vector<int>::const_iterator& end, int target) {
+    while (begin != end) {
+        if (*(begin++) == target)
+            return begin;
+    }
+    return end;
+}
+```
