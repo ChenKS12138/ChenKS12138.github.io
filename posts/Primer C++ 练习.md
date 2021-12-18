@@ -5,7 +5,7 @@ tags: ["随笔"]
 index_img:
 ---
 
-## CH1
+## 第一章
 
 ### 1-9
 
@@ -116,7 +116,7 @@ int main() {
 }
 ```
 
-## CH2
+## 第二章
 
 ### 2-3
 
@@ -176,7 +176,7 @@ int main() {
 }
 ```
 
-## CH3
+## 第三章
 
 ### 3-2
 
@@ -595,13 +595,13 @@ int main() {
 }
 ```
 
-## CH4
+## 第四章
 
 ### 4-1
 
 105
 
-## CH6
+## 第六章
 
 ### 6-1
 
@@ -967,3 +967,758 @@ my_find(std::vector<int>::const_iterator& begin,
     return end;
 }
 ```
+
+### 9-6
+
+应该修改为 `while(iter1 != iter2)`，list 的迭代器不支持随机访问
+
+### 9-7
+
+应该使用`vecotr<int>::size_type`
+
+### 9-8
+
+应该使用`string::reference`
+
+### 9-9
+
+begin 可能返回`iterator`或者`const_iterator`，cbegin 返回`const_iterator`
+
+### 9-10
+
+`it1`为`vector<int>::iterator`，`it2`,`it3`,`it4`为`vector<int>::const_iterator`
+
+### 9-11
+
+```cpp
+int main() {
+    using namespace std;
+    vector<int> v1;
+    vector<int> v2(10, 1);
+    vector<int> v3{1, 2, 3, 4};
+    vector<int> v4 = {1, 2, 3, 4};
+    vector<int> v5 = v1;
+    vector<int> v6(v1);
+}
+```
+
+### 9-12
+
+前者需要保证容器类型和元素类型都相同，后者只需要保证元素类型相同
+
+### 9-13
+
+```cpp
+int main() {
+    using namespace std;
+    list<int> l = {1, 2, 3};
+    vector<double> v(l.begin(), l.end());
+}
+```
+
+### 9-14
+
+```cpp
+int main() {
+    using namespace std;
+    list<const char*> l = {"hello", "cattchen"};
+    vector<string> v(l.begin(), l.end());
+}
+```
+
+### 9-15
+
+```cpp
+int main() {
+    using namespace std;
+    vector<int> v1 = {1, 2, 3}, v2 = {1, 2, 3};
+    cout << (v1 == v2 ? "equal" : "not equal") << endl;
+}
+```
+
+### 9-17
+
+c1 和 c2 的容器类型、元素类型相同，且元素类型支持比较运算符
+
+### 9-18
+
+```cpp
+int main() {
+    using namespace std;
+    deque<string> d;
+    string s;
+    while (cin >> s)
+        d.push_back(s);
+    for (const auto& line : d) {
+        cout << line << endl;
+    }
+}
+```
+
+### 9-19
+
+```cpp
+int main() {
+    using namespace std;
+  	// 修改容器类型即可
+    list<string> d;
+    string s;
+    while (cin >> s)
+        d.push_back(s);
+    for (const auto& line : d) {
+        cout << line << endl;
+    }
+}
+```
+
+### 9-20
+
+```cpp
+int main() {
+    using namespace std;
+    list<int> total = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+    deque<int> odd, even;
+    for (const auto& item : total) {
+        if (item % 2 == 0) {
+            even.push_back(item);
+        } else {
+            odd.push_back(item);
+        }
+    }
+}
+```
+
+### 9-21
+
+```cpp
+int main() {
+    using namespace std;
+    list<string> lst;
+    string word;
+    auto iter = lst.begin();
+    while (cin >> word)
+        iter = lst.insert(iter, word);
+
+    for (const auto& s : lst) {
+        cout << s << endl;
+    }
+}
+```
+
+### 9-22
+
+没有对 iter 进行自增，有死循环。while 循转中进行自增操作
+
+### 9-24
+
+```cpp
+int main() {
+    using namespace std;
+    vector<int> v = {1, 2, 3};
+    cout << v.at(0) << endl;
+    cout << v[0] << endl;
+    cout << v.front() << endl;
+    cout << *v.begin() << endl;
+}
+```
+
+### 9-25
+
+elem1 和 elem2 相等，不发生删除
+
+elem2 是尾后迭代器，删除 elem1 及之后的元素
+
+### 9-26
+
+```cpp
+int main() {
+    using namespace std;
+    int ia[] = {0, 1, 1, 2, 3, 5, 8, 13, 21, 55, 89};
+    vector<int> v(begin(ia), end(ia));
+    list<int> l(begin(ia), end(ia));
+    for (auto it = v.begin(); it != v.end(); it++) {
+        if (*it % 2 == 0) {
+            it = v.erase(it);
+        }
+    }
+    for (auto it = l.begin(); it != l.end(); it++) {
+        if (*it % 2 != 0) {
+            it = l.erase(it);
+        }
+    }
+    return 0;
+}
+```
+
+### 9-27
+
+```cpp
+int main() {
+    using namespace std;
+    forward_list<int> fl{1, 2, 3, 4, 5, 6, 7, 8, 9};
+    for (auto it = fl.before_begin(); it != fl.end(); it++) {
+        if (*next(it) % 2 != 0) {
+            it = fl.erase_after(it);
+        }
+    }
+    for (const auto n : fl) {
+        cout << n << endl;
+    }
+    return 0;
+}
+```
+
+### 9-28
+
+```cpp
+void insert_str(std::forward_list<std::string>& l, std::string& str1,
+                std::string& str2) {
+    for (auto it = l.before_begin(); it != l.end(); it++) {
+        if (*next(it) == str1) {
+            it = l.insert_after(it, str2);
+            return;
+        }
+    }
+}
+```
+
+### 9-29
+
+先在尾部新增 75 个元素，然后删除后 90 个元素
+
+### 9-30
+
+元素需要提供默认构造函数
+
+### 9-31
+
+list 或者是 forward_list 的迭代器不支持运算符+
+
+### 9-32
+
+合法
+
+### 9-33
+
+vector 扩容时，可能发生底层数组的改变，导致原来的迭代器不可用
+
+### 9-34
+
+遇到奇数值后，不停地在奇数值前插入该数值，是个死循环
+
+### 9-35
+
+capacity 是 vector 底层数组的大小，size 是 vector 实际存放的元素的个数
+
+### 9-36
+
+不可能
+
+### 9-37
+
+list 是双向链表，没有对应的底层数组，array 对应的底层数据固定大小
+
+### 9-38
+
+以 2^n 的趋势扩张
+
+```cpp
+int main() {
+    vector<int> vi;
+    for (int i = 0; i < 3000; i++) {
+        vi.push_back(1);
+        cout << vi.size() << " " << vi.capacity() << endl;
+    }
+}
+```
+
+### 9-39
+
+vector 预先扩容为 1024，读入字符串，结束输入后扩容为原来的 1.5 倍
+
+### 9-41
+
+```cpp
+int main() {
+    vector<char> vc = {'h', 'e', 'l', 'l', 'o'};
+    string s(vc.begin(), vc.end());
+    cout << s << endl;
+}
+```
+
+### 9-42
+
+使用 reserve 提前分配空间
+
+### 9-43
+
+```cpp
+// 好像还有点问题
+void my_replace(string& s, const string& old_val, const string& new_val) {
+    string::iterator iter1, iter2;
+    iter1 = s.begin();
+    while (iter1 != s.end()) {
+        while (*iter1 == ' ')
+            iter1++;
+        iter2 = iter1;
+        while (iter2 != s.end() && *iter2 != ' ')
+            iter2++;
+        string sub(iter1, iter2);
+        if (sub == old_val) {
+            iter2 = s.erase(iter1, iter2);
+            s.insert(iter2 - s.begin(), new_val);
+        }
+        iter1 = iter2;
+    }
+}
+
+int main() {
+    string s = "tho i thru";
+    my_replace(s, "tho", "though");
+    cout << s << endl;
+}
+```
+
+### 9-44
+
+//
+
+### 9-45
+
+```cpp
+std::string generate_name(const std::string& name, const std::string& prefix) {
+    std::string result = name;
+    auto iter = result.begin();
+    for (const auto& c : prefix) {
+        iter = result.insert(iter, c) + 1;
+    }
+    return result;
+}
+```
+
+### 9-46
+
+```cpp
+std::string generate_name(const std::string& name, const std::string& prefix) {
+    std::string result = name;
+    result.insert(0, prefix.c_str(), prefix.size());
+    return result;
+}
+```
+
+### 9-47
+
+```cpp
+int main() {
+    string s("ab2c3d7R4E6"), numbers("0123456789");
+    int pos = 0;
+    cout << "search number" << endl;
+    while ((pos = s.find_first_of(numbers, pos)) != string::npos) {
+        cout << s[pos++] << endl;
+    }
+    cout << "search alpha" << endl;
+    pos = 0;
+    while ((pos = s.find_first_not_of(numbers, pos)) != string::npos) {
+        cout << s[pos++] << endl;
+    }
+}
+```
+
+### 9-48
+
+返回`string::npos`
+
+### 9-49
+
+```cpp
+std::string longest_noender(const string& in) {
+    auto it = in.begin();
+    string result;
+    string::const_iterator start = in.end(), end = in.end();
+    while (it != in.end()) {
+        switch (*it) {
+        case 'd':
+        case 'f':
+        case 'p':
+        case 'g':
+        case 'b':
+        case 'h':
+        case 'i':
+        case 'j':
+        case 'k':
+        case 'l':
+        case 'q':
+        case 't':
+        case 'y':
+            if (start != end) {
+                string tmp(start, end);
+                if (tmp.length() > result.length()) {
+                    result = tmp;
+                }
+                start = it + 1;
+                end = start;
+            }
+            break;
+        default:
+            if (start == end) {
+                start = it;
+                end = it + 1;
+            } else {
+                end = it + 1;
+            }
+        }
+        it++;
+    }
+    return result;
+}
+```
+
+### 9-50
+
+```cpp
+double str_sum(const vector<string>& s) {
+    double sum;
+    for (const auto& v : s) {
+        sum += stold(v);
+    }
+    return sum;
+}
+```
+
+### 9-51
+
+```cpp
+static unordered_map<string, unsigned int> map_months{
+    {"January", 1},   {"February", 2}, {"March", 3},     {"April", 4},
+    {"May", 5},       {"June", 6},     {"July", 7},      {"August", 8},
+    {"September", 9}, {"October", 10}, {"November", 11}, {"December", 12},
+};
+
+static unordered_map<string, unsigned int> map_short_months{
+    {"Jan", 1}, {"Feb", 2}, {"Mar", 3}, {"Apr", 4},  {"May", 5},  {"Jun", 6},
+    {"Jul", 7}, {"Aug", 8}, {"Sep", 9}, {"Oct", 10}, {"Nov", 11}, {"Dec", 12}};
+
+class MyDate {
+  private:
+    unsigned int year;
+    unsigned int month;
+    unsigned int day;
+
+  public:
+    MyDate(unsigned int year, unsigned int month, unsigned int day)
+        : year(year), month(month), day(day) {}
+    static MyDate from_str(const string& in) {
+        vector<string> values;
+        vector<char> seperators;
+        auto it = in.begin();
+        auto beg = in.end(), end = in.end();
+        while (it != in.end()) {
+            switch (*it) {
+            case ' ':
+            case ',':
+            case '/':
+                seperators.push_back(*it);
+                values.emplace_back(beg, end);
+                beg = it + 1;
+                end = beg;
+                break;
+            default:
+                if (beg == end) {
+                    beg = it;
+                }
+                end = it + 1;
+            }
+            it++;
+        }
+        if (beg != end) {
+            values.emplace_back(beg, end);
+        }
+        if (seperators[0] == ' ' && seperators[1] == ',') {
+            return {(unsigned int)(stoul(values[2])),
+                    (unsigned int)(stoul(values[1])), map_months[values[0]]};
+        } else if (seperators[0] == '/' && seperators[1] == '/') {
+            return {(unsigned int)(stoul(values[2])),
+                    (unsigned int)(stoul(values[1])),
+                    (unsigned int)(stoul(values[0]))};
+        } else if (seperators[0] == ' ' && seperators[1] == ' ') {
+            return {(unsigned int)(stoul(values[2])),
+                    (unsigned int)(stoul(values[1])),
+                    map_short_months.at(values[0])};
+        }
+        throw new runtime_error("unexpeted date string");
+    };
+    friend ostream& operator<<(ostream& out, const MyDate& date) {
+        out << "year: " << date.year << ", month: " << date.month
+            << ", day: " << date.day;
+        return out;
+    }
+};
+```
+
+### 9-52
+
+```cpp
+int calc_expr(const string& expr) {
+    stack<string> t;
+    int result;
+    auto it = expr.begin();
+    auto beg = expr.begin(), end = expr.begin();
+    while (it != expr.end()) {
+        if (*it >= '0' && *it <= '9') {
+            if (beg == end) {
+                beg = it;
+                end = it + 1;
+            } else {
+                end = it + 1;
+            }
+        } else if (*it != ' ') {
+            if (beg != end) {
+                t.emplace(beg, end);
+                beg = it + 1;
+                end = beg;
+            }
+            if (*it == ')') {
+
+            } else {
+                t.emplace(1, *it);
+            }
+        }
+        it++;
+    }
+    if (beg != end) {
+        // TODO
+        // t.emplace(beg, end);
+    }
+    while (!t.empty()) {
+        cout << t.top() << endl;
+        t.pop();
+    }
+    return result;
+}
+```
+
+## 第十章
+
+### 10-1
+
+```cpp
+int main() {
+    vector<int> v = {1, 2, 3, 4, 5, 2};
+    int count = ::count(v.begin(), v.end(), 2);
+    cout << count << endl;
+}
+```
+
+### 10-2
+
+```cpp
+int main() {
+    vector<string> v = {"hello", "hola", "hello"};
+    int count = ::count(v.begin(), v.end(), "hello");
+    cout << count << endl;
+}
+```
+
+### 10-3
+
+```cpp
+int main() {
+    vector<int> v{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+    int sum = accumulate(v.begin(), v.end(), 0);
+    cout << sum << endl;
+}
+```
+
+### 10-4
+
+精度丢失问题，改为`accmulate(v.cbegin(),v.cend(),0.0)`
+
+### 10-5
+
+也是可以执行，我理解是直接比较了`const char*`的地址
+
+### 10-6
+
+```cpp
+int main() {
+    vector<int> v;
+    v.resize(10);
+    fill_n(v.begin(), 10, 0);
+    for (const auto& n : v) {
+        cout << n << endl;
+    }
+}
+```
+
+### 10-7
+
+(a) 修改为`copy(lst.cbegin(), lst.cend(), back_inserter(vec));` 泛型算法并不会去执行容器操作
+
+(b) 修改为`vec.resize(10);` 泛型算法不会修改容器的 size
+
+### 10-9
+
+```cpp
+void elim_dups(std::vector<string>& words) {
+    sort(words.begin(), words.end());
+    auto it = unique(words.begin(), words.end());
+    words.erase(it, words.end());
+}
+
+int main() {
+    std::vector<string> words = {"fox", "jumps", "over", "quick",
+                                 "red", "slow",  "the",  "turtle"};
+    elim_dups(words);
+    for (const auto& s : words) {
+        cout << s << endl;
+    }
+}
+```
+
+### 10-11
+
+```cpp
+bool is_shorter(const string& s1, const string& s2) {
+    return s1.size() < s2.size();
+}
+
+void elim_dups(std::vector<string>& words) {
+    stable_sort(words.begin(), words.end(), is_shorter);
+    auto it = unique(words.begin(), words.end());
+    words.erase(it, words.end());
+}
+
+int main() {
+    std::vector<string> words = {"fox", "jumps", "over", "quick",
+                                 "red", "slow",  "the",  "turtle"};
+    elim_dups(words);
+    for (const auto& s : words) {
+        cout << s << endl;
+    }
+}
+```
+
+### 10-13
+
+```cpp
+bool is_longer_then_5(const string& s) { return s.size() >= 5; }
+
+int main() {
+    //
+    vector<string> v{"fox", "jumps", "over", "quick",
+                     "red", "slow",  "the",  "turtle"};
+    auto it = partition(v.begin(), v.end(), is_longer_then_5);
+    v.erase(it, v.end());
+    for (const auto& s : v) {
+        cout << s << endl;
+    }
+}
+```
+
+### 10-14
+
+```cpp
+int main() {
+    auto my_max = [](int a, int b) -> int { return a > b ? a : b; };
+    cout << my_max(2, 3) << endl;
+}
+```
+
+### 10-15
+
+```cpp
+int main() {
+    auto create_adder = [](int a) -> std::function<int(int)> {
+        return [a](int b) -> int { return a + b; };
+    };
+    auto adder = create_adder(1);
+    cout << adder(3) << endl;
+}
+```
+
+### 10-16
+
+```cpp
+int main() {
+    auto biggies = [](vector<string>& words, vector<string>::size_type sz) {
+        sort(words.begin(), words.end());
+        auto it = unique(words.begin(), words.end());
+        words.erase(it, words.end());
+        stable_sort(words.begin(), words.end(),
+                    [](const string& a, const string& b) {
+                        return a.size() < b.size();
+                    });
+        auto wc = find_if(words.begin(), words.end(),
+                          [sz](const string& a) { return a.size() >= sz; });
+        auto count = words.end() - wc;
+        cout << count << endl;
+    };
+    vector<string> words{"fox", "jumps", "over", "quick",
+                         "red", "slow",  "the",  "turtle"};
+    biggies(words, 5);
+}
+```
+
+### 10-20
+
+```cpp
+int main() {
+    vector<string> words{"fox",       "jumps", "over", "quick",
+                         "redredred", "slow",  "the",  "turtle"};
+    auto c = count_if(words.begin(), words.end(),
+                      [](const string& s) -> bool { return s.size() > 6; });
+    cout << c << endl;
+}
+```
+
+### 10-21
+
+```cpp
+int main() {
+    int i = 5;
+    auto dec = [&i]() {
+        if (i <= 0)
+            return false;
+        i--;
+        return true;
+    };
+    while (dec()) {
+        cout << i << endl;
+    }
+}
+```
+
+### 10-22
+
+```cpp
+int main() {
+    vector<string> words{"fox",       "jumps", "over", "quick",
+                         "redredred", "slow",  "the",  "turtle"};
+    auto count_size = [](const vector<string>& v,
+                         const vector<string>::size_type size) -> int {
+        return count_if(v.begin(), v.end(), [size](const string& s) -> bool {
+            return s.size() >= size;
+        });
+    };
+    auto count_size_5 = bind(count_size, placeholders::_1, 5);
+    cout << count_size_5(words) << endl;
+}
+```
+
+### 10-23
+
+29 个参数
+
+### 10-24
+
+```cpp
+int main() {
+    vector<int> sizes{1, 2, 3, 4, 5, 6, 7, 8};
+    string s("helo");
+    auto it = find_if(sizes.begin(), sizes.end(),
+                      [&s](int size) -> bool { return size > s.size(); });
+    cout << (it == sizes.end() ? "not found" : ::to_string(*it)) << endl;
+}
+```
+
+###
