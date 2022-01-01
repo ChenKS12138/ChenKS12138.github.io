@@ -1721,4 +1721,107 @@ int main() {
 }
 ```
 
-###
+### 10-26
+
+对迭代器进行复制时，进行的容器操作不同`push_front`,`push_back`,`insert`
+
+### 10-27
+
+```cpp
+int main() {
+    vector<int> sizes{1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 5, 6, 6, 6, 6}, result;
+    unique_copy(sizes.begin(), sizes.end(), back_inserter(result));
+    for (const auto& n : result) {
+        cout << n << endl;
+    }
+}
+```
+
+### 10-28
+
+```cpp
+int main() {
+    vector<int> sizes{1, 2, 3, 4, 5, 6, 7, 8, 9};
+    deque<int> result1, result2, result3;
+    copy(sizes.begin(), sizes.end(), inserter(result1, result1.begin()));
+    copy(sizes.begin(), sizes.end(), back_inserter(result2));
+    copy(sizes.begin(), sizes.end(), front_inserter(result3));
+    cout << "result 1:" << endl;
+    for (const auto& n : result1) {
+        cout << n << endl;
+    }
+    cout << "result 2:" << endl;
+    for (const auto& n : result2) {
+        cout << n << endl;
+    }
+    cout << "result 3:" << endl;
+    for (const auto& n : result3) {
+        cout << n << endl;
+    }
+}
+```
+
+### 10-29
+
+```cpp
+int main() {
+    auto ifs = ifstream("in.txt", ios_base::in);
+    vector<string> res{};
+    istream_iterator<string> isi(ifs), eof;
+
+    while (isi != eof) {
+        res.emplace_back(*(isi++));
+    }
+
+    for (const auto& n : res) {
+        cout << n << endl;
+    }
+}
+```
+
+### 10-30
+
+```cpp
+int main() {
+    istream_iterator<int> in_iter(cin), eof;
+    vector<int> result{};
+    copy(in_iter, eof, back_inserter(result));
+    sort(result.begin(), result.end());
+    for (const auto& n : result) {
+        cout << n << endl;
+    }
+}
+```
+
+### 10-31
+
+```cpp
+int main() {
+    istream_iterator<int> in_iter(cin), eof;
+    vector<int> result{};
+    unique_copy(in_iter, eof, back_inserter(result));
+    sort(result.begin(), result.end());
+    for (const auto& n : result) {
+        cout << n << endl;
+    }
+}
+```
+
+### 10-33
+
+```cpp
+int main(int argc, const char** argv) {
+    if (argc < 4) {
+        cerr << "args not enough" << endl;
+        return -1;
+    }
+    auto inf = ifstream(argv[1], ios_base::in);
+    auto outf1 = ofstream(argv[2], ios_base::trunc | ios_base::out);
+    auto outf2 = ofstream(argv[3], ios_base::trunc | ios_base::out);
+    istream_iterator<int> isi(inf), eof;
+    ostream_iterator<int> osi1(outf1, " "), osi2(outf2, " ");
+
+    partition_copy(isi, eof, osi1, osi2,
+                   [](int x) -> bool { return x % 2 == 0; });
+}
+```
