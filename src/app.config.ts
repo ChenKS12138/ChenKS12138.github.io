@@ -6,8 +6,6 @@ import DETAIL_HEADER_IMAGE from "@/images/FSwWKYB.jpg";
 import ABOUT_HEADER_IMAGE from "@/images/rVtDsho.png";
 import USER_AVATAR from "@/images/avatar.png";
 
-const HOME_HEADER_IMAGE = "https://open.saintic.com/api/bingPic/";
-
 interface Config {
   name: string;
   avatar?: string;
@@ -101,7 +99,6 @@ const config: Config = {
     },
   ],
   headerImages: {
-    home: HOME_HEADER_IMAGE,
     about: ABOUT_HEADER_IMAGE,
     archives: ARCHIVES_HEADER_IMAGE,
     detail: DETAIL_HEADER_IMAGE,

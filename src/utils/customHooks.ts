@@ -1,4 +1,27 @@
+import useAxios from "axios-hooks";
 import React, { useState, useEffect, useCallback } from "react";
+
+interface BingInfo {
+  images: {
+    copyright: string;
+    url: string;
+  }[];
+}
+
+const BING_INFO_URL =
+  "https://jsonp.afeld.me/?url=http%3A%2F%2Fcn.bing.com%2FHPImageArchive.aspx%3Fformat%3Djs%26idx%3D0%26n%3D1";
+
+export function useBingInfo() {
+  const [{ data: axiosData, error: axiosError }] = useAxios(BING_INFO_URL);
+  const [data, setData] = useLocalStorage<[BingInfo, Error]>(BING_INFO_URL, [
+    null,
+    null,
+  ]);
+  useEffect(() => {
+    setData([axiosData, axiosError]);
+  }, [axiosData, axiosError, setData]);
+  return data;
+}
 
 /**
  * 获取图片的平均颜色
@@ -16,12 +39,12 @@ export function useImageColor(src: string): string {
       if (colorCache.length > 20) {
         colorCache.shift();
       }
-      setColorCache(
-        colorCache.concat({
+      setColorCache([
+        {
           src: responseURL,
           color,
-        })
-      );
+        },
+      ]);
     }
   }, [color]);
 
@@ -111,4 +134,8 @@ export function useLocalStorage<T = any>(
     parsedValue = storageValue as any;
   }
   return [parsedValue ?? defaultValue, setValue];
+}
+
+export function useBrowserWindow(): Window | null {
+  return typeof window === "undefined" ? null : window;
 }

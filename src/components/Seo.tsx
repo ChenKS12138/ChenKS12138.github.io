@@ -13,7 +13,6 @@ import appConfig from "@/app.config";
 
 // 需要preload的image
 const imagesToPreload = [
-  appConfig.headerImages.home,
   appConfig.headerImages.about,
   appConfig.headerImages.archives,
   appConfig.headerImages.detail,

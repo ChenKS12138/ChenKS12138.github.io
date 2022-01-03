@@ -10,10 +10,6 @@ import "normalize.css";
 
 import appConfig from "@/app.config";
 
-const ANALIZE_URL =
-  "https://busuanzi.ibruce.info/busuanzi?jsonpCallback=BusuanziCallback_476857951214";
-
-const THEME_COLOR = "#563d7c";
 const TITLE = "ChenKS";
 const DEFAULT_BACKGROUND_SRC = appConfig.headerImages.about;
 

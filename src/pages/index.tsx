@@ -1,23 +1,23 @@
 import React, { useCallback } from "react";
 import { graphql, PageProps, navigate } from "gatsby";
-import useAxios from "axios-hooks";
 import styled from "styled-components";
 
 import { Layout } from "@/components";
-
+import { useBingInfo } from "@/utils";
 import appConfig from "@/app.config";
-
-const BACKGROUND_BING_INFO =
-  "https://jsonp.afeld.me/?url=http%3A%2F%2Fcn.bing.com%2FHPImageArchive.aspx%3Fformat%3Djs%26idx%3D0%26n%3D1";
 
 export default function Index(props: PageProps) {
   const { data } = props;
-  const [{ data: responseData, error }] = useAxios(BACKGROUND_BING_INFO);
+  const [responseData, error] = useBingInfo();
 
   const createIndex = useCallback(
     (children: React.ReactElement): React.ReactElement => (
       <Layout
-        backgroundSrc={appConfig.headerImages.home}
+        backgroundSrc={
+          (responseData &&
+            `https://cn.bing.com${responseData?.images?.[0].url}`) ??
+          appConfig.headerImages.about
+        }
         content={
           <HeaderContent>{responseData?.images?.[0]?.copyright}</HeaderContent>
         }
