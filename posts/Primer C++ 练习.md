@@ -1880,3 +1880,133 @@ int main() {
 ### 10-39
 
 list 上的迭代器属于双向迭代器，vector 上的迭代器属于随机访问迭代器
+
+## 第十一章
+
+### 11-3
+
+```cpp
+int main() {
+    unordered_map<string, unsigned int> counter;
+    vector<string> words{"The", "But", "And", "Or", "An", "A",
+                         "The", "But", "And", "or", "an", "a"};
+    for (const auto& word : words) {
+        counter[word]++;
+    }
+    for (const auto& pair : counter) {
+        cout << pair.first << " -> " << pair.second << endl;
+    }
+}
+```
+
+### 11-4
+
+```cpp
+int main() {
+    unordered_map<string, unsigned int> counter;
+    vector<string> words{"The", "But", "And", "Or", "An", "A",
+                         "The", "But", "And", "or", "an", "a"};
+    for (const auto& word : words) {
+        string key;
+        transform(word.begin(), word.end(), back_inserter(key),
+                  [](unsigned char c) { return tolower(c); });
+        counter[key]++;
+    }
+    for (const auto& pair : counter) {
+        cout << pair.first << " -> " << pair.second << endl;
+    }
+}
+```
+
+### 11-9
+
+```cpp
+int main() {
+    map<string, list<unsigned int>> m;
+    return 0;
+}
+```
+
+### 11-10
+
+前者可以，后者不行，因为 list\<int>::iterator 没有实现<=运算符
+
+### 11-15
+
+mapped_type 为 vector\<int>,key_type 为 int,value_type 为 pair<int,vector\<int>>
+
+### 11-16
+
+```cpp
+int main() {
+    map<int, int> m{{1, 2}};
+    auto it = m.begin();
+    it->second = 3;
+    for (const auto& pair : m) {
+        cout << pair.first << " " << pair.second << endl;
+    }
+    return 0;
+}
+```
+
+### 11-17
+
+1. 合法
+2. 不合法，multiset 上没有`push_back`的方法
+3. 合法
+4. 合法
+
+### 11-28
+
+```cpp
+int main() {
+    map<string, vector<int>> m{{"a", {1, 2, 3, 4}}, {"b", {5, 6, 7, 8}}};
+    auto it = m.find("a");
+    for (const auto& item : it->second) {
+        cout << item << endl;
+    }
+}
+```
+
+### 11-29
+
+前两者返回 end,后者返回 pair{end,end}
+
+### 11-33
+
+```cpp
+#include <fstream>
+#include <ios>
+#include <iostream>
+#include <map>
+#include <sstream>
+#include <string>
+
+using namespace std;
+
+int main() {
+    ifstream dict_if("./1.txt", ios_base::in), text_if("./2.txt", ios_base::in);
+    map<string, string> dict;
+    string tmp;
+    stringstream result_ss;
+    while (getline(dict_if, tmp)) {
+        auto it = tmp.find(' ');
+        dict.insert({tmp.substr(0, it), tmp.substr(it + 1)});
+    }
+    while (text_if >> tmp) {
+        if (dict.find(tmp) != dict.end()) {
+            tmp = dict[tmp];
+        }
+        result_ss << tmp << " ";
+    }
+    cout << result_ss.str() << endl;
+}
+```
+
+### 11-34
+
+下标会在 key_type 不存在时，自动创建，find 不会
+
+### 11-35
+
+insert 不会生效，因为相同的 key_type 已经存在
