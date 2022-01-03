@@ -1825,3 +1825,58 @@ int main(int argc, const char** argv) {
                    [](int x) -> bool { return x % 2 == 0; });
 }
 ```
+
+### 10-.34
+
+```cpp
+int main() {
+    vector<int> v{1, 2, 3, 4, 5};
+    for (auto it = v.rbegin(); it != v.rend(); it++) {
+        cout << *it << endl;
+    }
+    return 0;
+}
+```
+
+### 10-35
+
+```cpp
+int main() {
+    vector<int> v{1, 2, 3, 4, 5};
+    auto it = v.end();
+    do {
+        it--;
+        cout << *it << endl;
+    } while (it != v.begin());
+    return 0;
+}
+```
+
+### 10-36
+
+```cpp
+int main() {
+    vector<int> v{1, 2, 3, 0, 4, 0, 5};
+    auto it = find(v.rbegin(), v.rend(), 0);
+    cout << *(it + 1) << " " << *it << " " << *(it - 1) << endl;
+    return 0;
+}
+```
+
+### 10-37
+
+```cpp
+int main() {
+    vector<int> v{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+    list<int> l;
+    copy(v.rbegin() + 3, v.rbegin() + 7, back_inserter(l));
+    for (const auto& n : l) {
+        cout << n << endl;
+    }
+    return 0;
+}
+```
+
+### 10-39
+
+list 上的迭代器属于双向迭代器，vector 上的迭代器属于随机访问迭代器
