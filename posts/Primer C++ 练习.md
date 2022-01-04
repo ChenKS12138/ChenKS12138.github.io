@@ -2010,3 +2010,237 @@ int main() {
 ### 11-35
 
 insert 不会生效，因为相同的 key_type 已经存在
+
+## 第十二章
+
+### 12-6
+
+```cpp
+#include <iostream>
+#include <iterator>
+#include <vector>
+
+using namespace std;
+
+auto foo1() -> vector<int>* {
+    auto v = new vector<int>();
+    istream_iterator<int> in(cin), eof;
+    while (in != eof) {
+        v->emplace_back(*in);
+        in++;
+    }
+    return v;
+}
+
+auto foo2(vector<int>* v) {
+    for (const auto& n : *v) {
+        cout << n << endl;
+    }
+}
+
+int main() {
+    auto p = foo1();
+    foo2(p);
+    delete p;
+}
+```
+
+### 12-7
+
+```cpp
+#include <iostream>
+#include <iterator>
+#include <memory>
+#include <vector>
+
+using namespace std;
+
+auto foo1() -> shared_ptr<vector<int>> {
+    auto v = make_shared<vector<int>>();
+    istream_iterator<int> in(cin), eof;
+    while (in != eof) {
+        v->emplace_back(*in);
+        in++;
+    }
+    return v;
+}
+
+auto foo2(shared_ptr<vector<int>> v) {
+    for (const auto& n : *v) {
+        cout << n << endl;
+    }
+}
+
+int main() {
+    auto p = foo1();
+    foo2(p);
+}
+```
+
+### 12-8
+
+无错误，存在指针类型向 bool 的隐式类型转换
+
+### 12-10
+
+应该没啥问题
+
+### 12-11
+
+会导致资源指针被 delete 两次
+
+### 12-12
+
+a、c 合法，b 会导致内存泄露，d 中的 p 会被自动 delete
+
+### 12-13
+
+会导致 p 被 delete 了两次
+
+### 12-14
+
+```cpp
+#include <iostream>
+#include <memory>
+
+using namespace std;
+
+using connection = int;
+
+void disconnect(connection* c) { cout << "disconnected" << endl; }
+
+int main() {
+    connection conn_id = 1;
+    auto sp = shared_ptr<connection>(&conn_id, disconnect);
+    return 0;
+}
+```
+
+### 12-15
+
+```cpp
+#include <iostream>
+#include <memory>
+
+using namespace std;
+
+using connection = int;
+
+int main() {
+    connection conn_id = 1;
+    auto sp = shared_ptr<connection>(
+        &conn_id, [](connection* conn) { cout << "disconnected" << endl; });
+    return 0;
+}
+```
+
+### 12-16
+
+将 unique_ptr 的赋值构造函数重载为 delete
+
+### 12-17
+
+a、b、d、f 有问题
+
+a 传入参数类型不对，需要 int\*
+
+b、d 导致栈上的地址被 delete
+
+f 导致 double delete
+
+### 12-18
+
+shared_ptr 上的引用计数不一定为 1，不能移交所有权
+
+### 12-23
+
+```cpp
+#include <cstddef>
+#include <cstring>
+#include <iostream>
+#include <memory>
+
+using namespace std;
+
+unique_ptr<char[]> str_concat(const char* s1, const char* s2) {
+    size_t len1 = strlen(s1), len2 = strlen(s2);
+    unique_ptr<char[]> str(new char[len1 + len2 + 1]);
+    memcpy(str.get(), s1, len1);
+    memcpy(str.get() + len1, s2, len2);
+    str[len1 + len2] = '\0';
+    return str;
+}
+
+int main() {
+    const char* s1 = "hello ";
+    const char* s2 = "cattchen";
+    auto p = str_concat(s1, s2);
+    cout << p.get() << endl;
+}
+```
+
+### 12-25
+
+```cpp
+delete [] pa;
+```
+
+### 12-26
+
+```cpp
+#include <cstddef>
+#include <iostream>
+#include <memory>
+
+using namespace std;
+
+const size_t N = 5;
+
+int main() {
+    allocator<string> alloc;
+    auto p = alloc.allocate(N);
+    string s;
+    string* q = p;
+    while (cin >> s && q != p + N)
+        alloc.construct(q++, s);
+    const size_t size = q - p;
+    alloc.deallocate(p, N);
+}
+```
+
+### 12-28
+
+```cpp
+#include <cstddef>
+#include <fstream>
+#include <iostream>
+#include <iterator>
+#include <map>
+#include <sstream>
+#include <vector>
+
+using namespace std;
+int main() {
+    vector<string> lines;
+    multimap<string, size_t> dict;
+    ifstream in("./1.txt");
+    string tmp, word;
+    size_t line = 0;
+    while (getline(in, tmp)) {
+        stringstream ss(tmp);
+        lines.push_back(tmp);
+        while (ss >> word) {
+            dict.insert({word, line});
+        }
+        ++line;
+    }
+    while (cin >> tmp) {
+        cout << "element occurs " << dict.count(tmp) << " times" << endl;
+        auto r = dict.equal_range(tmp);
+        for (auto it = r.first; it != r.second; it++) {
+            cout << "(line " << (it->second + 1) << ") " << lines[it->second]
+                 << endl;
+        }
+    }
+}
+```
