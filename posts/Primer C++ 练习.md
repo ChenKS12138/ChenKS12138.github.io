@@ -2244,3 +2244,225 @@ int main() {
     }
 }
 ```
+
+## 第十三章
+
+### 13-1
+
+拷贝构造函数的第一个参数是自身类型的引用
+
+### 13-12
+
+要发生三次析构函数调用，一次是形参，两次是局部变量
+
+### 13-14
+
+都显示相同的序号，因为合成拷贝构造函数会直接复制序号，导致 a、b、c 序号相同
+
+```cpp
+#include <iostream>
+
+using namespace std;
+
+static int global_id = 0;
+
+class numbered {
+
+  public:
+    int id;
+    numbered() : id(++global_id){};
+};
+
+void f(numbered s) { cout << s.id << endl; }
+
+int main() {
+    numbered a, b = a, c = b;
+    f(a);
+    f(b);
+    f(c);
+}
+```
+
+### 13-15
+
+会，但是 f 显示的不是对应的序号，而是新序号。函数调用进行值传递，复制了 numbered
+
+### 13-16
+
+显示预期的结果，因为是引用传递
+
+### 13-18
+
+```cpp
+#include <iostream>
+
+using namespace std;
+
+static int global_id = 0;
+
+class Employee {
+  public:
+    int id;
+    string name;
+    Employee(const string& n) : id(global_id++), name(n) {}
+};
+
+int main() {}
+```
+
+### 13-19
+
+不需要定义自己的拷贝控制成员，因为 int 和 string 可以直接复制
+
+### 13-27
+
+```cpp
+#include <iostream>
+#include <string>
+
+using namespace std;
+
+class HasPtr {
+  private:
+    string* sp;
+    unsigned int* reference_count;
+
+  public:
+    HasPtr() : sp(new string()), reference_count(new unsigned int(1)) {}
+    HasPtr(const string& s)
+        : sp(new string(s)), reference_count(new unsigned int(1)) {}
+    HasPtr(const HasPtr& hp)
+        : sp(new string(*hp.sp)), reference_count(hp.reference_count) {
+        (*hp.reference_count)++;
+    }
+    HasPtr& operator=(const HasPtr& hp) {
+        (*hp.reference_count)++;
+        this->sp = hp.sp;
+        this->reference_count = hp.reference_count;
+        return *this;
+    }
+    ~HasPtr() {
+        (*reference_count)--;
+        if (*reference_count <= 0) {
+            delete reference_count;
+            delete sp;
+        }
+    }
+    unsigned int const use_count() { return *this->reference_count; }
+};
+
+int main() {
+    //
+    HasPtr hp("hello"), hp2 = hp;
+    cout << hp.use_count() << endl << hp2.use_count() << endl;
+}
+```
+
+### 13-29
+
+发生了函数重载，函数签名不一致，并不是同一个函数
+
+### 13-30
+
+```cpp
+#include <iostream>
+#include <string>
+
+using namespace std;
+
+class HasPtr {
+  private:
+    string* sp;
+    unsigned int* reference_count;
+
+  public:
+    friend void swap(HasPtr& hpa, HasPtr& hpb) {
+        cout << "swap" << endl;
+        swap(hpa.reference_count, hpb.reference_count);
+        swap(hpa.sp, hpb.sp);
+    };
+    HasPtr() : sp(new string()), reference_count(new unsigned int(1)) {}
+    HasPtr(const string& s)
+        : sp(new string(s)), reference_count(new unsigned int(1)) {}
+    HasPtr(const HasPtr& hp)
+        : sp(new string(*hp.sp)), reference_count(hp.reference_count) {
+        (*hp.reference_count)++;
+    }
+    HasPtr& operator=(HasPtr hp) {
+        swap(*this, hp);
+        return *this;
+    }
+    ~HasPtr() {
+        (*reference_count)--;
+        if (*reference_count <= 0) {
+            delete reference_count;
+            delete sp;
+        }
+    }
+    unsigned int const use_count() { return *this->reference_count; }
+};
+
+int main() {
+    HasPtr hp("hello"), hp2;
+    hp2 = hp;
+    cout << hp.use_count() << endl << hp2.use_count() << endl;
+}
+```
+
+### 13-31
+
+```cpp
+#include <algorithm>
+#include <iostream>
+#include <string>
+#include <vector>
+
+using namespace std;
+
+class HasPtr {
+  private:
+    string* sp;
+    unsigned int* reference_count;
+
+  public:
+    friend void swap(HasPtr& hpa, HasPtr& hpb) {
+        // cout << "swap" << endl;
+        swap(hpa.reference_count, hpb.reference_count);
+        swap(hpa.sp, hpb.sp);
+    };
+    HasPtr() : sp(new string()), reference_count(new unsigned int(1)) {}
+    HasPtr(const string& s)
+        : sp(new string(s)), reference_count(new unsigned int(1)) {}
+    HasPtr(const HasPtr& hp)
+        : sp(new string(*hp.sp)), reference_count(hp.reference_count) {
+        (*hp.reference_count)++;
+    }
+    HasPtr& operator=(HasPtr hp) {
+        swap(*this, hp);
+        return *this;
+    }
+    ~HasPtr() {
+        (*reference_count)--;
+        if (*reference_count <= 0) {
+            delete reference_count;
+            delete sp;
+        }
+    }
+    bool operator<(const HasPtr& hp) {
+        return *(this->sp) < *hp.sp;
+        return true;
+    }
+    friend ostream& operator<<(ostream& out, const HasPtr& hp) {
+        return out << (*hp.sp);
+    }
+    unsigned int const use_count() { return *this->reference_count; }
+};
+
+int main() {
+    vector<HasPtr> v{{"hello"}, {"cattchen"}, {"asdf"}};
+    sort(v.begin(), v.end());
+    for (const auto& item : v) {
+        cout << item << endl;
+    }
+}
+```
