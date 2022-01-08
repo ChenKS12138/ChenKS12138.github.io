@@ -2465,3 +2465,125 @@ int main() {
     }
 }
 ```
+
+## 第十四章
+
+### 14-34
+
+```cpp
+#include <iostream>
+
+using namespace std;
+
+class Foo {
+
+  public:
+    int operator()(bool condition, int a, int b) { return condition ? a : b; }
+};
+
+int main() {
+    Foo f;
+    cout << f(1 < 2, 1, 2) << endl << f(1 > 2, 1, 2) << endl;
+}
+```
+
+### 14-35
+
+```cpp
+#include <iostream>
+#include <string>
+
+using namespace std;
+
+class InputString {
+  public:
+    InputString(istream& in = cin) : in(in) {}
+    string const operator()() const {
+        string tmp;
+        getline(in, tmp);
+        return tmp;
+    }
+
+  private:
+    istream& in;
+};
+
+int main() {
+    InputString is;
+    cout << is() << endl;
+    return 0;
+}
+```
+
+### 14-36
+
+```cpp
+#include <iostream>
+#include <string>
+#include <vector>
+
+using namespace std;
+
+class InputString {
+  public:
+    InputString(istream& in = cin) : in(in) {}
+    string const operator()() const {
+        string tmp;
+        getline(in, tmp);
+        return tmp;
+    }
+
+  private:
+    istream& in;
+};
+
+int main() {
+    InputString is;
+    string tmp;
+    vector<string> v;
+    while (!(tmp = is()).empty()) {
+        v.push_back(tmp);
+    }
+    for (const auto& item : v) {
+        cout << item << endl;
+    }
+    return 0;
+}
+```
+
+### 14-37
+
+```cpp
+#include <algorithm>
+#include <iostream>
+#include <vector>
+
+using namespace std;
+
+class Point {
+  private:
+    int x, y;
+
+  public:
+    Point(int x, int y) : x(x), y(y) {}
+    Point() : Point(0, 0) {}
+    friend ostream& operator<<(ostream& out, const Point& p) {
+        return out << "Point {x: " << p.x << ", y: " << p.y << "}";
+    }
+    friend bool operator==(const Point& pa, const Point& pb) {
+        return pa.x == pb.x && pa.y == pb.y;
+    }
+};
+
+int main() {
+    vector<Point> v{{0, 0}, {1, 2}, {1, 1}, {0, 0}, {1, 1}};
+    v.erase(remove(v.begin(), v.end(), Point{1, 1}), v.end());
+    for (const auto& item : v) {
+        cout << item << endl;
+    }
+}
+```
+
+### 14-47
+
+前者表示将`Integral`转为`const int`，后者表示这是常对象的函数
