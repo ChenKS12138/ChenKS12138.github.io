@@ -2587,3 +2587,293 @@ int main() {
 ### 14-47
 
 前者表示将`Integral`转为`const int`，后者表示这是常对象的函数
+
+## 第十六章
+
+### 16-2
+
+```cpp
+#include <iostream>
+
+using namespace std;
+
+template <typename T> bool compare(const T& a, const T& b) {
+    if (less<T>()(a, b))
+        return -1;
+    if (less<T>()(b, a))
+        return 1;
+    return 0;
+}
+
+int main() {
+    cout << compare(1, 2) << endl;
+    return 0;
+}
+```
+
+### 16-4
+
+```cpp
+#include <iostream>
+#include <vector>
+
+using namespace std;
+
+template <typename Iter, typename Value>
+Iter my_find(const Iter& begin, const Iter& end, const Value& value) {
+    for (Iter it = begin; it != end; it++) {
+        if (*it == value) {
+            return it;
+        }
+    }
+    return end;
+};
+
+int main() {
+    vector<int> v{3, 4, 2, 5, 1};
+    auto it = my_find(v.begin(), v.end(), 2);
+    cout << *it << endl;
+    return 0;
+}
+```
+
+### 16-5
+
+```cpp
+#include <cstddef>
+#include <iostream>
+
+using namespace std;
+
+template <typename Value, unsigned Size> void print(const Value (&arr)[Size]) {
+    for (size_t i = 0; i < Size; i++) {
+        cout << arr[i] << endl;
+    }
+}
+
+int main() {
+    int arr[3] = {2, 3, 4};
+    print(arr);
+    return 0;
+}
+```
+
+### 16-6
+
+```cpp
+#include <iostream>
+
+using namespace std;
+
+template <typename Type, unsigned Size>
+const Type* my_begin(const Type (&arr)[Size]) {
+    return &arr[0];
+}
+
+template <typename Type, unsigned Size>
+const Type* my_end(const Type (&arr)[Size]) {
+    return &arr[Size];
+}
+
+int main() {
+    int arr[3] = {1, 2, 3};
+    for (auto it = my_begin(arr); it != my_end(arr); it++) {
+        cout << *it << endl;
+    }
+}
+```
+
+### 16-7
+
+```cpp
+#include <cstddef>
+#include <iostream>
+
+using namespace std;
+
+template <typename Type, unsigned Size>
+size_t get_size(const Type (&arr)[Size]) {
+    return Size;
+}
+
+int main() {
+    int arr[3] = {1, 2, 3};
+    cout << get_size(arr) << endl;
+    return 0;
+}
+```
+
+### 16-11
+
+```cpp
+template <typename elemType> class ListItem;
+
+template <typename elemType> class List {
+  public:
+    List<elemType>();
+    List<elemType>(const List<elemType>&);
+    List<elemType>& operator=(const List<elemType>&);
+    void insert(ListItem<elemType>* prt, elemType value);
+
+  private:
+    ListItem<elemType>*front, *end;
+};
+```
+
+### 16-14
+
+```cpp
+template <typename SizeType> class Screen {
+  private:
+    SizeType width;
+    SizeType height;
+
+  public:
+    Screen(SizeType width, SizeType height) : width(width), height(height){};
+    Screen() : Screen(0, 0) {}
+};
+```
+
+### 16-19
+
+```cpp
+#include <iostream>
+#include <vector>
+
+using namespace std;
+
+template <typename Container> void print(const Container& c) {
+    for (typename Container::size_type i = 0; i < c.size(); i++) {
+        std::cout << c[i] << std::endl;
+    }
+}
+
+int main() {
+    vector<int> v{1, 2, 3, 4, 5};
+    print(v);
+    return 0;
+}
+```
+
+### 16-20
+
+```cpp
+#include <iostream>
+#include <vector>
+
+using namespace std;
+
+template <typename Container> void print(Container& c) {
+    for (typename Container::iterator it = c.begin(); it != c.end(); it++) {
+        std::cout << *it << std::endl;
+    }
+}
+
+int main() {
+    vector<int> v{1, 2, 3, 4, 5};
+
+    print(v);
+    return 0;
+}
+```
+
+### 16-21
+
+```cpp
+#include <iostream>
+
+class DebugDeleter {
+  private:
+    std::ostream& os;
+
+  public:
+    DebugDeleter(std::ostream& out = std::cerr) : os(out) {}
+    template <typename Pointer> void operator()(Pointer* p) const {
+        os << "deleting pointer" << std::endl;
+        delete p;
+    }
+};
+
+int main() {
+    DebugDeleter d;
+    auto a = new int;
+    d(a);
+    auto b = new double;
+    d(b);
+    return 0;
+}
+```
+
+### 16-28
+
+```cpp
+#include <cstddef>
+#include <functional>
+#include <iostream>
+
+using namespace std;
+
+template <typename Value> class my_shared_ptr {
+  private:
+    typedef Value* Pointer;
+    size_t* const reference_count;
+    Pointer const pointer;
+    const std::function<void(Pointer)> del;
+
+  public:
+    my_shared_ptr<Value>(Pointer pointer, std::function<void(Pointer)> deleter)
+        : pointer(pointer), reference_count(new size_t(1)), del(deleter) {}
+    my_shared_ptr<Value>(Pointer pointer)
+        : my_shared_ptr<Value>(pointer, [](Pointer p) { delete p; }) {}
+    my_shared_ptr<Value>() : my_shared_ptr<Value>(new Value) {}
+
+    my_shared_ptr<Value>(const my_shared_ptr<Value>& p)
+        : reference_count(p.reference_count), pointer(p.pointer), del(p.del) {
+        (*reference_count)++;
+    }
+
+    ~my_shared_ptr<Value>() {
+        (*reference_count)--;
+        if (*reference_count <= 0) {
+            del(pointer);
+        }
+        delete reference_count;
+    }
+
+    Pointer operator->() const { return pointer; }
+    Value operator*() const { return *pointer; }
+};
+
+int main() {
+    auto sp = my_shared_ptr<int>(new int(10), [](int* p) {
+        delete p;
+        cout << "destrcted" << endl;
+    });
+    cout << *sp << endl;
+}
+```
+
+### 16-53
+
+```cpp
+#include <iostream>
+
+using namespace std;
+
+template <typename T> void print(const T& value) { cout << value << endl; }
+
+template <typename T, typename... Args>
+void print(const T& value, const Args&... args) {
+    cout << value << endl;
+    if (sizeof...(args)) {
+        print(args...);
+    }
+}
+
+int main() {
+    //
+    print(1);
+    print(2, 3);
+    print(4, 5, 6);
+}
+```
