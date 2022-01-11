@@ -2877,3 +2877,104 @@ int main() {
     print(4, 5, 6);
 }
 ```
+
+## 第十七章
+
+### 17-1
+
+```cpp
+#include <iostream>
+#include <tuple>
+
+using namespace std;
+
+int main() {
+    auto p = make_tuple(10, 20, 30);
+    cout << get<0>(p) << endl;
+    cout << get<1>(p) << endl;
+    cout << get<2>(p) << endl;
+    return 0;
+}
+```
+
+### 17-2
+
+```cpp
+#include <iostream>
+#include <map>
+#include <string>
+#include <tuple>
+#include <vector>
+
+using namespace std;
+
+int main() {
+    tuple<string, vector<string>, pair<string, int>> p;
+    return 0;
+}
+```
+
+### 17-10
+
+```cpp
+#include <bitset>
+#include <iostream>
+
+using namespace std;
+
+int main() {
+    bitset<32> bitvec1(0b100000001000010010111), bitvec2;
+    cout << bitvec1 << endl;
+    bitvec2.set(0);
+    bitvec2.set(1);
+    bitvec2.set(2);
+    bitvec2.set(4);
+    bitvec2.set(7);
+    bitvec2.set(12);
+    bitvec2.set(20);
+    cout << bitvec2 << endl;
+}
+```
+
+### 17-28
+
+```cpp
+#include <iostream>
+#include <random>
+
+using namespace std;
+
+unsigned int random_number() {
+    static default_random_engine dre;
+    static uniform_int_distribution<unsigned int> uid(1, 100);
+    return uid(dre);
+}
+
+int main() {
+    cout << random_number() << endl;
+    cout << random_number() << endl;
+    cout << random_number() << endl;
+}
+```
+
+### 17-30
+
+```cpp
+#include <iostream>
+#include <random>
+
+using namespace std;
+
+unsigned int random_number(int seed = default_random_engine::default_seed,
+                           unsigned int min = 0, unsigned int max = 100) {
+    static default_random_engine dre(seed);
+    static uniform_int_distribution<unsigned int> uid(min, max);
+    return uid(dre);
+}
+
+int main() {
+    cout << random_number() << endl;
+    cout << random_number() << endl;
+    cout << random_number() << endl;
+}
+```
