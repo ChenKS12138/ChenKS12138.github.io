@@ -2978,3 +2978,59 @@ int main() {
     cout << random_number() << endl;
 }
 ```
+
+## 第十九章
+
+### 19-1
+
+```cpp
+#include <cstddef>
+#include <cstdlib>
+#include <iostream>
+#include <new>
+
+using namespace std;
+
+void* operator new(size_t size) {
+    void* mem;
+    if ((mem = malloc(size)) != NULL) {
+        cout << "new called" << endl;
+        return mem;
+    }
+    throw std::bad_alloc();
+}
+
+void operator delete(void* mem) noexcept { free(mem); }
+
+int main() {
+    auto p = new int;
+    *p = 123;
+}
+```
+
+### 19-12
+
+```cpp
+#include <iostream>
+#include <string>
+
+class Screen {
+  public:
+    typedef std::string::size_type pos;
+    char get_cursor() const { return contents[cursor]; }
+    char get() const;
+    char get(pos ht, pos wd) const;
+
+  public:
+    std::string contents;
+    pos cursor;
+    pos height, width;
+};
+
+int main() {
+    using namespace std;
+    auto pdata = &Screen::cursor;
+    Screen s;
+    auto cursor = s.*pdata;
+}
+```
