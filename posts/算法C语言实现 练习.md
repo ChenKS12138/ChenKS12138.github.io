@@ -280,3 +280,227 @@ int main(int argc, char** argv) {
     printf("%d\n", t->item);
 }
 ```
+
+### 3-34
+
+```c
+#include <assert.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef int Item;
+typedef struct node* link;
+struct node {
+    Item item;
+    link next;
+};
+
+link move_biggest_to_end(link head) {
+    link *curr = &head, *biggest = &head;
+    while (*curr != NULL) {
+        if ((*curr)->item > (*biggest)->item) {
+            biggest = curr;
+        }
+        curr = &(*curr)->next;
+    }
+    link tmp;
+    tmp = (*biggest)->next;
+    (*curr) = *biggest;
+    (*biggest)->next = NULL;
+    (*biggest) = tmp;
+    return head;
+}
+
+int main() {
+    link begin = malloc(sizeof(*begin)), t = begin;
+    begin->item = 9;
+    for (int i = 2; i < 6; i++) {
+        t = (t->next = malloc(sizeof(*t)));
+        t->item = i;
+    }
+    t->next = NULL;
+    begin = move_biggest_to_end(begin);
+    assert(begin->item == 2);
+    assert(begin->next->item == 3);
+    assert(begin->next->next->item == 4);
+    assert(begin->next->next->next->item == 5);
+    assert(begin->next->next->next->next->item == 9);
+}
+```
+
+### 3-35
+
+```c
+#include <assert.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef int Item;
+typedef struct node* link;
+struct node {
+    Item item;
+    link next;
+};
+
+link move_smallest_to_begin(link head) {
+    link *current = &head, *smallest = &head;
+    while (*current != NULL) {
+        if ((*current)->item < (*smallest)->item) {
+            smallest = current;
+        }
+        current = &(*current)->next;
+    }
+    current = &head;
+    link tmp1, tmp2;
+    tmp1 = (*smallest)->next;
+    tmp2 = (*current);
+    *current = *smallest;
+    (*current)->next = tmp2;
+    (*smallest) = tmp1;
+    return head;
+}
+
+int main() {
+    int i;
+    link begin = malloc(sizeof(*begin)), t = begin;
+    begin->item = 9;
+    for (i = 2; i < 6; i++) {
+        t = (t->next = malloc(sizeof(*t)));
+        t->item = i;
+    }
+    t->next = NULL;
+    begin = move_smallest_to_begin(begin);
+    assert(begin->item == 2);
+    assert(begin->next->item == 9);
+    assert(begin->next->next->item == 3);
+    assert(begin->next->next->next->item == 4);
+    assert(begin->next->next->next->next->item == 5);
+}
+```
+
+### 3-36
+
+```c
+#include <assert.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef int Item;
+typedef struct node* link;
+struct node {
+    Item item;
+    link next;
+};
+
+link move_even_after_odd(link head) {
+    int i;
+    link *current = &head, *tail = &head, *end;
+    while (*tail != NULL)
+        tail = &(*tail)->next;
+    end = tail;
+    for (i = 1; current != end; i++) {
+        if (i % 2 == 0) {
+            *tail = *current;
+            *current = (*current)->next;
+            (*tail)->next = NULL;
+            tail = &(*tail)->next;
+        } else {
+            current = &(*current)->next;
+        }
+    }
+    return head;
+}
+
+int main() {
+    int i;
+    link begin = malloc(sizeof(*begin)), t = begin;
+    begin->item = 1;
+    for (i = 2; i < 10; i++) {
+        t = (t->next = malloc(sizeof(*t)));
+        t->item = i;
+    }
+    t->next = NULL;
+    begin = move_even_after_odd(begin);
+    assert(begin->item == 1);
+    assert(begin->next->item == 3);
+    assert(begin->next->next->item == 5);
+    assert(begin->next->next->next->item == 7);
+    assert(begin->next->next->next->next->item == 9);
+    assert(begin->next->next->next->next->next->item == 2);
+    assert(begin->next->next->next->next->next->next->item == 4);
+    assert(begin->next->next->next->next->next->next->next->item == 6);
+    assert(begin->next->next->next->next->next->next->next->next->item == 8);
+}
+```
+
+### 3-56
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef int Item;
+typedef struct node* link;
+struct node {
+    Item item;
+    link next;
+};
+
+void print_char_table(const char* s) {
+    unsigned int table[256];
+    const char* t;
+    int i;
+    for (i = 0; i < 256; i++)
+        table[i] = 0;
+    for (t = s; *t != 0; t++) {
+        table[*t]++;
+    }
+    for (i = 0; i < 256; i++) {
+        if (table[i])
+            printf("%c %d\n", i, table[i]);
+    }
+}
+
+int main() {
+    print_char_table("hello");
+    return 0;
+}
+```
+
+### 3-57
+
+```c
+#include <assert.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+unsigned int is_palindrome(const char* s) {
+    unsigned int size;
+    const char *begin, *end;
+
+    size = strlen(s);
+
+    begin = s;
+    end = s + size - 1;
+    while (begin < end) {
+        while (*begin == ' ')
+            begin++;
+        while (*end == ' ')
+            end--;
+        if (*begin != *end)
+            return 0;
+        begin++;
+        end--;
+    }
+
+    return 1;
+}
+
+int main() {
+    assert(is_palindrome("hell") == 0);
+    assert(is_palindrome("if i had a hifi") == 1);
+}
+```
+
+## 第四章
