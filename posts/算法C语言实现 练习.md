@@ -751,3 +751,129 @@ int main() {
 ```
 
 ## 第五章
+
+### 5-1
+
+```c
+#include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+long double foo(long n) { return n <= 0 ? 0 : log10(n) + foo(n - 1); }
+
+int main() {
+    //
+}
+```
+
+### 5-5
+
+```c
+#include <assert.h>
+#include <stdio.h>
+
+int gcd(int a, int b) {
+    int t;
+    while (b != 0) {
+        t = b;
+        b = a % b;
+        a = t;
+    }
+    return a;
+}
+
+int main() {
+    //
+    assert(gcd(24, 64) == 8);
+}
+```
+
+### 5-9
+
+```c
+// 非递归
+#include <assert.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef int Item;
+typedef struct node* link;
+struct node {
+    Item item;
+    link next;
+};
+
+typedef link stack;
+
+stack stack_new() {
+    stack s = malloc(sizeof(struct node));
+    s->next = NULL;
+    return s;
+}
+
+int stack_empty(stack s) { return s->next == NULL; }
+
+int stack_push(stack s, Item item) {
+    link n = malloc(sizeof(struct node));
+    n->next = s->next;
+    n->item = item;
+    s->next = n;
+    return 0;
+}
+
+int stack_pop(stack s, Item* item) {
+    if (stack_empty(s))
+        return 1;
+    link t;
+    t = s->next;
+    *item = t->item;
+    s->next = s->next->next;
+    free(t);
+    return 0;
+}
+
+int eval(const char* s) {
+    stack st = stack_new();
+    Item item1, item2;
+    int i = 0, t;
+    while (s[i] != 0) {
+        while (s[i] == ' ')
+            i++;
+        if (s[i] >= '0' && s[i] <= '9') {
+            item1 = 0;
+            while (s[i] >= '0' && s[i] <= '9')
+                item1 = item1 * 10 + s[i++] - '0';
+            assert(stack_push(st, item1) == 0);
+        } else {
+            assert(stack_pop(st, &item2) == 0);
+            assert(stack_pop(st, &item1) == 0);
+            switch (s[i++]) {
+            case '+':
+                item1 = item1 + item2;
+                break;
+            case '-':
+                item1 = item1 - item2;
+                break;
+            case '*':
+                item1 = item1 * item2;
+                break;
+            case '/':
+                item1 = item1 / item2;
+                break;
+            default:
+                assert(0);
+            }
+            assert(stack_push(st, item1) == 0);
+        }
+    }
+    assert(stack_pop(st, &item1) == 0);
+    return item1;
+}
+
+int main() {
+    const char* s = "1 2 3 * +";
+    int result;
+    result = eval(s);
+    assert(result == 7);
+}
+```
