@@ -877,3 +877,102 @@ int main() {
     assert(result == 7);
 }
 ```
+
+### 5-51
+
+```c
+#include <assert.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+typedef struct {
+    int size;
+    int val;
+} Item;
+
+int max(int a, int b) { return a > b ? a : b; }
+int min(int a, int b) { return a < b ? a : b; }
+
+static Item items[] = {{3, 4}, {4, 5}, {7, 10}, {8, 11}, {9, 13}};
+
+int knap(int cap) {
+    int a, b, i, j, *arr, item_len;
+    arr = malloc(sizeof(int) * (cap + 1));
+    memset(arr, 0, (cap + 1) * sizeof(int));
+    item_len = sizeof(items) / sizeof(items[0]);
+    for (i = 0; i < min(item_len, cap); i++) {
+        arr[items[i].size] = max(arr[items[i].size], items[i].val);
+    }
+    for (i = 1; i <= cap; i++) {
+        for (j = 0; j < item_len; j++) {
+            if (i >= items[j].size) {
+                arr[i] = max(arr[i], arr[i - items[j].size] + items[j].val);
+            }
+        }
+    }
+    j = arr[cap];
+    free(arr);
+    return j;
+}
+
+int main() {
+    assert(knap(17) == 24);
+    return 0;
+}
+```
+
+### 5-52
+
+```c
+#include <assert.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+typedef struct {
+    int size;
+    int val;
+} Item;
+
+int max(int a, int b) { return a > b ? a : b; }
+int min(int a, int b) { return a < b ? a : b; }
+
+static Item items[] = {{3, 4}, {4, 5}, {7, 10}, {8, 11}, {9, 13}};
+
+static int items_len = sizeof(items) / sizeof(items[0]);
+
+static int tb[1024] = {0};
+
+int knap(int cap) {
+    int i, result, tmp;
+    if (cap <= 0)
+        return cap;
+    if (tb[cap] > 0)
+        return tb[cap];
+    result = 0;
+    for (i = 0; i < items_len; i++) {
+        tmp = knap(cap - items[i].size);
+        if (tmp >= 0) {
+            result = max(result, items[i].val + tmp);
+        }
+    }
+    tb[cap] = result;
+    return result;
+}
+
+int main() {
+    int i;
+    for (i = 0; i < items_len; i++) {
+        tb[items[i].size] = items[i].val;
+    }
+    assert(knap(17) == 24);
+    return 0;
+}
+```
+
+### 5-82
+
+```c
+
+```
