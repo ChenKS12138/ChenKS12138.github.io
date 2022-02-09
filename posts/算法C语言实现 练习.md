@@ -28,8 +28,6 @@ int main() {
         }
     }
 }
-
-// 1-3
 ```
 
 ### 1-5
@@ -974,5 +972,306 @@ int main() {
 ### 5-82
 
 ```c
+#include <stdio.h>
+#include <stdlib.h>
 
+typedef char tree_node_value;
+typedef struct tree_node* tree;
+struct tree_node {
+    tree_node_value value;
+    tree left;
+    tree right;
+};
+
+typedef struct list_node* list;
+struct list_node {
+    tree item;
+    list next;
+};
+typedef list stack;
+
+stack stack_init() {
+    stack s = malloc(sizeof(*s));
+    s->next = NULL;
+    return s;
+}
+
+int stack_push(stack s, tree item) {
+    stack tmp;
+    tmp = s->next;
+    s->next = malloc(sizeof(*s));
+    s->next->next = tmp;
+    s->next->item = item;
+    return 0;
+}
+
+int stack_pop(stack s, tree* item) {
+    list tmp;
+    if (s->next == NULL)
+        return 1;
+    *item = s->next->item;
+    tmp = s->next;
+    s->next = s->next->next;
+    free(tmp);
+    return 0;
+}
+
+int stack_empty(stack s) { return s->next == NULL ? 1 : 0; }
+
+tree tree_init(tree_node_value value, tree left, tree right) {
+    tree t = malloc(sizeof(*t));
+    t->value = value;
+    t->left = left;
+    t->right = right;
+    return t;
+}
+
+void handle_traverse(tree t) { printf("%c ", t->value); }
+
+void traverse(tree t, void (*handler)(tree t)) {
+    stack s = stack_init();
+    tree curr;
+    if (t == NULL)
+        return;
+    curr = t;
+    stack_push(s, curr);
+    while (curr->left) {
+        curr = curr->left;
+        stack_push(s, curr);
+    }
+    while (!stack_empty(s)) {
+        stack_pop(s, &curr);
+        handler(curr);
+        if (curr->right) {
+            curr = curr->right;
+            stack_push(s, curr);
+            while (curr->left) {
+                curr = curr->left;
+                stack_push(s, curr);
+            }
+        }
+    }
+}
+
+int main() {
+    tree t = tree_init(
+        'E',
+        tree_init('D',
+                  tree_init('B', tree_init('A', NULL, NULL),
+                            tree_init('C', NULL, NULL)),
+                  NULL),
+        tree_init('H', tree_init('F', NULL, tree_init('G', NULL, NULL)), NULL));
+
+    traverse(t, handle_traverse);
+}
+```
+
+### 5-83
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef char tree_node_value;
+typedef struct tree_node* tree;
+struct tree_node {
+    tree_node_value value;
+    tree left;
+    tree right;
+};
+
+typedef struct list_node* list;
+struct list_node {
+    tree item;
+    list next;
+};
+typedef list stack;
+
+stack stack_init() {
+    stack s = malloc(sizeof(*s));
+    s->next = NULL;
+    return s;
+}
+
+int stack_push(stack s, tree item) {
+    stack tmp;
+    tmp = s->next;
+    s->next = malloc(sizeof(*s));
+    s->next->next = tmp;
+    s->next->item = item;
+    return 0;
+}
+
+int stack_pop(stack s, tree* item) {
+    list tmp;
+    if (s->next == NULL)
+        return 1;
+    *item = s->next->item;
+    tmp = s->next;
+    s->next = s->next->next;
+    free(tmp);
+    return 0;
+}
+
+int stack_empty(stack s) { return s->next == NULL ? 1 : 0; }
+
+tree tree_init(tree_node_value value, tree left, tree right) {
+    tree t = malloc(sizeof(*t));
+    t->value = value;
+    t->left = left;
+    t->right = right;
+    return t;
+}
+
+void handle_traverse(tree t) { printf("%c ", t->value); }
+
+void traverse(tree t, void (*handler)(tree t)) {
+    stack s = stack_init(), sr = stack_init();
+    tree curr = t;
+    stack_push(s, curr);
+    while (!stack_empty(s)) {
+        stack_pop(s, &curr);
+        stack_push(sr, curr);
+        if (curr->left)
+            stack_push(s, curr->left);
+        if (curr->right)
+            stack_push(s, curr->right);
+    }
+    while (!stack_empty(sr)) {
+        stack_pop(sr, &curr);
+        handler(curr);
+    }
+}
+
+int main() {
+    tree t = tree_init(
+        'E',
+        tree_init('D',
+                  tree_init('B', tree_init('A', NULL, NULL),
+                            tree_init('C', NULL, NULL)),
+                  NULL),
+        tree_init('H', tree_init('F', NULL, tree_init('G', NULL, NULL)), NULL));
+
+    traverse(t, handle_traverse);
+}
+```
+
+### 5-84
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef char tree_node_value;
+typedef struct tree_node* tree;
+struct tree_node {
+    tree_node_value value;
+    tree left;
+    tree right;
+};
+
+tree tree_init(tree_node_value value, tree left, tree right) {
+    tree t = malloc(sizeof(*t));
+    t->value = value;
+    t->left = left;
+    t->right = right;
+    return t;
+}
+
+tree tree_build(char preorder[], int preorder_begin, int preorder_end,
+                char inorder[], int inorder_begin, int inorder_end) {
+    int index, len;
+    len = preorder_end - preorder_begin;
+    switch (len) {
+    case 0:
+        return NULL;
+    case 1:
+        return tree_init(preorder[preorder_begin], NULL, NULL);
+    }
+    for (index = 0; index < inorder_end; index++) {
+        if (inorder[inorder_begin + index] == preorder[preorder_begin])
+            break;
+    }
+    return tree_init(
+        preorder[preorder_begin],
+        tree_build(preorder, preorder_begin + 1, preorder_begin + index + 1,
+                   inorder, inorder_begin, preorder_begin + index),
+        tree_build(preorder, preorder_begin + index + 1, preorder_end, inorder,
+                   preorder_begin + index + 1, inorder_end));
+}
+
+typedef tree list_node_value;
+typedef struct list_node* list;
+struct list_node {
+    list_node_value value;
+    list next;
+};
+
+typedef struct queue {
+    list head;
+    list tail;
+} * queue;
+
+queue queue_init() {
+    queue q = malloc(sizeof(*q));
+    q->head = q->tail = NULL;
+    return q;
+}
+
+int queue_push(queue q, list_node_value item) {
+    if (q->tail == NULL) {
+        q->head = q->tail = malloc(sizeof(*q->head));
+        q->head->value = item;
+        q->head->next = NULL;
+    } else {
+        q->tail->next = malloc(sizeof(*q->tail));
+        q->tail = q->tail->next;
+        q->tail->next = NULL;
+        q->tail->value = item;
+    }
+    return 0;
+}
+
+int queue_pop(queue q, list_node_value* item) {
+    if (q->head == NULL)
+        return -1;
+    *item = q->head->value;
+    list tmp = q->head;
+    if (q->head == q->tail) {
+        q->head = q->tail = NULL;
+    } else {
+        q->head = q->head->next;
+    }
+    free(tmp);
+    return 0;
+}
+
+int queue_empty(queue q) { return q->head == NULL; }
+
+void traverse(tree t, void (*handler)(tree t)) {
+    tree curr;
+    queue q = queue_init();
+    queue_push(q, t);
+    while (!queue_empty(q)) {
+        queue_pop(q, &curr);
+        handler(curr);
+        if (curr->left)
+            queue_push(q, curr->left);
+        if (curr->right)
+            queue_push(q, curr->right);
+    }
+}
+
+void handle_traverse(tree t) { printf("%c ", t->value); }
+
+int main() {
+    char preorder_traverse[] = {'E', 'D', 'B', 'A', 'C', 'H', 'F', 'G'};
+    char inorder_traverse[] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'};
+    tree t =
+        tree_build(preorder_traverse, 0,
+                   sizeof(preorder_traverse) / sizeof(preorder_traverse[0]),
+                   inorder_traverse, 0,
+                   sizeof(inorder_traverse) / sizeof(inorder_traverse[0]));
+    traverse(t, handle_traverse);
+}
 ```
