@@ -8,7 +8,8 @@ import appConfig from "@/app.config";
 
 export default function Index(props: PageProps) {
   const { data } = props;
-  const [responseData, error] = useBingInfo();
+  // const [responseData, error] = useBingInfo();
+  const [responseData, error] = [null, null] as any;
 
   const createIndex = useCallback(
     (children: React.ReactElement): React.ReactElement => (
@@ -204,7 +205,8 @@ export const query = graphql`
   {
     allMarkdownRemark(
       sort: { order: DESC, fields: frontmatter___date }
-      limit: 15 # filter: { frontmatter: { tags: { nin: "leetcode" } } }
+      limit: 15
+      filter: { frontmatter: { exclude_from_home: { ne: true } } }
     ) {
       nodes {
         id

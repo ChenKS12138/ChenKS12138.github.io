@@ -2,6 +2,7 @@
 title: 算法C语言实现 练习
 date: 2022-01-12 10:15:52
 tags: ["随笔"]
+exclude_from_home: true
 ---
 
 ## 第一章
@@ -1275,3 +1276,7 @@ int main() {
     traverse(t, handle_traverse);
 }
 ```
+
+## 第六章
+
+### 6-1

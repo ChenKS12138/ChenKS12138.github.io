@@ -2,6 +2,7 @@
 title: leetcode每日一题
 date: 2021-04-05 11:04:07
 tags: ["leetcode"]
+exclude_from_home: true
 ---
 
 # 2021.03.15 螺旋矩阵
