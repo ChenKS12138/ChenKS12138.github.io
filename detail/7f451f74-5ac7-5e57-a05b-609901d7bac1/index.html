@@ -1,0 +1,358 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="x-ua-compatible" content="ie=edge"/><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/><style data-href="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/commons.24bf1742e3764eb5de3c.css" id="gatsby-global-css">/*! normalize.css v8.0.1 | MIT License | github.com/necolas/normalize.css */html{line-height:1.15;-webkit-text-size-adjust:100%}body{margin:0}main{display:block}h1{font-size:2em;margin:.67em 0}hr{box-sizing:content-box;height:0;overflow:visible}pre{font-family:monospace,monospace;font-size:1em}a{background-color:transparent}abbr[title]{border-bottom:none;text-decoration:underline;-webkit-text-decoration:underline dotted;text-decoration:underline dotted}b,strong{font-weight:bolder}code,kbd,samp{font-family:monospace,monospace;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}img{border-style:none}button,input,optgroup,select,textarea{font-family:inherit;font-size:100%;line-height:1.15;margin:0}button,input{overflow:visible}button,select{text-transform:none}[type=button],[type=reset],[type=submit],button{-webkit-appearance:button}[type=button]::-moz-focus-inner,[type=reset]::-moz-focus-inner,[type=submit]::-moz-focus-inner,button::-moz-focus-inner{border-style:none;padding:0}[type=button]:-moz-focusring,[type=reset]:-moz-focusring,[type=submit]:-moz-focusring,button:-moz-focusring{outline:1px dotted ButtonText}fieldset{padding:.35em .75em .625em}legend{box-sizing:border-box;color:inherit;display:table;max-width:100%;padding:0;white-space:normal}progress{vertical-align:baseline}textarea{overflow:auto}[type=checkbox],[type=radio]{box-sizing:border-box;padding:0}[type=number]::-webkit-inner-spin-button,[type=number]::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}[type=search]::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}details{display:block}summary{display:list-item}[hidden],template{display:none}</style><style data-href="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/styles.fbaa4c43489bc546c244.css" id="gatsby-global-css">code[class*=language-],pre[class*=language-]{color:#111b27;background:none;font-family:Consolas,Monaco,Andale Mono,Ubuntu Mono,monospace;text-align:left;white-space:pre;word-spacing:normal;word-break:normal;word-wrap:normal;line-height:1.5;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-hyphens:none;-ms-hyphens:none;hyphens:none}code[class*=language-]::selection,code[class*=language-] ::selection,pre[class*=language-]::selection,pre[class*=language-] ::selection{background:#8da1b9}pre[class*=language-]{padding:1em;margin:.5em 0;overflow:auto}:not(pre)>code[class*=language-],pre[class*=language-]{background:#e3eaf2}:not(pre)>code[class*=language-]{padding:.1em .3em;border-radius:.3em;white-space:normal}.token.cdata,.token.comment,.token.doctype,.token.prolog{color:#3c526d}.token.punctuation{color:#111b27}.token.delimiter.important,.token.selector .parent,.token.tag,.token.tag .token.punctuation{color:#006d6d}.token.attr-name,.token.boolean,.token.boolean.important,.token.constant,.token.number,.token.selector .token.attribute{color:#755f00}.token.class-name,.token.key,.token.parameter,.token.property,.token.property-access,.token.variable{color:#005a8e}.token.attr-value,.token.color,.token.inserted,.token.selector .token.value,.token.string,.token.string .token.url-link{color:#116b00}.token.builtin,.token.keyword-array,.token.package,.token.regex{color:#af00af}.token.function,.token.selector .token.class,.token.selector .token.id{color:#7c00aa}.token.atrule .token.rule,.token.combinator,.token.keyword,.token.operator,.token.pseudo-class,.token.pseudo-element,.token.selector,.token.unit{color:#a04900}.token.deleted,.token.important{color:#c22f2e}.token.keyword-this,.token.this{color:#005a8e}.token.bold,.token.important,.token.keyword-this,.token.this{font-weight:700}.token.delimiter.important{font-weight:inherit}.token.italic{font-style:italic}.token.entity{cursor:help}.language-markdown .token.title,.language-markdown .token.title .token.punctuation{color:#005a8e;font-weight:700}.language-markdown .token.blockquote.punctuation{color:#af00af}.language-markdown .token.code{color:#006d6d}.language-markdown .token.hr.punctuation{color:#005a8e}.language-markdown .token.url>.token.content{color:#116b00}.language-markdown .token.url-link{color:#755f00}.language-markdown .token.list.punctuation{color:#af00af}.language-json .token.operator,.language-markdown .token.table-header{color:#111b27}.language-scss .token.variable{color:#006d6d}.token.token.cr:before,.token.token.lf:before,.token.token.space:before,.token.token.tab:not(:empty):before{color:#3c526d}div.code-toolbar>.toolbar.toolbar>.toolbar-item>a,div.code-toolbar>.toolbar.toolbar>.toolbar-item>button{color:#e3eaf2;background:#005a8e}div.code-toolbar>.toolbar.toolbar>.toolbar-item>a:focus,div.code-toolbar>.toolbar.toolbar>.toolbar-item>a:hover,div.code-toolbar>.toolbar.toolbar>.toolbar-item>button:focus,div.code-toolbar>.toolbar.toolbar>.toolbar-item>button:hover{color:#e3eaf2;background:rgba(0,90,142,.8549019607843137);text-decoration:none}div.code-toolbar>.toolbar.toolbar>.toolbar-item>span,div.code-toolbar>.toolbar.toolbar>.toolbar-item>span:focus,div.code-toolbar>.toolbar.toolbar>.toolbar-item>span:hover{color:#e3eaf2;background:#3c526d}.line-highlight.line-highlight{background:rgba(141,161,185,.1843137254901961);background:linear-gradient(90deg,rgba(141,161,185,.1843137254901961) 70%,rgba(141,161,185,.1450980392156863))}.line-highlight.line-highlight:before,.line-highlight.line-highlight[data-end]:after{background-color:#3c526d;color:#e3eaf2;box-shadow:0 1px #8da1b9}pre[id].linkable-line-numbers.linkable-line-numbers span.line-numbers-rows>span:hover:before{background-color:rgba(60,82,109,.12156862745098039)}.line-numbers.line-numbers .line-numbers-rows{border-right:1px solid rgba(141,161,185,.47843137254901963);background:rgba(208,218,231,.47843137254901963)}.line-numbers .line-numbers-rows>span:before{color:rgba(60,82,109,.8549019607843137)}.rainbow-braces .token.token.punctuation.brace-level-1,.rainbow-braces .token.token.punctuation.brace-level-5,.rainbow-braces .token.token.punctuation.brace-level-9{color:#755f00}.rainbow-braces .token.token.punctuation.brace-level-2,.rainbow-braces .token.token.punctuation.brace-level-6,.rainbow-braces .token.token.punctuation.brace-level-10{color:#af00af}.rainbow-braces .token.token.punctuation.brace-level-3,.rainbow-braces .token.token.punctuation.brace-level-7,.rainbow-braces .token.token.punctuation.brace-level-11{color:#005a8e}.rainbow-braces .token.token.punctuation.brace-level-4,.rainbow-braces .token.token.punctuation.brace-level-8,.rainbow-braces .token.token.punctuation.brace-level-12{color:#7c00aa}pre.diff-highlight>code .token.token.deleted:not(.prefix),pre>code.diff-highlight .token.token.deleted:not(.prefix){background-color:rgba(194,47,46,.12156862745098039)}pre.diff-highlight>code .token.token.inserted:not(.prefix),pre>code.diff-highlight .token.token.inserted:not(.prefix){background-color:rgba(17,107,0,.12156862745098039)}.command-line .command-line-prompt{border-right:1px solid rgba(141,161,185,.47843137254901963)}.command-line .command-line-prompt>span:before{color:rgba(60,82,109,.8549019607843137)}.markdown-body .octicon{display:inline-block;fill:currentColor;vertical-align:text-bottom}.markdown-body .anchor{float:left;line-height:1;margin-left:-20px;padding-right:4px}.markdown-body .anchor:focus{outline:none}.markdown-body h1 .octicon-link,.markdown-body h2 .octicon-link,.markdown-body h3 .octicon-link,.markdown-body h4 .octicon-link,.markdown-body h5 .octicon-link,.markdown-body h6 .octicon-link{color:#1b1f23;vertical-align:middle;visibility:hidden}.markdown-body h1:hover .anchor,.markdown-body h2:hover .anchor,.markdown-body h3:hover .anchor,.markdown-body h4:hover .anchor,.markdown-body h5:hover .anchor,.markdown-body h6:hover .anchor{text-decoration:none}.markdown-body h1:hover .anchor .octicon-link,.markdown-body h2:hover .anchor .octicon-link,.markdown-body h3:hover .anchor .octicon-link,.markdown-body h4:hover .anchor .octicon-link,.markdown-body h5:hover .anchor .octicon-link,.markdown-body h6:hover .anchor .octicon-link{visibility:visible}.markdown-body h1:hover .anchor .octicon-link:before,.markdown-body h2:hover .anchor .octicon-link:before,.markdown-body h3:hover .anchor .octicon-link:before,.markdown-body h4:hover .anchor .octicon-link:before,.markdown-body h5:hover .anchor .octicon-link:before,.markdown-body h6:hover .anchor .octicon-link:before{width:16px;height:16px;content:" ";display:inline-block;background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' version='1.1' width='16' height='16' aria-hidden='true'%3E%3Cpath fill-rule='evenodd' d='M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z'/%3E%3C/svg%3E")}.markdown-body{-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;color:#24292e;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;font-size:16px;line-height:1.5;word-wrap:break-word}.markdown-body details{display:block}.markdown-body summary{display:list-item}.markdown-body a{background-color:initial}.markdown-body a:active,.markdown-body a:hover{outline-width:0}.markdown-body strong{font-weight:inherit;font-weight:bolder}.markdown-body h1{margin:.67em 0}.markdown-body img{border-style:none}.markdown-body code,.markdown-body kbd,.markdown-body pre{font-family:monospace,monospace;font-size:1em}.markdown-body hr{box-sizing:initial;overflow:visible}.markdown-body input{font:inherit;margin:0;overflow:visible}.markdown-body [type=checkbox]{box-sizing:border-box;padding:0}.markdown-body *{box-sizing:border-box}.markdown-body input{font-family:inherit;font-size:inherit;line-height:inherit}.markdown-body a{color:#0366d6;text-decoration:none}.markdown-body a:hover{text-decoration:underline}.markdown-body strong{font-weight:600}.markdown-body hr{height:0;margin:15px 0;overflow:hidden;background:transparent;border-bottom:1px solid #dfe2e5}.markdown-body hr:after,.markdown-body hr:before{display:table;content:""}.markdown-body hr:after{clear:both}.markdown-body table{border-spacing:0;border-collapse:collapse}.markdown-body td,.markdown-body th{padding:0}.markdown-body details summary{cursor:pointer}.markdown-body h1,.markdown-body h2,.markdown-body h3,.markdown-body h4,.markdown-body h5,.markdown-body h6{margin-top:0;margin-bottom:0}.markdown-body h1{font-size:32px}.markdown-body h1,.markdown-body h2{font-weight:600}.markdown-body h2{font-size:24px}.markdown-body h3{font-size:20px}.markdown-body h3,.markdown-body h4{font-weight:600}.markdown-body h4{font-size:16px}.markdown-body h5{font-size:14px}.markdown-body h5,.markdown-body h6{font-weight:600}.markdown-body h6{font-size:12px}.markdown-body p{margin-top:0;margin-bottom:10px}.markdown-body blockquote{margin:0}.markdown-body ol,.markdown-body ul{padding-left:0;margin-top:0;margin-bottom:0}.markdown-body ol ol,.markdown-body ul ol{list-style-type:lower-roman}.markdown-body ol ol ol,.markdown-body ol ul ol,.markdown-body ul ol ol,.markdown-body ul ul ol{list-style-type:lower-alpha}.markdown-body dd{margin-left:0}.markdown-body code,.markdown-body pre{font-family:SFMono-Regular,Consolas,Liberation Mono,Menlo,monospace;font-size:12px}.markdown-body pre{margin-top:0;margin-bottom:0}.markdown-body input::-webkit-inner-spin-button,.markdown-body input::-webkit-outer-spin-button{margin:0;-webkit-appearance:none;appearance:none}.markdown-body :checked+.radio-label{position:relative;z-index:1;border-color:#0366d6}.markdown-body .border{border:1px solid #e1e4e8!important}.markdown-body .border-0{border:0!important}.markdown-body .border-bottom{border-bottom:1px solid #e1e4e8!important}.markdown-body .rounded-1{border-radius:3px!important}.markdown-body .bg-white{background-color:#fff!important}.markdown-body .bg-gray-light{background-color:#fafbfc!important}.markdown-body .text-gray-light{color:#6a737d!important}.markdown-body .pl-3,.markdown-body .px-3{padding-left:16px!important}.markdown-body .px-3{padding-right:16px!important}.markdown-body .f6{font-size:12px!important}.markdown-body .lh-condensed{line-height:1.25!important}.markdown-body .text-bold{font-weight:600!important}.markdown-body .pl-c{color:#6a737d}.markdown-body .pl-c1,.markdown-body .pl-s .pl-v{color:#005cc5}.markdown-body .pl-e,.markdown-body .pl-en{color:#6f42c1}.markdown-body .pl-s .pl-s1,.markdown-body .pl-smi{color:#24292e}.markdown-body .pl-ent{color:#22863a}.markdown-body .pl-k{color:#d73a49}.markdown-body .pl-pds,.markdown-body .pl-s,.markdown-body .pl-s .pl-pse .pl-s1,.markdown-body .pl-sr,.markdown-body .pl-sr .pl-cce,.markdown-body .pl-sr .pl-sra,.markdown-body .pl-sr .pl-sre{color:#032f62}.markdown-body .pl-smw,.markdown-body .pl-v{color:#e36209}.markdown-body .pl-bu{color:#b31d28}.markdown-body .pl-ii{color:#fafbfc;background-color:#b31d28}.markdown-body .pl-c2{color:#fafbfc;background-color:#d73a49}.markdown-body .pl-c2:before{content:"^M"}.markdown-body .pl-sr .pl-cce{font-weight:700;color:#22863a}.markdown-body .pl-ml{color:#735c0f}.markdown-body .pl-mh,.markdown-body .pl-mh .pl-en,.markdown-body .pl-ms{font-weight:700;color:#005cc5}.markdown-body .pl-mi{font-style:italic;color:#24292e}.markdown-body .pl-mb{font-weight:700;color:#24292e}.markdown-body .pl-md{color:#b31d28;background-color:#ffeef0}.markdown-body .pl-mi1{color:#22863a;background-color:#f0fff4}.markdown-body .pl-mc{color:#e36209;background-color:#ffebda}.markdown-body .pl-mi2{color:#f6f8fa;background-color:#005cc5}.markdown-body .pl-mdr{font-weight:700;color:#6f42c1}.markdown-body .pl-ba{color:#586069}.markdown-body .pl-sg{color:#959da5}.markdown-body .pl-corl{text-decoration:underline;color:#032f62}.markdown-body .mb-0{margin-bottom:0!important}.markdown-body .my-2{margin-bottom:8px!important;margin-top:8px!important}.markdown-body .pl-0{padding-left:0!important}.markdown-body .py-0{padding-top:0!important;padding-bottom:0!important}.markdown-body .pl-1{padding-left:4px!important}.markdown-body .pl-2{padding-left:8px!important}.markdown-body .py-2{padding-top:8px!important;padding-bottom:8px!important}.markdown-body .pl-3{padding-left:16px!important}.markdown-body .pl-4{padding-left:24px!important}.markdown-body .pl-5{padding-left:32px!important}.markdown-body .pl-6{padding-left:40px!important}.markdown-body .pl-7{padding-left:48px!important}.markdown-body .pl-8{padding-left:64px!important}.markdown-body .pl-9{padding-left:80px!important}.markdown-body .pl-10{padding-left:96px!important}.markdown-body .pl-11{padding-left:112px!important}.markdown-body .pl-12{padding-left:128px!important}.markdown-body hr{border-bottom-color:#eee}.markdown-body kbd{display:inline-block;padding:3px 5px;font:11px SFMono-Regular,Consolas,Liberation Mono,Menlo,monospace;line-height:10px;color:#444d56;vertical-align:middle;background-color:#fafbfc;border:1px solid #d1d5da;border-radius:3px;box-shadow:inset 0 -1px 0 #d1d5da}.markdown-body:after,.markdown-body:before{display:table;content:""}.markdown-body:after{clear:both}.markdown-body>:first-child{margin-top:0!important}.markdown-body>:last-child{margin-bottom:0!important}.markdown-body a:not([href]){color:inherit;text-decoration:none}.markdown-body blockquote,.markdown-body details,.markdown-body dl,.markdown-body ol,.markdown-body p,.markdown-body pre,.markdown-body table,.markdown-body ul{margin-top:0;margin-bottom:16px}.markdown-body hr{height:.25em;padding:0;margin:24px 0;background-color:#e1e4e8;border:0}.markdown-body blockquote{padding:0 1em;color:#6a737d;border-left:.25em solid #dfe2e5}.markdown-body blockquote>:first-child{margin-top:0}.markdown-body blockquote>:last-child{margin-bottom:0}.markdown-body h1,.markdown-body h2,.markdown-body h3,.markdown-body h4,.markdown-body h5,.markdown-body h6{margin-top:24px;margin-bottom:16px;font-weight:600;line-height:1.25}.markdown-body h1{font-size:2em}.markdown-body h1,.markdown-body h2{padding-bottom:.3em;border-bottom:1px solid #eaecef}.markdown-body h2{font-size:1.5em}.markdown-body h3{font-size:1.25em}.markdown-body h4{font-size:1em}.markdown-body h5{font-size:.875em}.markdown-body h6{font-size:.85em;color:#6a737d}.markdown-body ol,.markdown-body ul{padding-left:2em}.markdown-body ol ol,.markdown-body ol ul,.markdown-body ul ol,.markdown-body ul ul{margin-top:0;margin-bottom:0}.markdown-body li{word-wrap:break-all}.markdown-body li>p{margin-top:16px}.markdown-body li+li{margin-top:.25em}.markdown-body dl{padding:0}.markdown-body dl dt{padding:0;margin-top:16px;font-size:1em;font-style:italic;font-weight:600}.markdown-body dl dd{padding:0 16px;margin-bottom:16px}.markdown-body table{display:block;width:100%;overflow:auto}.markdown-body table th{font-weight:600}.markdown-body table td,.markdown-body table th{padding:6px 13px;border:1px solid #dfe2e5}.markdown-body table tr{background-color:#fff;border-top:1px solid #c6cbd1}.markdown-body table tr:nth-child(2n){background-color:#f6f8fa}.markdown-body img{max-width:100%;box-sizing:initial;background-color:#fff}.markdown-body img[align=right]{padding-left:20px}.markdown-body img[align=left]{padding-right:20px}.markdown-body code{padding:.2em .4em;margin:0;font-size:85%;background-color:rgba(27,31,35,.05);border-radius:3px}.markdown-body pre{word-wrap:normal}.markdown-body pre>code{padding:0;margin:0;font-size:100%;word-break:normal;white-space:pre;background:transparent;border:0}.markdown-body .highlight{margin-bottom:16px}.markdown-body .highlight pre{margin-bottom:0;word-break:normal}.markdown-body .highlight pre,.markdown-body pre{padding:16px;overflow:auto;font-size:85%;line-height:1.45;background-color:#f6f8fa;border-radius:3px}.markdown-body pre code{display:inline;max-width:auto;padding:0;margin:0;overflow:visible;line-height:inherit;word-wrap:normal;background-color:initial;border:0}.markdown-body .commit-tease-sha{display:inline-block;font-family:SFMono-Regular,Consolas,Liberation Mono,Menlo,monospace;font-size:90%;color:#444d56}.markdown-body .full-commit .btn-outline:not(:disabled):hover{color:#005cc5;border-color:#005cc5}.markdown-body .blob-wrapper{overflow-x:auto;overflow-y:hidden}.markdown-body .blob-wrapper-embedded{max-height:240px;overflow-y:auto}.markdown-body .blob-num{width:1%;min-width:50px;padding-right:10px;padding-left:10px;font-family:SFMono-Regular,Consolas,Liberation Mono,Menlo,monospace;font-size:12px;line-height:20px;color:rgba(27,31,35,.3);text-align:right;white-space:nowrap;vertical-align:top;cursor:pointer;-webkit-user-select:none;-ms-user-select:none;user-select:none}.markdown-body .blob-num:hover{color:rgba(27,31,35,.6)}.markdown-body .blob-num:before{content:attr(data-line-number)}.markdown-body .blob-code{position:relative;padding-right:10px;padding-left:10px;line-height:20px;vertical-align:top}.markdown-body .blob-code-inner{overflow:visible;font-family:SFMono-Regular,Consolas,Liberation Mono,Menlo,monospace;font-size:12px;color:#24292e;word-wrap:normal;white-space:pre}.markdown-body .pl-token.active,.markdown-body .pl-token:hover{cursor:pointer;background:#ffea7f}.markdown-body .tab-size[data-tab-size="1"]{-moz-tab-size:1;-o-tab-size:1;tab-size:1}.markdown-body .tab-size[data-tab-size="2"]{-moz-tab-size:2;-o-tab-size:2;tab-size:2}.markdown-body .tab-size[data-tab-size="3"]{-moz-tab-size:3;-o-tab-size:3;tab-size:3}.markdown-body .tab-size[data-tab-size="4"]{-moz-tab-size:4;-o-tab-size:4;tab-size:4}.markdown-body .tab-size[data-tab-size="5"]{-moz-tab-size:5;-o-tab-size:5;tab-size:5}.markdown-body .tab-size[data-tab-size="6"]{-moz-tab-size:6;-o-tab-size:6;tab-size:6}.markdown-body .tab-size[data-tab-size="7"]{-moz-tab-size:7;-o-tab-size:7;tab-size:7}.markdown-body .tab-size[data-tab-size="8"]{-moz-tab-size:8;-o-tab-size:8;tab-size:8}.markdown-body .tab-size[data-tab-size="9"]{-moz-tab-size:9;-o-tab-size:9;tab-size:9}.markdown-body .tab-size[data-tab-size="10"]{-moz-tab-size:10;-o-tab-size:10;tab-size:10}.markdown-body .tab-size[data-tab-size="11"]{-moz-tab-size:11;-o-tab-size:11;tab-size:11}.markdown-body .tab-size[data-tab-size="12"]{-moz-tab-size:12;-o-tab-size:12;tab-size:12}.markdown-body .task-list-item{list-style-type:none}.markdown-body .task-list-item+.task-list-item{margin-top:3px}.markdown-body .task-list-item input{margin:0 .2em .25em -1.6em;vertical-align:middle}</style><meta name="generator" content="Gatsby 2.32.13"/><title data-react-helmet="true">使用WebAssembly构建FaaS服务 | ChenKS</title><link data-react-helmet="true" href="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/rVtDsho-9960518f2858389fe355212f7f03fc73.png" rel="preload" as="image"/><link data-react-helmet="true" href="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/OLJxbaR-618cc9142c7c6658b36a4075edaef4e2.jpg" rel="preload" as="image"/><link data-react-helmet="true" href="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/FSwWKYB-0f500022d38d2a73e4a2b57e50337d05.jpg" rel="preload" as="image"/><link data-react-helmet="true" href="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/avatar-9ebf78a88f69fda4a3b437a4f389bb51.png" rel="preload" as="image"/><meta data-react-helmet="true" name="description" content="Homepage|ChenKS"/><meta data-react-helmet="true" property="og:title" content="使用WebAssembly构建FaaS服务"/><meta data-react-helmet="true" property="og:description" content="Homepage|ChenKS"/><meta data-react-helmet="true" property="og:type" content="website"/><meta data-react-helmet="true" name="twitter:card" content="summary"/><meta data-react-helmet="true" name="twitter:creator" content="@ChenKS12138"/><meta data-react-helmet="true" name="twitter:title" content="使用WebAssembly构建FaaS服务"/><meta data-react-helmet="true" name="twitter:description" content="Homepage|ChenKS"/><meta data-react-helmet="true" name="theme-color" content="rgba(0,0,0,0.5)"/><style data-styled="" data-styled-version="5.3.1">body{background-color:rgb(235,235,235);}/*!sc*/
+data-styled.g1[id="sc-global-dSrMai1"]{content:"sc-global-dSrMai1,"}/*!sc*/
+.hjvckA{width:100%;position:relative;}/*!sc*/
+data-styled.g2[id="Header__HeaderWrapper-sc-1hkgguv-0"]{content:"hjvckA,"}/*!sc*/
+.lagoTY{position:fixed;top:0;left:0;width:100%;-webkit-transition:all 0.5s ease-in-out;transition:all 0.5s ease-in-out;z-index:999;box-shadow:0 2px 5px 0 rgba(0,0,0,0.16),0 2px 10px 0 rgba(0,0,0,0.12);display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-align-items:center;-webkit-box-align:center;-ms-flex-align:center;align-items:center;}/*!sc*/
+data-styled.g3[id="Header__HeaderNavigation-sc-1hkgguv-1"]{content:"lagoTY,"}/*!sc*/
+.hEmEJL{min-width:80%;max-width:850px;margin:0 auto;display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-align-items:center;-webkit-box-align:center;-ms-flex-align:center;align-items:center;-webkit-box-pack:justify;-webkit-justify-content:space-between;-ms-flex-pack:justify;justify-content:space-between;}/*!sc*/
+data-styled.g4[id="Header__HeaderNavigationContent-sc-1hkgguv-2"]{content:"hEmEJL,"}/*!sc*/
+.joMbzu{color:#ffffff;-webkit-text-decoration:none;text-decoration:none;font-weight:600;font-size:20px;}/*!sc*/
+data-styled.g5[id="Header__HeaderNavigationTitle-sc-1hkgguv-3"]{content:"joMbzu,"}/*!sc*/
+.kYujgx{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;}/*!sc*/
+data-styled.g6[id="Header__HeaderNavigationLinks-sc-1hkgguv-4"]{content:"kYujgx,"}/*!sc*/
+.cRMUNe{width:100%;height:100%;position:relative;}/*!sc*/
+data-styled.g7[id="Header__HeaderContentContainer-sc-1hkgguv-5"]{content:"cRMUNe,"}/*!sc*/
+.ghnWhK{width:100%;height:100%;background-position:center center;background-size:cover;background-repeat:no-repeat;}/*!sc*/
+.ghnWhK::before{position:absolute;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,0.3);z-index:2;content:"";}/*!sc*/
+data-styled.g8[id="Header__HeaderContentBg-sc-1hkgguv-6"]{content:"ghnWhK,"}/*!sc*/
+.muYVG{position:absolute;top:50%;left:50%;-webkit-transform:translate(-50%,-50%);-ms-transform:translate(-50%,-50%);transform:translate(-50%,-50%);z-index:4;}/*!sc*/
+data-styled.g9[id="Header__HeaderContentContent-sc-1hkgguv-7"]{content:"muYVG,"}/*!sc*/
+.gJsRhw{width:100%;min-height:100vh;display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-flex-direction:column;-ms-flex-direction:column;flex-direction:column;background-color:rgb(235,235,235);}/*!sc*/
+@media (prefers-color-scheme:dark){.gJsRhw{background-color:#212529;}}/*!sc*/
+data-styled.g10[id="Layout__AppWrapper-sc-rhcszr-0"]{content:"gJsRhw,"}/*!sc*/
+.hsCnxp{width:100%;}/*!sc*/
+data-styled.g11[id="Layout__AppHeader-sc-rhcszr-1"]{content:"hsCnxp,"}/*!sc*/
+.hNlnCn{position:relative;top:-50px;max-width:90%;z-index:4;margin:0 auto;border-radius:8px;background-color:rgb(255,255,255);box-shadow:0 12px 15px 0 rgba(0,0,0,0.24),0 17px 50px 0 rgba(0,0,0,0.19);}/*!sc*/
+@media (prefers-color-scheme:dark){.hNlnCn{background-color:#343a40;}}/*!sc*/
+data-styled.g12[id="Layout__AppContentContainer-sc-rhcszr-2"]{content:"hNlnCn,"}/*!sc*/
+.dJWBSu{max-width:100%;min-height:500px;padding:20px;position:relative;}/*!sc*/
+data-styled.g13[id="Layout__AppContent-sc-rhcszr-3"]{content:"dJWBSu,"}/*!sc*/
+.cOlmHB{-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;color:white;font-size:14px;-webkit-text-decoration:none;text-decoration:none;margin:0 5px;}/*!sc*/
+data-styled.g14[id="Layout__AppLinkItem-sc-rhcszr-4"]{content:"cOlmHB,"}/*!sc*/
+.ILgpl{color:#ffffff;font-weight:600;font-size:30px;}/*!sc*/
+@media (prefers-color-scheme:dark){.ILgpl{color:white;}}/*!sc*/
+.dyJArR{color:#ffffff;font-weight:400;font-size:18px;}/*!sc*/
+@media (prefers-color-scheme:dark){.dyJArR{color:white;}}/*!sc*/
+.ffbCxe{font-weight:800;font-size:0.9rem;}/*!sc*/
+@media (prefers-color-scheme:dark){.ffbCxe{color:white;}}/*!sc*/
+.giGyPI{font-size:20px;line-height:30px;}/*!sc*/
+@media (prefers-color-scheme:dark){.giGyPI{color:white;}}/*!sc*/
+data-styled.g17[id="Text-sc-16tux7c-0"]{content:"ILgpl,dyJArR,ffbCxe,giGyPI,"}/*!sc*/
+.zqmSo{position:relative;margin-top:30px;}/*!sc*/
+@media (prefers-color-scheme:dark){.zqmSo{color:white;}}/*!sc*/
+.gKZkDs{position:relative;width:960px;max-width:100%;}/*!sc*/
+@media (prefers-color-scheme:dark){.gKZkDs{color:white;}}/*!sc*/
+data-styled.g20[id="BoxContainer-sc-1cp1x4f-0"]{content:"zqmSo,gKZkDs,"}/*!sc*/
+.dRyMXY{max-width:100%;margin:0 4rem;padding:10px;margin-top:50px;background-color:#faf4e0;border-left-color:rgb(194,164,66);border-left-width:6px;border-left-style:solid;border-radius:5px;color:#3c4858;}/*!sc*/
+@media screen and (max-width:770px){.dRyMXY{margin:40px 10px;}}/*!sc*/
+@media (prefers-color-scheme:dark){.dRyMXY{color:white;background-color:#495057;}}/*!sc*/
+data-styled.g24[id="detail__CopyrightContainer-sc-18ilojt-0"]{content:"dRyMXY,"}/*!sc*/
+.eXdfJg{padding:40px 4rem;border-top:solid 1px rgba(0,0,0,0.1);}/*!sc*/
+@media screen and (max-width:770px){.eXdfJg{padding:40px 10px;}}/*!sc*/
+data-styled.g25[id="detail__TagContainer-sc-18ilojt-1"]{content:"eXdfJg,"}/*!sc*/
+.jdUzDW{background-color:#e0e0e0;font-weight:800;padding:0.25em 0.4em;border-radius:0.125rem;margin:0 5px;box-shadow:0 2px 5px 0 rgba(0,0,0,0.16),0 2px 10px 0 rgba(0,0,0,0.12);}/*!sc*/
+.jdUzDW::before{content:"# ";}/*!sc*/
+@media (prefers-color-scheme:dark){.jdUzDW{color:white;background-color:#495057;}}/*!sc*/
+data-styled.g26[id="detail__Tag-sc-18ilojt-2"]{content:"jdUzDW,"}/*!sc*/
+.iXltuO{position:absolute;top:50%;left:50%;-webkit-transform:translate(-50%,-50%);-ms-transform:translate(-50%,-50%);transform:translate(-50%,-50%);text-align:center;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;max-width:80vw;width:600px;}/*!sc*/
+data-styled.g27[id="detail__DetailHeaderContent-sc-18ilojt-3"]{content:"iXltuO,"}/*!sc*/
+</style><link rel="icon" href="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/favicon-32x32.png?v=5932f08b280e1537764aebecd3aa637a" type="image/png"/><link rel="manifest" href="/manifest.webmanifest" crossorigin="anonymous"/><link rel="apple-touch-icon" sizes="48x48" href="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/icons/icon-48x48.png?v=5932f08b280e1537764aebecd3aa637a"/><link rel="apple-touch-icon" sizes="72x72" href="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/icons/icon-72x72.png?v=5932f08b280e1537764aebecd3aa637a"/><link rel="apple-touch-icon" sizes="96x96" href="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/icons/icon-96x96.png?v=5932f08b280e1537764aebecd3aa637a"/><link rel="apple-touch-icon" sizes="144x144" href="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/icons/icon-144x144.png?v=5932f08b280e1537764aebecd3aa637a"/><link rel="apple-touch-icon" sizes="192x192" href="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/icons/icon-192x192.png?v=5932f08b280e1537764aebecd3aa637a"/><link rel="apple-touch-icon" sizes="256x256" href="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/icons/icon-256x256.png?v=5932f08b280e1537764aebecd3aa637a"/><link rel="apple-touch-icon" sizes="384x384" href="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/icons/icon-384x384.png?v=5932f08b280e1537764aebecd3aa637a"/><link rel="apple-touch-icon" sizes="512x512" href="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/icons/icon-512x512.png?v=5932f08b280e1537764aebecd3aa637a"/><link rel="sitemap" type="application/xml" href="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/sitemap.xml"/><link as="script" rel="preload" href="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/webpack-runtime-8bf73465596fd4400d48.js"/><link as="script" rel="preload" href="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/styles-12bbf25d54412988e290.js"/><link as="script" rel="preload" href="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/app-1654347006101.js"/><link as="script" rel="preload" href="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/commons-63ce9974892b4fadc396.js"/><link as="script" rel="preload" href="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/component---src-pages-detail-tsx-b284249810cd75c9e63a.js"/><link as="fetch" rel="preload" href="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/page-data/detail/7f451f74-5ac7-5e57-a05b-609901d7bac1/page-data.1654347006101.json" crossorigin="anonymous"/><link as="fetch" rel="preload" href="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/page-data/sq/d/63159454.json" crossorigin="anonymous"/><link as="fetch" rel="preload" href="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/page-data/app-data.json" crossorigin="anonymous"/></head><body><div id="___gatsby"><div style="outline:none" tabindex="-1" id="gatsby-focus-wrapper"><div class="Layout__AppWrapper-sc-rhcszr-0 gJsRhw"><div class="Header__HeaderWrapper-sc-1hkgguv-0 hjvckA Layout__AppHeader-sc-rhcszr-1 hsCnxp" style="height:400px"><div style="height:64px;background-color:transparent" class="Header__HeaderNavigation-sc-1hkgguv-1 lagoTY"><div class="Header__HeaderNavigationContent-sc-1hkgguv-2 hEmEJL"><a class="Header__HeaderNavigationTitle-sc-1hkgguv-3 joMbzu" href="/">ChenKS</a><div class="Header__HeaderNavigationLinks-sc-1hkgguv-4 kYujgx"><a class="Layout__AppLinkItem-sc-rhcszr-4 cOlmHB" href="/">Home</a><a class="Layout__AppLinkItem-sc-rhcszr-4 cOlmHB" href="/list">Archives</a><a class="Layout__AppLinkItem-sc-rhcszr-4 cOlmHB" href="/about">About</a></div></div></div><div class="Header__HeaderContentContainer-sc-1hkgguv-5 cRMUNe"><div style="background-image:url(&quot;https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/FSwWKYB-0f500022d38d2a73e4a2b57e50337d05.jpg&quot;)" class="Header__HeaderContentBg-sc-1hkgguv-6 ghnWhK"></div><div class="Header__HeaderContentContent-sc-1hkgguv-7 muYVG"><div class="detail__DetailHeaderContent-sc-18ilojt-3 iXltuO"><span font-size="30px" color="#ffffff" font-weight="600" class="Text-sc-16tux7c-0 ILgpl">使用WebAssembly构建FaaS服务</span><div class="BoxContainer-sc-1cp1x4f-0 zqmSo"><span font-weight="400" font-size="18px" color="#ffffff" class="Text-sc-16tux7c-0 dyJArR">Friday, June 3, 2022 11:54 PM</span></div></div></div></div></div><div class="Layout__AppContentContainer-sc-rhcszr-2 hNlnCn"><div class="Layout__AppContent-sc-rhcszr-3 dJWBSu"><div class="markdown-body"><div width="960px" style="overflow-wrap:break-word" class="BoxContainer-sc-1cp1x4f-0 gKZkDs"><div class="post-content"><p>有一段是没有写博客了，这一段时间了解了不少新技术，但是没来得及写成博客总结。WebAssembly和Rust是我一直在关注的两项技术，这段时间使用它们编写了一个FaaS服务工具。</p>
+<h1>动机</h1>
+<p>作为一个Web开发者，我总希望能有这样一套工具/系统/流程。它能给我提供一套模板，我只需要简单地编写Restful服务的核心代码，整个过程足够优雅。</p>
+<ul>
+<li>
+<p>性能/性能方面</p>
+<ol>
+<li>性能足够好。服务不会有太高的内存占用，性能足够好。如果能方便地进行扩缩容更好。</li>
+<li>安全性足够好。希望能够向我提供控制Restful服务访问宿主机的各项权限的能力，如IO、环境变量等。</li>
+</ol>
+</li>
+<li>
+<p>开发体验方面</p>
+<ol start="3">
+<li>编程效率足够高。能给我提供注解/装饰器，我只需要编写Restful服务核心的Handler，对于路由实现、服务鉴权等问题我不需要关心或者只需要做简单的配置即可。</li>
+<li>编译产物足够简单。希望它最终产物只有一个Bundle，且这个Bundle体积不应该太大，因为我也不会在里面写什么复杂算法，不希望我的编译器把时间/算力浪费在重复地编译HTTP Server的实现上。</li>
+<li>部署足够方便。以往一些将整个运行环境打包发布的方式太过麻烦（没错，说的就是Node.js/Python ）。同时，如果能同静态资源一起打包发布更好，避免需要同时维护两个模块。</li>
+<li>测试开发的重编译速度足够快。开发时服务重启速度会影响开发速度，不希望我的时间浪费在等待长时间的编译上。</li>
+</ol>
+</li>
+</ul>
+<p>由此，我开发了<a href="https://github.com/ChenKS12138/wasm-lambda">wams-lambda</a>项目，虽然已有不少的Web开发解决方案，但是我认为不能满足我的这些需求。</p>
+<h1>基于事件的FaaS</h1>
+<p>大部分的Restful服务都是可以转化成基于事件处理的服务，这种场景下使用FaaS<sup>[1]</sup>其实更为合适，但是我们看到的更多的是，每个Restful服务都bind一个socket，单独启动了一个HttpServer，这样的Restful服务多了，性能占用自然就高了。而使用FaaS平台，不需要常驻服务监听端口，可以缩容到0，降低了对系统资源的占用。</p>
+<h1>为什么是WebAssembly</h1>
+<h2>WebAssembly的安全性和性能</h2>
+<blockquote>
+<p>WebAssembly provides no ambient access to the computing environment in which code is executed. Any inter- action with the environment, such as I/O, access to resources, or operating system calls, can only be performed by invoking functions provided by the embedder and imported into a WebAssembly module. An embedder can establish security policies suitable for a respective environment by controlling or limiting which functional capa- bilities it makes available for import. Such considerations are an embedder’s responsibility and the subject of API definitions for a specific environment.</p>
+</blockquote>
+<p>WebAssembly<sup>[2]</sup>是一种被用于栈式虚拟机的编码格式。最初是被设计用于Web端，因此安全性在设计之初就是重要考量。wasm模块的指令集只包含了最基础的计算能力，不会影响外部执行环境，内部需要的IO能力、系统调用等都需要由虚拟机提供。当被用于FaaS时，FaaS模块内部代码通过调用import段的特定函数实现对外部环境的访问，这些函数由虚拟机进行实现，由此我们可以轻易地对模块的环境变量、模块的系统调用以及系统调用参数进行控制，提高安全性。同时，每个虚拟机都是隔离的（包括执行栈、内存、系统调用等），即使一个虚拟机发生了crush，也不会影响到其他模块的执行。</p>
+<p>WebAssembly的性能表现依赖于具体的runtime实现，wasm的指令集是对真实世界计算机指令集的抽象<sup>[3]</sup>，不仅可以对wasm进行解释执行，还可以进行JIT/AOT，让代码以native的方式执行。</p>
+<h2>冷启动速度</h2>
+<p>FaaS缩容可以到0，因此冷启动问题<sup>[4]</sup>是FaaS相对于PaaS需要多处理的一个比较大的问题。不同于OpenFaaS等方案，运行一个wasm模块不需要单独启动一个容器，wasm运行时本身就是一个沙箱，因此可以比较好地应对冷启动问题，其主要的时间开销为从代码存储中拉取代码。</p>
+<h1>Runtime Library</h1>
+<p>wasm-lambda提供了wasm-lambda-bridge的crate供FaaS模块调用，定义了一系列hostcall。每个wasm模块通过hostcall获取到事件，与宿主环境(host)进行通信。但是还不够开发者友好，因此wasm-lambda-bridge对hostcall进行了进一步封装，对事件进行解析，并派发给其他Handler，实现更优雅的编程。</p>
+<div class="gatsby-highlight" data-language="rust"><pre style="counter-reset: linenumber NaN" class="language-rust line-numbers"><code class="language-rust"><span class="token comment">// 直接调用raw hostcall</span>
+<span class="token keyword">use</span> <span class="token namespace">std<span class="token punctuation">::</span>collections<span class="token punctuation">::</span></span><span class="token class-name">HashMap</span><span class="token punctuation">;</span>
+<span class="token keyword">use</span> <span class="token namespace">wasm_lambda_bridge<span class="token punctuation">::</span>core<span class="token punctuation">::</span></span><span class="token punctuation">{</span><span class="token namespace">value<span class="token punctuation">::</span></span><span class="token class-name">Response</span><span class="token punctuation">,</span><span class="token namespace">hostcall<span class="token punctuation">::</span>raw<span class="token punctuation">::</span></span>event_reply<span class="token punctuation">}</span><span class="token punctuation">;</span>
+<span class="token keyword">fn</span> <span class="token function-definition function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+		<span class="token keyword">let</span> reply <span class="token operator">=</span> <span class="token class-name">Response</span> <span class="token punctuation">{</span>
+				value<span class="token punctuation">:</span> <span class="token number">200</span><span class="token punctuation">,</span>
+				headers<span class="token punctuation">:</span> <span class="token class-name">HashMap</span><span class="token punctuation">::</span><span class="token function">new</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+				body<span class="token punctuation">:</span> <span class="token class-name">Some</span><span class="token punctuation">(</span><span class="token string">"hello"</span><span class="token punctuation">.</span><span class="token function">to_string</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+		<span class="token punctuation">}</span><span class="token punctuation">;</span>
+		<span class="token keyword">let</span> data <span class="token operator">=</span> <span class="token namespace">bson<span class="token punctuation">::</span></span><span class="token function">to_vec</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>reply<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">unwrap</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">unsafe</span> <span class="token punctuation">{</span>
+        <span class="token function">event_reply</span><span class="token punctuation">(</span>data<span class="token punctuation">.</span><span class="token function">as_ptr</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> data<span class="token punctuation">.</span><span class="token function">len</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">as</span> <span class="token keyword">u64</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment">// 使用Runtime Library</span>
+<span class="token keyword">use</span> <span class="token namespace">wasm_lambda_bridge<span class="token punctuation">::</span></span><span class="token punctuation">{</span>make_response<span class="token punctuation">,</span>codegen<span class="token punctuation">,</span><span class="token namespace">value<span class="token punctuation">::</span></span><span class="token class-name">Response</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+<span class="token attribute attr-name">#[codegen::main]</span> 
+<span class="token keyword">fn</span> <span class="token function-definition function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">-></span> <span class="token class-name">Result</span><span class="token operator">&lt;</span><span class="token class-name">Response</span><span class="token operator">></span> <span class="token punctuation">{</span>
+    <span class="token class-name">Ok</span><span class="token punctuation">(</span><span class="token macro property">make_response!</span><span class="token punctuation">(</span><span class="token string">"hello"</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span></code><span aria-hidden="true" class="line-numbers-rows" style="white-space: normal; width: auto; left: 0;"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></pre></div>
+<h2>基于洋葱路由的事件处理中间件</h2>
+<p><span
+      class="gatsby-resp-image-wrapper"
+      style="position: relative; display: block; margin-left: auto; margin-right: auto; max-width: 590px; "
+    >
+      <a
+    class="gatsby-resp-image-link"
+    href="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/de890b2d712d4b64709eec2b9055fd3a/d0cc0/1.png"
+    style="display: block"
+    target="_blank"
+    rel="noopener"
+  >
+    <span
+    class="gatsby-resp-image-background-image"
+    style="padding-bottom: 87.16216216216216%; position: relative; bottom: 0; left: 0; background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAARCAIAAABSJhvpAAAACXBIWXMAAAsTAAALEwEAmpwYAAACnUlEQVQ4y3VTWW8SURSeH2BMfDcm/gfj9j9q1CeNPKoYtG14ExuTijZpLISmtJKaJp0pmYEHkhKBECAtS0tKF2QZKJQdylBaKDQs4sdcApjY83AzdznnW84Z6s9YVCqVVCpls9kYhlGpVIuLi7FYrNfr4ar3v6DGN8fHxyzL0jS9vb1tMpmkUqlSqex2u71rgrq8vKzVaq1Wq9Pp1Ov18/NznJIEn88nl8uLxSI5GQaIkJU6OjoyGo0OhwNsrVZrPp/HUxTCyvO8TCbLZrPXMafIBdSCAslpd9pAi8fjKysroF0ul3FYKpUODg5wnslksmLgPUUYGjju8PAQH7u7uyDySwy8tlgsxDNU39raAkG32+33+z0eD4oOko2cgVmHU7Rerw+HwvFY/PT0FDjIhxwilchJp1JDFYNkPso/mZhA1VwuByihLDSbzWq1iq3dbod4InKDZuh1ui+t3e4bRpIDgcDzp882GAZizs7OqmJAFZKR6XQ6YcH05NSje/crgtBH7o4ho6ufPiru3r7zZXZWEAQ0rNFoXF1dQWoikVj4vvD4wcNbN26aNzf7bRN9HSVzHLezs4NeyaTvQAyd/6b8OvX+w/Tk5NvXb169ePl5ZsbAskT2sG0jZJfLBUDAAjAUCs3Pz/9YXv65uoppM5vN4D/s/6jPpAxMWltbSyYS4XCYSIULwWAQrXJ7PBqNBrZHo9FkMhkVAxM5GhKsaBJAIpEIvMGjvb09bE9OTkAKPwlmIxqJwDxULxQKGOQRMtAANTc35/V6cY2nSN7f34cXGDLMD3oOdiExMAKE/yAZlbRarUQiUSgUOp0ObFmOVavV+CaZ4MKLgRFE0YuLi39owy1wBvmlpSVMKL7xKJ3GRKUSYvwWA1VgKtH8F6AfYwOQR53nAAAAAElFTkSuQmCC'); background-size: cover; display: block;"
+  ></span>
+  <img
+        class="gatsby-resp-image-image"
+        alt="onion model"
+        title="onion model"
+        src="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/de890b2d712d4b64709eec2b9055fd3a/fcda8/1.png"
+        srcset="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/de890b2d712d4b64709eec2b9055fd3a/12f09/1.png 148w,
+https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/de890b2d712d4b64709eec2b9055fd3a/e4a3f/1.png 295w,
+https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/de890b2d712d4b64709eec2b9055fd3a/fcda8/1.png 590w,
+https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/de890b2d712d4b64709eec2b9055fd3a/d0cc0/1.png 732w"
+        sizes="(max-width: 590px) 100vw, 590px"
+        style="width:100%;height:100%;margin:0;vertical-align:middle;position:absolute;top:0;left:0;"
+        loading="lazy"
+      />
+  </a>
+    </span></p>
+<div class="gatsby-highlight" data-language="rust"><pre style="counter-reset: linenumber NaN" class="language-rust line-numbers"><code class="language-rust"><span class="token attribute attr-name">#[middleware]</span>
+<span class="token keyword">fn</span> <span class="token function-definition function">not_found</span><span class="token punctuation">(</span>context<span class="token punctuation">:</span> <span class="token class-name">MiddlewareContext</span><span class="token punctuation">,</span> next<span class="token punctuation">:</span> <span class="token class-name">MiddlewareNext</span><span class="token punctuation">)</span> <span class="token punctuation">-></span> <span class="token class-name">MiddlewareContext</span> <span class="token punctuation">{</span>
+    <span class="token keyword">let</span> <span class="token keyword">mut</span> context <span class="token operator">=</span> next<span class="token punctuation">.</span><span class="token function">call</span><span class="token punctuation">(</span>context<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> context<span class="token number">.1</span><span class="token punctuation">.</span><span class="token function">is_none</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        context<span class="token number">.1</span> <span class="token operator">=</span> <span class="token class-name">Some</span><span class="token punctuation">(</span><span class="token macro property">make_response!</span><span class="token punctuation">(</span><span class="token number">404</span><span class="token punctuation">,</span> <span class="token string">"404 Not Found"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    context
+<span class="token punctuation">}</span></code><span aria-hidden="true" class="line-numbers-rows" style="white-space: normal; width: auto; left: 0;"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></pre></div>
+<p>熟悉Koa.js的人对这个概念一定不陌生，这让我们的中间件有了两次被触发的机会，并且都写在了一个函数里。一些常见的中间件能力，如请求日志、错误捕获、处理未匹配路由都可以被实现。</p>
+<h2>使用Rust宏减少重复编码</h2>
+<p>我喜欢Rust的一个重要原因就是其强大的宏能力，它让我能够做到DRY(Don't Repeat Yourself)，或者是在Rust代码里再实现一套自己的DSL(Domain Specific Language)。Rust宏主要包括了声明式宏和过程宏。声明式宏编写匹配规则返回代码，更容易编写，能力有限；过程宏编写函数处理TokenStrema返回TokenStream，较为复杂，能力强大。Rust宏的使用这里不做赘述。</p>
+<h3><code>main</code>生成入口函数</h3>
+<p>使用过程宏重新wrap了传入的main函数，一方面使得代码更为简洁，另一方面避免了开发时遗忘返回响应。</p>
+<p><span
+      class="gatsby-resp-image-wrapper"
+      style="position: relative; display: block; margin-left: auto; margin-right: auto; max-width: 590px; "
+    >
+      <a
+    class="gatsby-resp-image-link"
+    href="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/4f02d5554c8f15959ab1ac6b9c344be9/6871f/2.png"
+    style="display: block"
+    target="_blank"
+    rel="noopener"
+  >
+    <span
+    class="gatsby-resp-image-background-image"
+    style="padding-bottom: 35.13513513513513%; position: relative; bottom: 0; left: 0; background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAHCAYAAAAIy204AAAACXBIWXMAABYlAAAWJQFJUiTwAAABKUlEQVQoz21R2W7DMAzL/3/mhnVp6ya+D/ngaGfr0wIQMiKSouytRA/vPayzsN7CEDE6SMmoraJWQQgeOUXYU+G+f2LfP/C8f8EfB8LCiXiyElsyJ47bDcmYhag1sjVoNGnOofeBVAQlBRT2DkU+TQ7qDPnCQTVHtMJKbKLZUM8rhVAohRCMMdC9QWfCAaBLRmP62juspbh1/PdtkzTJwZ9orfAX5WNc3eSBJuvYa0F1epmnGOC0QmK6UirTc9gcPDq2ReJdCZMtEsmLSDT2yLwM5c9wLGGevJhpyK1yWbgM7YlREhVtxrjAVIN1OMNh8jYUqyEUNa79u8O7vlfOvHi73+BfD4TXE1EpRL5a51WADzGnTtncIj2+EdQO0a+FShS+bDUHRrALPw1GIRzDyVepAAAAAElFTkSuQmCC'); background-size: cover; display: block;"
+  ></span>
+  <img
+        class="gatsby-resp-image-image"
+        alt="main"
+        title="main"
+        src="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/4f02d5554c8f15959ab1ac6b9c344be9/fcda8/2.png"
+        srcset="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/4f02d5554c8f15959ab1ac6b9c344be9/12f09/2.png 148w,
+https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/4f02d5554c8f15959ab1ac6b9c344be9/e4a3f/2.png 295w,
+https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/4f02d5554c8f15959ab1ac6b9c344be9/fcda8/2.png 590w,
+https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/4f02d5554c8f15959ab1ac6b9c344be9/efc66/2.png 885w,
+https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/4f02d5554c8f15959ab1ac6b9c344be9/c83ae/2.png 1180w,
+https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/4f02d5554c8f15959ab1ac6b9c344be9/6871f/2.png 2688w"
+        sizes="(max-width: 590px) 100vw, 590px"
+        style="width:100%;height:100%;margin:0;vertical-align:middle;position:absolute;top:0;left:0;"
+        loading="lazy"
+      />
+  </a>
+    </span></p>
+<h3><code>#[get]</code>等生成route生成函数</h3>
+<p>使用<code>装饰器/注解</code>编写Restful服务的路由是我认为比较优雅的方式，这在<code>flask</code>和<code>Sprint Boot</code>中很常见，一方面使得代码更为直观，另一方面也使得后续使用代码生成文档更为容易。</p>
+<p><span
+      class="gatsby-resp-image-wrapper"
+      style="position: relative; display: block; margin-left: auto; margin-right: auto; max-width: 590px; "
+    >
+      <a
+    class="gatsby-resp-image-link"
+    href="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/4e180ab752f90f7ec5b45339175cc69a/748b0/5.png"
+    style="display: block"
+    target="_blank"
+    rel="noopener"
+  >
+    <span
+    class="gatsby-resp-image-background-image"
+    style="padding-bottom: 81.08108108108108%; position: relative; bottom: 0; left: 0; background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAQCAYAAAAWGF8bAAAACXBIWXMAABYlAAAWJQFJUiTwAAACm0lEQVQ4y4VU2ZLjKBD0/3/ibnSE3dbJISEQh5BQTgp393hnH0bhCiwEReVR3JTyaNsHFq0gdUBKG/zqsG4b5piwMPy2Y8sZlnOW7yZGLCki5R2v58R5MlBw27YTWk3o+yfGfoASHUT/CaUFHgPnpMbcjXBSQrY9FqnQiQA1TliWFZIF+RCYtDDvidtRrszAUa7TdpSSOX98LdjrIuz5d5QDdcNZ+DuQt2vPa/1V5c3aAD0rZGeQlESeJ2zzjDhNiKwm+BU7Dy1MsDOu8eCBO5McjPI1dzKuk252yejbAWPToL8/MLYNZH/n2OPjnwFNS26lgFwsBhcIj9x6D7F6SOfQWQftPHL+SkiwFcmyJDRdB9UKTM8Ghkm6UeF+7/Hk+5bIEysrx06oL7hnhf9K9BKGohzHC385IvT4ASPu0D2rbD8xigZdryiaQfQW3mkss4ZlRbOZMJOWlY74TlYTnqww+JMfEx73J9UeMZLTVo+QHPXsYVj9QsiZ1vnbc7sUOvYTMSSMtImYLz9SEG7O+fLkyvBIYUWKjC1S2SsCqUp1rO/Xf66/lQr5ckTE0P1bfdiJJ4VQEAMhNx+QhH7NWyOwBouwThV+9AvcojgarKTEWkvIJDptmVwsmMQntHxgdqqKEIPDxs7IrDLTvNQDx1EQ4849L9v8DzK/I8QMYydyaQjPsIIZiaevlqczWdKaPnX8v3NNhFIOE7mNbL93QaooMW6I5AA77cA+JlEo+9/J/37ON9tUH2oVaI0GljwZWkXQd2Mnq6rGWUw+1QvDEPLkGRRIcbQh/pj5fO+USxNjVgzjJ63TQojrguhhNLuHc0rNcG0HV28jdokJeHQTuoGtSlW/E/5UuO8F51vJ9VLAf2HgD1jva/+E/Ats6dc3743V7wAAAABJRU5ErkJggg=='); background-size: cover; display: block;"
+  ></span>
+  <img
+        class="gatsby-resp-image-image"
+        alt="routes"
+        title="routes"
+        src="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/4e180ab752f90f7ec5b45339175cc69a/fcda8/5.png"
+        srcset="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/4e180ab752f90f7ec5b45339175cc69a/12f09/5.png 148w,
+https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/4e180ab752f90f7ec5b45339175cc69a/e4a3f/5.png 295w,
+https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/4e180ab752f90f7ec5b45339175cc69a/fcda8/5.png 590w,
+https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/4e180ab752f90f7ec5b45339175cc69a/748b0/5.png 868w"
+        sizes="(max-width: 590px) 100vw, 590px"
+        style="width:100%;height:100%;margin:0;vertical-align:middle;position:absolute;top:0;left:0;"
+        loading="lazy"
+      />
+  </a>
+    </span></p>
+<p>同时对传入的函数参数进行解析，从请求事件中提取出对应的<code>Query</code>、<code>Param</code>、<code>TriggerEvent</code>、<code>Json</code>等再传入。</p>
+<p><span
+      class="gatsby-resp-image-wrapper"
+      style="position: relative; display: block; margin-left: auto; margin-right: auto; max-width: 590px; "
+    >
+      <a
+    class="gatsby-resp-image-link"
+    href="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/0f1d281a02003a20b36a7a4231512ef2/9aaee/3.png"
+    style="display: block"
+    target="_blank"
+    rel="noopener"
+  >
+    <span
+    class="gatsby-resp-image-background-image"
+    style="padding-bottom: 31.08108108108108%; position: relative; bottom: 0; left: 0; background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAGCAYAAADDl76dAAAACXBIWXMAABYlAAAWJQFJUiTwAAABGElEQVQY01WQ226EMAxE+f+PrNR2V8ASEgi5ORdmJ6laqaB5SGQfH2cK+wa7zHB6h9sVvFJwaocYDckZuVTEJPDeI7kT2/yNdf7C/PjAsS7s2ZEOAznP0TNFrWEfn3DLk+AFfttwEZg44G4VN4BaOzShOQu7G1hrEaNnAlKWUTc+DpwKDaw5oJ4PvF6KVjJSRhFxd/tJB18nWk4wxmJdNYwLuEKE5waZQ9tlMLXW4C6LZZtxUN3TQpJHljjAtZYBzqVADlrXPO68D8iE18KzCBqB9SSwv1OgqidduIKkblhw0+o3HdhXjlqhdUC/519bGWm11/NsDwIlw9sTjokhwIc0VsBouf+ASQg0fBLWlegA2v0LB8FqvAHNN9HVJs4uygAAAABJRU5ErkJggg=='); background-size: cover; display: block;"
+  ></span>
+  <img
+        class="gatsby-resp-image-image"
+        alt="get"
+        title="get"
+        src="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/0f1d281a02003a20b36a7a4231512ef2/fcda8/3.png"
+        srcset="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/0f1d281a02003a20b36a7a4231512ef2/12f09/3.png 148w,
+https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/0f1d281a02003a20b36a7a4231512ef2/e4a3f/3.png 295w,
+https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/0f1d281a02003a20b36a7a4231512ef2/fcda8/3.png 590w,
+https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/0f1d281a02003a20b36a7a4231512ef2/efc66/3.png 885w,
+https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/0f1d281a02003a20b36a7a4231512ef2/c83ae/3.png 1180w,
+https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/0f1d281a02003a20b36a7a4231512ef2/9aaee/3.png 2608w"
+        sizes="(max-width: 590px) 100vw, 590px"
+        style="width:100%;height:100%;margin:0;vertical-align:middle;position:absolute;top:0;left:0;"
+        loading="lazy"
+      />
+  </a>
+    </span></p>
+<h3><code>static_resource!()</code>引入资源</h3>
+<p>使用<code>static_resource!()</code>可以在编译期间对目录进行扫描，读取目录文件并生成包含<code>include_bytes!</code>的代码，实现静态资源也能被打包在wasm模块中。</p>
+<p><span
+      class="gatsby-resp-image-wrapper"
+      style="position: relative; display: block; margin-left: auto; margin-right: auto; max-width: 590px; "
+    >
+      <a
+    class="gatsby-resp-image-link"
+    href="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/36a9ec1ae3be177289d419a695685974/b9bfc/4.png"
+    style="display: block"
+    target="_blank"
+    rel="noopener"
+  >
+    <span
+    class="gatsby-resp-image-background-image"
+    style="padding-bottom: 52.02702702702703%; position: relative; bottom: 0; left: 0; background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAKCAYAAAC0VX7mAAAACXBIWXMAABYlAAAWJQFJUiTwAAABsElEQVQoz11Sh2rjQBD1///fQSCEI6S4aK3tvby8XcW5I4bRGmnntZlTChG7VNDWo7aK3vuqlCIrwAQDEw1s0Mglo9SCUhIr/1TKGZe/L3h7+oNTI8i23Raoj44gnoAVtdZ1+bbtuLC0tfC5IBUC8luuHaU1klQMAPfrGa/PTzjlnGB4OVCRj2GdnSTgtUmmrgL7+zvU+QNa3JDUjijviDyzVmjOYgQHw//K2AmYYY0m28HU1/P4tWmN3y43XhYCxiiSGwTvEEgeU1pOwBgsXVrncHpYc5+vKOKKSvZKJZ0NvdGikmyOaHRSc2RvJkihelZvPPtkhhHfgIWZtDGQyB7UHYkKkpYEoPXKwGnlTIX7JmhJc0hhqZvRBLorBBzM8j/AvGT3Zfe3ZTYQPFqHxpyqN2isET0GCcFIVmVug9gOwBgTLJsc2T1feK5RpupjKA3qztwYhZMCfmZN4AfQmDWB6SQED2u/M5QM/PLxCc0pHbv2b8pSOugZxZw+342xnj8+HueMzk2Fs8laBcmm4AzyCj5xF9sK37pAsCOWOneQhHkOhbuKCT76gi3McwJ+AWojCROD8h0wAAAAAElFTkSuQmCC'); background-size: cover; display: block;"
+  ></span>
+  <img
+        class="gatsby-resp-image-image"
+        alt="static_resource"
+        title="static_resource"
+        src="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/36a9ec1ae3be177289d419a695685974/fcda8/4.png"
+        srcset="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/36a9ec1ae3be177289d419a695685974/12f09/4.png 148w,
+https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/36a9ec1ae3be177289d419a695685974/e4a3f/4.png 295w,
+https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/36a9ec1ae3be177289d419a695685974/fcda8/4.png 590w,
+https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/36a9ec1ae3be177289d419a695685974/efc66/4.png 885w,
+https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/36a9ec1ae3be177289d419a695685974/c83ae/4.png 1180w,
+https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/36a9ec1ae3be177289d419a695685974/b9bfc/4.png 3112w"
+        sizes="(max-width: 590px) 100vw, 590px"
+        style="width:100%;height:100%;margin:0;vertical-align:middle;position:absolute;top:0;left:0;"
+        loading="lazy"
+      />
+  </a>
+    </span></p>
+<h1>wasm-lambda Demo</h1>
+<ol>
+<li>克隆并安装</li>
+</ol>
+<div class="gatsby-highlight" data-language="shell"><pre style="counter-reset: linenumber NaN" class="language-shell line-numbers"><code class="language-shell"><span class="token function">git</span> clone https://github.com/ChenKS12138/wasm-lambda.git
+<span class="token builtin class-name">cd</span> wasm-lambda
+cargo <span class="token function">install</span> --path <span class="token builtin class-name">.</span></code><span aria-hidden="true" class="line-numbers-rows" style="white-space: normal; width: auto; left: 0;"><span></span><span></span><span></span></span></pre></div>
+<ol start="2">
+<li>编译 Example <code>hello-world</code></li>
+</ol>
+<div class="gatsby-highlight" data-language="shell"><pre style="counter-reset: linenumber NaN" class="language-shell line-numbers"><code class="language-shell"><span class="token builtin class-name">cd</span> examples/hello-world
+cargo build</code><span aria-hidden="true" class="line-numbers-rows" style="white-space: normal; width: auto; left: 0;"><span></span><span></span></span></pre></div>
+<ol start="3">
+<li>启动</li>
+</ol>
+<div class="gatsby-highlight" data-language="shell"><pre style="counter-reset: linenumber NaN" class="language-shell line-numbers"><code class="language-shell"><span class="token comment"># Start Dev Server</span>
+wasm-lambda dev --bind <span class="token number">0.0</span>.0.0:3000 -m hello-world:./target/wasm32-wasi/debug/hello-world.wasm
+
+<span class="token comment"># Rebuild</span>
+<span class="token comment"># cargo build</span></code><span aria-hidden="true" class="line-numbers-rows" style="white-space: normal; width: auto; left: 0;"><span></span><span></span><span></span><span></span><span></span></span></pre></div>
+<ol start="4">
+<li>触发请求事件</li>
+</ol>
+<p>打开浏览器，访问 <code>http://127.0.0.1:3000/hello-world/latest/</code></p>
+<p>或</p>
+<div class="gatsby-highlight" data-language="shell"><pre style="counter-reset: linenumber NaN" class="language-shell line-numbers"><code class="language-shell"><span class="token function">curl</span> -iL http://127.0.0.1:3000/hello-world/latest/
+<span class="token function">curl</span> -i http://127.0.0.1:3000/hello-world/latest/api/capitalize/hello-world
+<span class="token function">curl</span> -i http://127.0.0.1:3000/hello-world/latest/api/echo-query?name<span class="token operator">=</span>cattchen<span class="token operator">&amp;</span><span class="token assign-left variable">age</span><span class="token operator">=</span><span class="token number">21</span>
+<span class="token function">curl</span> -i -X POST -d <span class="token string">'{"name":"cattchen","age":21}'</span> http://127.0.0.1:3000/hello-world/latest/api/echo-person</code><span aria-hidden="true" class="line-numbers-rows" style="white-space: normal; width: auto; left: 0;"><span></span><span></span><span></span><span></span></span></pre></div>
+<p><span
+      class="gatsby-resp-image-wrapper"
+      style="position: relative; display: block; margin-left: auto; margin-right: auto; max-width: 590px; "
+    >
+      <a
+    class="gatsby-resp-image-link"
+    href="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/075709d228a8095ec6428b24d0a6a12e/84ee5/6.png"
+    style="display: block"
+    target="_blank"
+    rel="noopener"
+  >
+    <span
+    class="gatsby-resp-image-background-image"
+    style="padding-bottom: 62.16216216216216%; position: relative; bottom: 0; left: 0; background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAMCAYAAABiDJ37AAAACXBIWXMAABYlAAAWJQFJUiTwAAABp0lEQVQoz32SDY+aQBCG+f9/7dpcraaeXmqId+UaI7DsAgvLx9v3RbiqsZ1kHNydnXnmI9q/7PDl6Qmvux1e9nv8OMQ4HN+wP77j6+o7vj0/Y7vdYr1eY7VaYbPZII7pczggSRIMwwDJOI6TjdLKIXUWee2R+QYNz+XS0qEfRoQQ0HXdp/Z9j3tZgl0CFgbnPIOxDklukJQ1bOjwP1GAa70hLJ1DUVjYsoQh5VvpEdsKjkHbfkBNqkCLBwGuyT4JTZ6TkJSuxIl0P43D+0xp2zAFDtd9uqO7J41yBTyfocBpmuLE0mNX40j9Rdq661EwsJ97d0M5603J+tCkFjvMD2RF1lFV8n2vLvYv8XIWtW0LT62adprgwJ5V3sPVNQLPO05ZPpb9rahN00yTl62k2gz6L9OPegbQ45MpYIxBLWdeqlQR67HEhR7dTNIwgUQ+kx/9lWAKqB9NOs8yZOxj7i8Xyvr74wMnboBnySKfqhE9NyIM480aLYmjR6PXydRPtYAP9d9ai4xJlbgggLZgeTvdFQUcaaNHi/ooyb8WXNKyXLWhYSV/AIxlqFzVYD2lAAAAAElFTkSuQmCC'); background-size: cover; display: block;"
+  ></span>
+  <img
+        class="gatsby-resp-image-image"
+        alt="visit"
+        title="visit"
+        src="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/075709d228a8095ec6428b24d0a6a12e/fcda8/6.png"
+        srcset="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/075709d228a8095ec6428b24d0a6a12e/12f09/6.png 148w,
+https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/075709d228a8095ec6428b24d0a6a12e/e4a3f/6.png 295w,
+https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/075709d228a8095ec6428b24d0a6a12e/fcda8/6.png 590w,
+https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/075709d228a8095ec6428b24d0a6a12e/efc66/6.png 885w,
+https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/static/075709d228a8095ec6428b24d0a6a12e/84ee5/6.png 1076w"
+        sizes="(max-width: 590px) 100vw, 590px"
+        style="width:100%;height:100%;margin:0;vertical-align:middle;position:absolute;top:0;left:0;"
+        loading="lazy"
+      />
+  </a>
+    </span></p>
+<h1>总结</h1>
+<p>这个项目实现还比较原始，很多东西都还没有实现或者是考虑到，后面还需要花比较多的时间来完善。</p>
+<h1>参考资料</h1>
+<ul>
+<li>[1] <a href="https://aws.amazon.com/cn/blogs/china/iaas-faas-serverless/">https://aws.amazon.com/cn/blogs/china/iaas-faas-serverless/</a></li>
+<li>[2] <a href="https://webassembly.org/">https://webassembly.org/</a></li>
+<li>[3] <a href="https://blog.logrocket.com/webassembly-runtimes-compared/">https://blog.logrocket.com/webassembly-runtimes-compared/</a></li>
+<li>[4] <a href="https://www.infoq.cn/article/mi0lpquvxi7bpcq7ou9u">https://www.infoq.cn/article/mi0lpquvxi7bpcq7ou9u</a></li>
+</ul></div><div class="detail__TagContainer-sc-18ilojt-1 eXdfJg"><span class="detail__Tag-sc-18ilojt-2 jdUzDW"><span font-weight="800" font-size="0.9rem" class="Text-sc-16tux7c-0 ffbCxe">WebAssembly</span></span><span class="detail__Tag-sc-18ilojt-2 jdUzDW"><span font-weight="800" font-size="0.9rem" class="Text-sc-16tux7c-0 ffbCxe">随笔</span></span></div><div class="detail__CopyrightContainer-sc-18ilojt-0 dRyMXY"><span font-size="20px" class="Text-sc-16tux7c-0 giGyPI">本博客所有文章除特别声明外，均采用 CC BY-SA 3.0协议 。转载请注明出处！</span></div></div></div></div></div></div></div><div id="gatsby-announcer" style="position:absolute;top:0;width:1px;height:1px;padding:0;overflow:hidden;clip:rect(0, 0, 0, 0);white-space:nowrap;border:0" aria-live="assertive" aria-atomic="true"></div></div><script id="gatsby-script-loader">/*<![CDATA[*/window.pagePath="/detail/7f451f74-5ac7-5e57-a05b-609901d7bac1";/*]]>*/</script><script id="gatsby-chunk-mapping">/*<![CDATA[*/window.___chunkMapping={"polyfill":["/polyfill-25570ab66979add1e8b7.js"],"app":["/app-1654347006101.js"],"component---src-pages-404-tsx":["/component---src-pages-404-tsx-26477a5c71838adaa07e.js"],"component---src-pages-about-tsx":["/component---src-pages-about-tsx-644abfad025cf164d336.js"],"component---src-pages-detail-tsx":["/component---src-pages-detail-tsx-b284249810cd75c9e63a.js"],"component---src-pages-index-tsx":["/component---src-pages-index-tsx-338bb35a85e0e1be842b.js"],"component---src-pages-list-tsx":["/component---src-pages-list-tsx-f528511840d727d8c594.js"]};/*]]>*/</script><script src="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/polyfill-25570ab66979add1e8b7.js" nomodule=""></script><script src="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/component---src-pages-detail-tsx-b284249810cd75c9e63a.js" async=""></script><script src="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/commons-63ce9974892b4fadc396.js" async=""></script><script src="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/app-1654347006101.js" async=""></script><script src="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/styles-12bbf25d54412988e290.js" async=""></script><script src="https://cdn.jsdelivr.net/gh/ChenKS12138/ChenKS12138.github.io/webpack-runtime-8bf73465596fd4400d48.js" async=""></script></body></html>
