@@ -42,6 +42,7 @@ function Layout({
       <AppLinkItem to="/about" key="about">
         About
       </AppLinkItem>,
+      <AppLinkA href="/rss.xml">RSS</AppLinkA>,
     ],
     []
   );
@@ -105,6 +106,14 @@ const AppContent = styled.div`
 `;
 
 const AppLinkItem = styled(Link)`
+  user-select: none;
+  color: white;
+  font-size: 14px;
+  text-decoration: none;
+  margin: 0 5px;
+`;
+
+const AppLinkA = styled.a`
   user-select: none;
   color: white;
   font-size: 14px;
