@@ -45,6 +45,7 @@
     "fs-extra": "^9.0.1",
     "gatsby-cli": "^2.12.44",
     "gatsby-plugin-feed": "^4.15.1",
+    "gatsby-plugin-google-gtag": "^4.15.0",
     "gatsby-plugin-robots-txt": "^1.5.5",
     "gatsby-plugin-sitemap": "^3.1.0",
     "gatsby-plugin-slug": "^2.0.0",

@@ -235,5 +235,15 @@ module.exports = {
       },
     },
     `gatsby-plugin-slug`,
+    {
+      resolve: `gatsby-plugin-google-gtag`,
+      options: {
+        trackingIds: ["G-EZRSNLSEWX"],
+        pluginConfig: {
+          head: false,
+          respectDNT: true,
+        },
+      },
+    },
   ],
 };

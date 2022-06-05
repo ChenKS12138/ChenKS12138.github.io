@@ -17,6 +17,7 @@ specifiers:
   gatsby-image: ^2.4.5
   gatsby-plugin-cname: ^1.0.0
   gatsby-plugin-feed: ^4.15.1
+  gatsby-plugin-google-gtag: ^4.15.0
   gatsby-plugin-less: ^3.2.3
   gatsby-plugin-manifest: ^2.4.9
   gatsby-plugin-offline: ^3.2.7
@@ -98,6 +99,7 @@ devDependencies:
   fs-extra: 9.1.0
   gatsby-cli: 2.19.3
   gatsby-plugin-feed: 4.15.1_4vd5wkeqfqumxizwqzrvsndrfu
+  gatsby-plugin-google-gtag: 4.15.0_4vd5wkeqfqumxizwqzrvsndrfu
   gatsby-plugin-robots-txt: 1.6.10_gatsby@2.32.13
   gatsby-plugin-sitemap: 3.3.0_4vd5wkeqfqumxizwqzrvsndrfu
   gatsby-plugin-slug: 2.0.0_gatsby@2.32.13
@@ -4754,7 +4756,7 @@ packages:
     dev: false
 
   /concat-map/0.0.1:
-    resolution: {integrity: sha1-2Klr13/Wjfd5OnMDajug1UBdR3s=}
+    resolution: {integrity: sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==}
 
   /concat-stream/1.6.2:
     resolution: {integrity: sha512-27HBghJxjiZtIk3Ycvn/4kbJk/1uZuJFfuPEns6LaEvpvG1f0hTea8lilrouyo9mVc2GWdcEZ8OLoGmSADlrCw==}
@@ -4894,7 +4896,7 @@ packages:
     hasBin: true
     dependencies:
       glob: 7.2.0
-      minimatch: 3.0.4
+      minimatch: 3.1.2
       mkdirp: 1.0.4
       noms: 0.0.0
       through2: 2.0.5
@@ -6662,7 +6664,7 @@ packages:
       find-up: 2.1.0
       has: 1.0.3
       is-core-module: 2.7.0
-      minimatch: 3.0.4
+      minimatch: 3.1.2
       object.values: 1.1.5
       pkg-up: 2.0.0
       read-pkg-up: 3.0.0
@@ -6711,7 +6713,7 @@ packages:
       eslint: 6.8.0
       estraverse: 5.2.0
       jsx-ast-utils: 3.2.1
-      minimatch: 3.0.4
+      minimatch: 3.1.2
       object.entries: 1.1.5
       object.fromentries: 2.0.5
       object.hasown: 1.1.0
@@ -6787,7 +6789,7 @@ packages:
       json-stable-stringify-without-jsonify: 1.0.1
       levn: 0.3.0
       lodash: 4.17.21
-      minimatch: 3.0.4
+      minimatch: 3.1.2
       mkdirp: 0.5.5
       natural-compare: 1.4.0
       optionator: 0.8.3
@@ -7800,6 +7802,21 @@ packages:
       rss: 1.2.2
     transitivePeerDependencies:
       - graphql
+    dev: true
+
+  /gatsby-plugin-google-gtag/4.15.0_4vd5wkeqfqumxizwqzrvsndrfu:
+    resolution: {integrity: sha512-kcncL6qMa4KhJjYNnJ8xdkKK1fPoX3OGlm1pQZ1Be6bPZyOaWQiJrZhWJCB4vNxJm/qw3BRL3uBbXcsim0IqaA==}
+    engines: {node: '>=14.15.0'}
+    peerDependencies:
+      gatsby: ^4.0.0-next
+      react: ^16.9.0 || ^17.0.0 || ^18.0.0
+      react-dom: ^16.9.0 || ^17.0.0 || ^18.0.0
+    dependencies:
+      '@babel/runtime': 7.15.4
+      gatsby: 2.32.13_nobsrlrtxz54zoxnzpwknpaskm
+      minimatch: 3.1.2
+      react: 16.14.0
+      react-dom: 16.14.0_react@16.14.0
     dev: true
 
   /gatsby-plugin-less/3.2.9_gatsby@2.32.13+less@3.13.1:
@@ -11431,13 +11448,18 @@ packages:
     dev: false
 
   /minimatch/3.0.3:
-    resolution: {integrity: sha1-Kk5AkLlrLbBqnX3wEFWmKnfJt3Q=}
+    resolution: {integrity: sha512-NyXjqu1IwcqH6nv5vmMtaG3iw7kdV3g6MwlUBZkc3Vn5b5AMIWYKfptvzipoyFfhlfOgBQ9zoTxQMravF1QTnw==}
     dependencies:
       brace-expansion: 1.1.11
     dev: false
 
   /minimatch/3.0.4:
     resolution: {integrity: sha512-yJHVQEhyqPLUTgt9B83PXu6W3rx4MvvHvSUvToogpwoGDOUQ+yDrR0HRot+yOCdCO7u4hX3pWft6kWBBcqh0UA==}
+    dependencies:
+      brace-expansion: 1.1.11
+
+  /minimatch/3.1.2:
+    resolution: {integrity: sha512-J7p63hRiAjw1NDEww1W7i37+ByIrOWO5XQQAzZ3VOcL0PNybwpfmV/N05zFAzwQ9USyEcX6t3UO+K5aqBQOIHw==}
     dependencies:
       brace-expansion: 1.1.11
 
