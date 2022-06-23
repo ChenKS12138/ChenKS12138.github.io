@@ -1,0 +1,2 @@
+"use strict";(self.webpackChunkchenks12138_blog=self.webpackChunkchenks12138_blog||[]).push([[218],{9386:function(e,t,n){n.r(t);var l=n(959),c=n(483);t.default=function(){return l.createElement(c.Ar,null,l.createElement(c.HJ,{title:"404: Not found"}),l.createElement(c.K3,{width:"960px",maxWidth:"80vw"},l.createElement(c.T,{direction:"vertical",align:"center"},l.createElement("h1",null,"糟糕~没有找到这个页面 :("),l.createElement("p",null,"似乎不能理解输入的路径，请点击回到主页查看更多的文章"))))}}}]);
+//# sourceMappingURL=component---src-pages-404-tsx-0cd78ccd4769ad001d8d.js.map
