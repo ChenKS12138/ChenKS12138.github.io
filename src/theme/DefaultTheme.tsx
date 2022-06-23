@@ -20,6 +20,9 @@ export default createGlobalStyle`
     font-size: 20px;
     line-height: 30px;
   }
+  .post-content p:has(> img) {
+    display: flex;
+  }
 
   @media only screen and (max-width: 990px) {
     .post-content {

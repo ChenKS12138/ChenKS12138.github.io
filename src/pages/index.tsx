@@ -50,11 +50,6 @@ export default function Index(props: PageProps) {
         return (
           <ArchiveItem key={id}>
             <ArchiveItemContent onClick={() => navigate(`/detail/${id}`)}>
-              {publicURL && (
-                <ArchiveItemImage
-                  style={{ backgroundImage: `url("${publicURL}")` }}
-                />
-              )}
               <ArchiveItemRight>
                 <ArchiveItemTitle>{title}</ArchiveItemTitle>
                 <ArchiveItemIntro>{excerpt}</ArchiveItemIntro>
@@ -65,6 +60,11 @@ export default function Index(props: PageProps) {
                   </ArchiveItemMeta>
                 </ArchiveItemOtherInfo>
               </ArchiveItemRight>
+              {publicURL && (
+                <ArchiveItemImage
+                  style={{ backgroundImage: `url("${publicURL}")` }}
+                />
+              )}
             </ArchiveItemContent>
           </ArchiveItem>
         );
