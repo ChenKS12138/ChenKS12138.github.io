@@ -59,7 +59,7 @@ const config: Config = {
     {
       name: "0xfaner",
       avatar: "https://avatars2.githubusercontent.com/u/44130614?s=460&v=4",
-      link: "https://0xfaner.top/",
+      link: "https://blog.0xfaner.site",
     },
     {
       name: "yiayaz",
