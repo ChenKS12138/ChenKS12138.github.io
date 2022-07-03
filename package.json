@@ -6,6 +6,7 @@
   "author": "ChenKS12138 <chenks12138@gmail.com>",
   "dependencies": {
     "@deckdeckgo/highlight-code": "^4.3.0",
+    "@fontsource/open-sans": "^4.5.10",
     "axios-hooks": "^3.1.2",
     "babel-plugin-styled-components": "^2.0.7",
     "gatsby": "^4.17.0",
@@ -27,8 +28,8 @@
     "gatsby-transformer-sharp": "^4.17.0",
     "github-markdown-css": "^5.1.0",
     "normalize.css": "^8.0.1",
-    "prismjs": "^1.28.0",
     "prism-themes": "^1.9.0",
+    "prismjs": "^1.28.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-helmet": "^6.1.0",

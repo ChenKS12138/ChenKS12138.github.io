@@ -2,6 +2,7 @@ lockfileVersion: 5.4
 
 specifiers:
   '@deckdeckgo/highlight-code': ^4.3.0
+  '@fontsource/open-sans': ^4.5.10
   '@types/fs-extra': ^9.0.13
   '@types/highlight.js': ^10.1.0
   '@types/inquirer': ^8.2.1
@@ -68,6 +69,7 @@ specifiers:
 
 dependencies:
   '@deckdeckgo/highlight-code': 4.3.0
+  '@fontsource/open-sans': 4.5.10
   axios-hooks: 3.1.2_axios@0.24.0+react@18.2.0
   babel-plugin-styled-components: 2.0.7_styled-components@5.3.5
   gatsby: 4.17.0_a3ho6h2mnecmmcgs2sqjjjkgci
@@ -1469,6 +1471,10 @@ packages:
       strip-json-comments: 3.1.1
     transitivePeerDependencies:
       - supports-color
+
+  /@fontsource/open-sans/4.5.10:
+    resolution: {integrity: sha512-MrtTDfWb1Tu9YxVh2KaKmsKBn6O3KL/lHZS0KRKK58jgqvdwuiDt4QW4udmW4FQf0XOWgnZ+4vKUF80F3SqBAA==}
+    dev: false
 
   /@gatsbyjs/parcel-namer-relative-to-cwd/1.2.0_6ytfviid77wlngylveknsjknd4:
     resolution: {integrity: sha512-4iIdquFDl+b+U8Ng0dg6dCtxB/cnH27ERrlQQlxfdaWe8e9CLo8aWc6u3UeuHwNJixBFOUbOgEFaA5qCUPwLCQ==}
