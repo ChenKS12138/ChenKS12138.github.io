@@ -5,7 +5,7 @@ useHead({
 })
 
 const go = (externalUrl: string) => {
-  window.open(externalUrl, 'blank');
+  window.open(externalUrl, '_blank');
 }
 
 const config = {
@@ -86,7 +86,7 @@ const config = {
   <div class="about-divider border-t dark:border-white"></div>
   <div class="links-title">Links</div>
   <div class="about-link-container">
-    <div class="flex items-center my-2 mx-1 cursor-pointer" v-for="item in config.links" @click="go(item.url)">
+    <div class="flex items-center my-2 mx-1 cursor-pointer" v-for="item in config.links" @click="go(item.link)">
       <img class="h-8 w-8 rounded-1\/2" :src="item.avatar" alt="">
       <span class="text-sm ml-1">{{item.name}}</span>
     </div>
