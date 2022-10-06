@@ -1,0 +1,16 @@
+html {
+  @apply bg-white;
+}
+html.dark {
+  @apply bg-gray-900;
+}
+
+* {
+  padding: 0;
+  margin: 0;
+  border: 0;
+}
+
+html.dark .markdown-body code:not([class]) {
+  color: rgb(201, 209, 217);
+}
