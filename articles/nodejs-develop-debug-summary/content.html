@@ -1,0 +1,51 @@
+<!DOCTYPE html><html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Node.js开发调试总结</title>
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <script async="" src="https://www.googletagmanager.com/gtag/js?id=G-EZRSNLSEWX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+    </script>
+    <script type="module" crossorigin="" src="/assets/app.83cb956a.js"></script>
+    <link rel="stylesheet" href="/assets/index.27166dc9.css">
+  <link rel="modulepreload" crossorigin="" href="/assets/content.253e6f45.js"></head>
+
+  <body>
+    <div id="app" data-server-rendered="true"><div class="w-full items-center justify-center m-0 p-0"><!--[--><header class="w-full fixed z-99" style="--3eedde64:url(&quot;/bg1.png&quot;);" data-v-686bff37=""><div class="header-navigation text--layout flex items-center justify-center" style="height:64px;background-color:transparent;" data-v-686bff37=""><div class="flex justify-between items-center w-3xl <md:w-full" data-v-686bff37=""><div data-v-686bff37=""><a href="/" class="text--link" data-v-686bff37="">ChenKS</a></div><div class="flex text-sm font-400 items-center" data-v-686bff37=""><!--[--><a href="/" class="text--link" data-v-686bff37="">Home</a><a href="/article-list" class="text--link" data-v-686bff37="">Articles</a><a href="/about" class="text--link" data-v-686bff37="">About</a><a href="/RSS" class="text--link" data-v-686bff37="">RSS</a><!--]--><button class="cursor-pointer text-white bg-transparent py-0.75 px-2.5 text-sm" data-v-686bff37=""><span class="inline-block align-middle dark:i-carbon-moon i-carbon-sun"></span><span class="pl-2">Light</span></button></div></div></div></header><div class="w-full header-cover-bg min-h-lg" style="--3eedde64:url(&quot;/bg1.png&quot;);" data-v-686bff37=""></div><div class="content-container-wrapper dark:bg-dark" style="--3eedde64:url(&quot;/bg1.png&quot;);" data-v-686bff37=""><div class="content-container" data-v-686bff37=""><!--[--><div class="h-70 -mt-70 flex flex-col items-center text-white"><div class="font-bold text-3xl">Node.js开发调试总结</div><div class="text-lg mt-2">2022-06-22</div><div class="mt-2 italic">#随笔 #Node.js</div></div><!--[--><div class="markdown-body"><p>自己进行 Node.js 也有很长一段时间了，更准确地说是进行编程开发。编程开发给我的感觉就是这样的一个状态变化，我总是在不断地重复<code>设计逻辑/编写逻辑/验证逻辑</code>的 loop，如果遇到了逻辑验证失败的情况就需要增加<code>调试逻辑</code>并重新重复一遍 loop。一个程序的开发就是由这样的若干个 loop 组成。如果<code>设计逻辑</code>环节设计得当，设计的方案是正确的且能够正确地处理各种情况，<code>编写逻辑/验证逻辑</code>环节依然是必须的，但是可以避免一些不必要的<code>调试逻辑</code> 。</p><pre class="language-mermaid"><code class="language-mermaid"><span class="token keyword">flowchart</span> TD
+
+    Begin<span class="token text string">(开始)</span>
+    <span class="token keyword">End</span><span class="token text string">(结束)</span>
+    IsOver<span class="token text string">{程序是否完成}</span>
+    Debug<span class="token text string">[调试逻辑]</span>
+    Code<span class="token text string">[编写逻辑]</span>
+    Verify<span class="token text string">{验证逻辑}</span>
+    Design<span class="token text string">[设计逻辑]</span>
+
+    Begin <span class="token arrow operator">--&gt;</span> Design
+    Design <span class="token arrow operator">--&gt;</span> Code
+    Code <span class="token arrow operator">--&gt;</span> Verify
+    Verify <span class="token inter-arrow-label"><span class="token arrow-head arrow operator">--</span> <span class="token label property">成功</span> <span class="token arrow operator">--&gt;</span></span> IsOver
+    Verify <span class="token inter-arrow-label"><span class="token arrow-head arrow operator">--</span> <span class="token label property">失败</span> <span class="token arrow operator">--&gt;</span></span> Debug
+    Debug <span class="token inter-arrow-label"><span class="token arrow-head arrow operator">--</span> <span class="token label property">反馈信息</span> <span class="token arrow operator">--&gt;</span></span> Design
+    IsOver <span class="token inter-arrow-label"><span class="token arrow-head arrow operator">--</span> <span class="token label property">是</span> <span class="token arrow operator">--&gt;</span></span> End
+    IsOver <span class="token inter-arrow-label"><span class="token arrow-head arrow operator">--</span> <span class="token label property">否</span> <span class="token arrow operator">--&gt;</span></span> Design
+    Design <span class="token inter-arrow-label"><span class="token arrow-head arrow operator">--</span> <span class="token label property">获取更多信息</span> <span class="token arrow operator">--&gt;</span></span> Debug
+</code></pre><p>同时，如果逻辑调试没有做好，就容易产生很多不必要的<code>设计逻辑 ⇔ 调试逻辑</code>，浪费我的很多时间，导致效率低下。<code>编写逻辑</code>和<code>验证逻辑</code>环节时间占用基本是比较固定且比较难改变的，想办法降低<code>设计逻辑</code>和<code>调试逻辑</code>环节的时间占用，能比较好的提升自己的开发效率。<code>验证逻辑</code>是执行<code>设计逻辑</code>环节设计的逻辑验证方案，如果这个环节占用了大量时间，比如编写了一个接口，等服务重启或者是等请求响应需要大半天，则这里有很大的优化空间。由于优化方式不具有普适性，这里不做讨论。而能将<code>设计逻辑</code>和<code>调试逻辑</code>做得很好，我觉得这是软件工程师和代码打字员最大的区别。</p><p><img src="/assets/1.d080dd5d.gif" alt="1.gif"></p><h1>日志调试和断点调试</h1><p>日志调试直白的说就是<code>console.log</code>，直接在多个可疑的地方打印出相关的中间变量，判断是否符合预期，用二分的思想锁定BUG的位置，有时日志调试需要不止一轮。断点调试则是让程序执行到特定的位置停止，方便开发人员对此刻的全局变量/局部变量/函数参数等信息进行审查，并能进行代码的逐行执行。</p><p>对于大部分情况来说，日志调试已经足够了。Node.js重启执行代码足够迅速，能够短时间完成多轮的日志调试，如果我们对该项目代码足够熟悉，已经可以快速的做出判断，异常出现的位置。</p><pre class="language-javascript"><code class="language-javascript"><span class="token keyword">export</span> <span class="token keyword">function</span> <span class="token function">handlerBizFoo</span><span class="token punctuation">(</span><span class="token parameter">ctx<span class="token punctuation">,</span> bizPayload</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+  <span class="token comment">// bizPlayload类型未知，仅能判断它有name属性</span>
+	console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>bizPaylaod<span class="token punctuation">.</span>name<span class="token punctuation">)</span>
+<span class="token punctuation">}</span>
+</code></pre><p>我们遇到的更多的调试逻辑比较棘手的情况是需要维护一个庞大的陌生的javascript项目，同时由于javascript的动态语言特性，函数参数的类型是不确定的，我们只能通过函数参数的使用以及检查所有函数调用处，对参数的类型进行推导 <s>(很伤脑细胞)</s>。这种情况下，日志调试也能用，但是提供的信息不够全面友好（对比较复杂的javascript对象进行<code>console.log</code>效果并不好）。这时候借助Chrome Devtool、VS Code Debugger等工具进行断点调试，能够比较方便地对局部变量、全局变量进行审查，有比较好的效果。</p><p><img src="/assets/2.361a08fb.png" alt="2.png"></p><h1>调试Node.js进程</h1><pre class="language-shell"><code class="language-shell"><span class="token function">node</span> <span class="token parameter variable">--inspect</span><span class="token operator">=</span><span class="token number">127.0</span>.0.1:9229 main.js
+
+<span class="token comment"># OR</span>
+<span class="token function">node</span> <span class="token parameter variable">--title</span><span class="token operator">=</span>hello-world main.js <span class="token operator">&amp;&amp;</span> pgrep <span class="token parameter variable">-f</span> hello-world <span class="token operator">|</span> <span class="token function">xargs</span> <span class="token parameter variable">-n1</span> <span class="token function">sudo</span> <span class="token function">kill</span> <span class="token parameter variable">-SIGUSR1</span>
+
+</code></pre><p>通过添加inspect参数使Node.js启动调试器，在Chrome浏览器中输入<code>chrome://inspect</code>即可在inspect面板调试Node.js进程。如果已经启动了Node.js进程，来不及添加参数也没关系，可以向进程发送<code>SIGUSR1</code>信号启动调试。</p></div><!--]--><div class="rounded bg-gray mt-10 p-1 text-white italic indent-md text-lg"> CC BY-SA 3.0协议 。转载请注明出处! </div><!--]--></div></div><!--]--></div></div>
+    
+  
+
+</body></html>

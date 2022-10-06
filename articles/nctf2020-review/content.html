@@ -1,0 +1,33 @@
+<!DOCTYPE html><html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NCTF2020复盘</title>
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <script async="" src="https://www.googletagmanager.com/gtag/js?id=G-EZRSNLSEWX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+    </script>
+    <script type="module" crossorigin="" src="/assets/app.83cb956a.js"></script>
+    <link rel="stylesheet" href="/assets/index.27166dc9.css">
+  <link rel="modulepreload" crossorigin="" href="/assets/content.e2d40b58.js"></head>
+
+  <body>
+    <div id="app" data-server-rendered="true"><div class="w-full items-center justify-center m-0 p-0"><!--[--><header class="w-full fixed z-99" style="--3eedde64:url(&quot;/bg1.png&quot;);" data-v-686bff37=""><div class="header-navigation text--layout flex items-center justify-center" style="height:64px;background-color:transparent;" data-v-686bff37=""><div class="flex justify-between items-center w-3xl <md:w-full" data-v-686bff37=""><div data-v-686bff37=""><a href="/" class="text--link" data-v-686bff37="">ChenKS</a></div><div class="flex text-sm font-400 items-center" data-v-686bff37=""><!--[--><a href="/" class="text--link" data-v-686bff37="">Home</a><a href="/article-list" class="text--link" data-v-686bff37="">Articles</a><a href="/about" class="text--link" data-v-686bff37="">About</a><a href="/RSS" class="text--link" data-v-686bff37="">RSS</a><!--]--><button class="cursor-pointer text-white bg-transparent py-0.75 px-2.5 text-sm" data-v-686bff37=""><span class="inline-block align-middle dark:i-carbon-moon i-carbon-sun"></span><span class="pl-2">Light</span></button></div></div></div></header><div class="w-full header-cover-bg min-h-lg" style="--3eedde64:url(&quot;/bg1.png&quot;);" data-v-686bff37=""></div><div class="content-container-wrapper dark:bg-dark" style="--3eedde64:url(&quot;/bg1.png&quot;);" data-v-686bff37=""><div class="content-container" data-v-686bff37=""><!--[--><div class="h-70 -mt-70 flex flex-col items-center text-white"><div class="font-bold text-3xl">NCTF2020复盘</div><div class="text-lg mt-2">2020-11-23</div><div class="mt-2 italic">#随笔 #安全</div></div><!--[--><div class="markdown-body"><h1>前言</h1><p>从大一开始我每年都打 NCTF，~~除了恰烂钱，~~感觉每次都可以学到点不一样的东西。今年的 web 题有点不一样，感觉挺有意思的，加深了我对 JavaScript 相关的一些安全问题的理解。</p><p><img src="/assets/profile.76b1f8e4.png" alt="profile"></p><h2>JS-world</h2><p><img src="/assets/problem1-1.ed05b544.png" alt="problem1-1.png"></p><p>这道题涉及到的是 ejs 模板的注入问题，同时传入的后端的信息会先经过前端过滤一次。可以通过 DevTool 的断点调试功能，找到相关的过滤关键字的代码如下，删除后即可绕过。</p><pre class="language-javascript"><code class="language-javascript">_0x23132f <span class="token operator">=</span> _0x23132f<span class="token punctuation">[</span><span class="token function">_0x1bef85</span><span class="token punctuation">(</span><span class="token string">"0x5"</span><span class="token punctuation">)</span><span class="token punctuation">]</span><span class="token punctuation">(</span>
+  <span class="token regex"><span class="token regex-delimiter">/</span><span class="token regex-source language-regex">[\/\*\'\"\`\&lt;\\\&gt;\-\(\)\[\]\=\%\.]</span><span class="token regex-delimiter">/</span><span class="token regex-flags">g</span></span><span class="token punctuation">,</span>
+  <span class="token string">""</span>
+<span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre><p>这里的输入存在模板注入问题，通过 payload <code>&gt; &lt;%= global.process.mainModule.constructor._load("fs"). readdirSync("/") %&gt; &lt;</code> 和<code>&gt; &lt;%= global.process.mainModule.constructor._load("fs"). readFileSync("/flag.txt") %&gt; &lt;</code> 即可读取目录并获得 flag</p><p><img src="/assets/problem1-2.25dd9ae3.png" alt="problem1-1.png"></p><h2>PackageManager_v1.0</h2><p>这道题可以获取到源码，通过审计代码发现了一个问题，这里的鉴权使用的是 JWT token，签名时使用的是 RS256，但是验证时使用的是 RS256 和 HS256，同时将公钥加到了 payload 中。RS256 是非对称加密算法，HS256 是对称加密算法。因此我们可以解析 token 后获取到公钥，并使用公钥和 HS256 生成自己的 token，绕过鉴权。</p><p><img src="/assets/problem2-1.87857088.png" alt="problem2-1"></p><p>代码中存在着对象 clone 的代码，有原型链污染的漏洞</p><p><img src="/assets/problem2-2.432df6d4.png" alt="problem2-2"></p><p><img src="/assets/problem2-3.55986c77.png" alt="problem2-3"></p><p>这里当第 9 行的 key 为<code>__proto__</code>时就会造成原型链污染，修改变量<code>a</code>的原型(即 Object.prototype)上的属性。</p><p>同时，这里使用的模板引擎是 nunjucks，其源代码中存在着一些<code>new Function</code>和字符串拼接，有被注入的可能性。</p><p>构造 payload 如下，即可成功获取 flag</p><pre class="language-json"><code class="language-json"><span class="token punctuation">{</span>
+  <span class="token property">"author"</span><span class="token operator">:</span> <span class="token string">"111"</span><span class="token punctuation">,</span>
+  <span class="token property">"__proto__"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+    <span class="token property">"description"</span><span class="token operator">:</span> <span class="token string">"global.process.mainModule.require('fs').readFileSync('/w0w_Congrats_Th1s_1s_y0ur_flaaag')"</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre><p><img src="/assets/problem2-5.2904044f.png" alt="problem2-5"></p><p>-------------------------时间分割线---------------------------</p><p>2020 年 11 月 25 日</p><p><img src="https://user-images.githubusercontent.com/42082890/100094205-9cc29480-2e93-11eb-8365-6b2d191de84e.png" alt="payload"></p><p>后面排查发现这个是<code>nunjucks</code>的一个漏洞，目前已经发起 Pull Request 修复了<a href="https://github.com/mozilla/nunjucks/pull/1330/">nunjucks/pull/1330/</a>。感谢出题人<a href="https://bycsec.top">@baiyecha404</a>的题发现了这个漏洞。</p><p>经过排查，问题出在<a href="https://github.com/mozilla/nunjucks/blob/f51afa3382eab27ccb216c0f302832e5a4135ac5/nunjucks/src/runtime.js">nunjucks/src/runtime.js</a>文件中<code>Frame.prototype.variables</code>变量中，错误地使用普通的 object 作为 Map 使用，导致读取变量时可能会从 Object.prototype 中读取变量。当 npm 包外发生 Object.prototype 被污染时，会导致读取 variables 上的属性时得到意料之外的值，同时模板引擎存在着大量字符串拼接，这导致 payload 被执行。</p><p>使用<code>Object.create(null)</code>替代<code>{}</code>作为 Map 会更为安全，同时也可以对原型使用<code>Object.freeze</code>避免原型被意外修改。</p></div><!--]--><div class="rounded bg-gray mt-10 p-1 text-white italic indent-md text-lg"> CC BY-SA 3.0协议 。转载请注明出处! </div><!--]--></div></div><!--]--></div></div>
+    
+  
+
+</body></html>

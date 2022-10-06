@@ -1,0 +1,161 @@
+<!DOCTYPE html><html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>使用go协程优化求和算法</title>
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <script async="" src="https://www.googletagmanager.com/gtag/js?id=G-EZRSNLSEWX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+    </script>
+    <script type="module" crossorigin="" src="/assets/app.83cb956a.js"></script>
+    <link rel="stylesheet" href="/assets/index.27166dc9.css">
+  <link rel="modulepreload" crossorigin="" href="/assets/content.90137fd3.js"></head>
+
+  <body>
+    <div id="app" data-server-rendered="true"><div class="w-full items-center justify-center m-0 p-0"><!--[--><header class="w-full fixed z-99" style="--3eedde64:url(&quot;/bg1.png&quot;);" data-v-686bff37=""><div class="header-navigation text--layout flex items-center justify-center" style="height:64px;background-color:transparent;" data-v-686bff37=""><div class="flex justify-between items-center w-3xl <md:w-full" data-v-686bff37=""><div data-v-686bff37=""><a href="/" class="text--link" data-v-686bff37="">ChenKS</a></div><div class="flex text-sm font-400 items-center" data-v-686bff37=""><!--[--><a href="/" class="text--link" data-v-686bff37="">Home</a><a href="/article-list" class="text--link" data-v-686bff37="">Articles</a><a href="/about" class="text--link" data-v-686bff37="">About</a><a href="/RSS" class="text--link" data-v-686bff37="">RSS</a><!--]--><button class="cursor-pointer text-white bg-transparent py-0.75 px-2.5 text-sm" data-v-686bff37=""><span class="inline-block align-middle dark:i-carbon-moon i-carbon-sun"></span><span class="pl-2">Light</span></button></div></div></div></header><div class="w-full header-cover-bg min-h-lg" style="--3eedde64:url(&quot;/bg1.png&quot;);" data-v-686bff37=""></div><div class="content-container-wrapper dark:bg-dark" style="--3eedde64:url(&quot;/bg1.png&quot;);" data-v-686bff37=""><div class="content-container" data-v-686bff37=""><!--[--><div class="h-70 -mt-70 flex flex-col items-center text-white"><div class="font-bold text-3xl">使用go协程优化求和算法</div><div class="text-lg mt-2">2020-07-27</div><div class="mt-2 italic">#go #随笔</div></div><!--[--><div class="markdown-body"><h1>前言</h1><p>我的主力开发语言是<code>JavaScript</code>，但是 js 对多线程的支持并不是特别好。在入门<code>golang</code>后，了解到了<code>go协程</code>和<code>channel</code>，想试一试多线程。<code>go</code>原生对并发很友好，我这里是希望尝试使用<code>go协程</code>优化大数组求和。</p><h1>对比</h1><p>进行对比的两个函数</p><ol><li><code>func sum1(bigArray []int) int</code> 使用普通的数组求和</li><li><code>func sum2(bigArray []int)int</code>将数组分割成若干个数组，在不同的<code>go协程</code>进行求和，所有的<code>go协程</code>都得到结果后，再进行求和</li></ol><pre class="language-go"><code class="language-go"><span class="token keyword">package</span> main
+
+<span class="token keyword">import</span> <span class="token punctuation">(</span>
+	<span class="token string">"math/rand"</span>
+	<span class="token string">"fmt"</span>
+	<span class="token string">"sync"</span>
+	<span class="token string">"time"</span>
+<span class="token punctuation">)</span>
+
+<span class="token keyword">func</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+	<span class="token keyword">for</span> i<span class="token operator">:=</span><span class="token number">1000</span><span class="token punctuation">;</span>i<span class="token operator">&lt;</span><span class="token number">10000000000</span><span class="token punctuation">;</span>i<span class="token operator">*=</span><span class="token number">2</span> <span class="token punctuation">{</span>
+		duration1<span class="token punctuation">,</span>duration2<span class="token punctuation">,</span>result1<span class="token punctuation">,</span>result2 <span class="token operator">:=</span> <span class="token function">runBenchmark</span><span class="token punctuation">(</span>i<span class="token punctuation">)</span><span class="token punctuation">;</span>
+		fmt<span class="token punctuation">.</span><span class="token function">Println</span><span class="token punctuation">(</span>i<span class="token punctuation">,</span>duration1<span class="token punctuation">,</span>duration2<span class="token punctuation">,</span>result1<span class="token punctuation">,</span>result2<span class="token punctuation">)</span>
+	<span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+
+<span class="token keyword">func</span> <span class="token function">runBenchmark</span><span class="token punctuation">(</span>amout <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token punctuation">(</span><span class="token builtin">int64</span><span class="token punctuation">,</span><span class="token builtin">int64</span><span class="token punctuation">,</span><span class="token builtin">int64</span><span class="token punctuation">,</span><span class="token builtin">int64</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+	bigArray <span class="token operator">:=</span><span class="token function">createBigArray</span><span class="token punctuation">(</span>amout<span class="token punctuation">)</span><span class="token punctuation">;</span>
+	stop1 <span class="token operator">:=</span> <span class="token function">createTimer</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+	result1 <span class="token operator">:=</span> <span class="token function">sum1</span><span class="token punctuation">(</span>bigArray<span class="token punctuation">)</span><span class="token punctuation">;</span>
+	duration1 <span class="token operator">:=</span> <span class="token function">stop1</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+	stop2 <span class="token operator">:=</span><span class="token function">createTimer</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+	result2 <span class="token operator">:=</span> <span class="token function">sum2</span><span class="token punctuation">(</span>bigArray<span class="token punctuation">)</span><span class="token punctuation">;</span>
+	duration2 <span class="token operator">:=</span> <span class="token function">stop2</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+	<span class="token keyword">return</span> duration1<span class="token punctuation">,</span>duration2<span class="token punctuation">,</span>result1<span class="token punctuation">,</span>result2<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">func</span> <span class="token function">createBigArray</span><span class="token punctuation">(</span>size <span class="token builtin">int</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">{</span>
+	rand<span class="token punctuation">.</span><span class="token function">Seed</span><span class="token punctuation">(</span>time<span class="token punctuation">.</span><span class="token function">Now</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">Unix</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+	list <span class="token operator">:=</span> <span class="token function">make</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">,</span>size<span class="token punctuation">)</span><span class="token punctuation">;</span>
+	<span class="token keyword">for</span> i<span class="token operator">:=</span><span class="token number">0</span><span class="token punctuation">;</span>i<span class="token operator">&lt;</span>size<span class="token punctuation">;</span>i<span class="token operator">++</span><span class="token punctuation">{</span>
+		list<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">=</span> rand<span class="token punctuation">.</span><span class="token function">Int</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+	<span class="token punctuation">}</span>
+	<span class="token keyword">return</span> list<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">func</span> <span class="token function">createTimer</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">func</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">int64</span> <span class="token punctuation">{</span>
+	startTime <span class="token operator">:=</span> time<span class="token punctuation">.</span><span class="token function">Now</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">UnixNano</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+	<span class="token keyword">return</span> <span class="token keyword">func</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">int64</span> <span class="token punctuation">{</span>
+		<span class="token keyword">return</span> time<span class="token punctuation">.</span><span class="token function">Now</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">UnixNano</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">-</span> startTime
+	<span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">func</span> <span class="token function">sum1</span><span class="token punctuation">(</span>bigArray <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token builtin">int64</span> <span class="token punctuation">{</span>
+	sum <span class="token operator">:=</span> <span class="token function">int64</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span>
+	<span class="token keyword">for</span> <span class="token boolean">_</span><span class="token punctuation">,</span>value <span class="token operator">:=</span> <span class="token keyword">range</span><span class="token punctuation">(</span>bigArray<span class="token punctuation">)</span><span class="token punctuation">{</span>
+		sum <span class="token operator">+=</span> <span class="token function">int64</span><span class="token punctuation">(</span>value<span class="token punctuation">)</span><span class="token punctuation">;</span>
+	<span class="token punctuation">}</span>
+	<span class="token keyword">return</span> sum<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">func</span> <span class="token function">sum2</span><span class="token punctuation">(</span>bigArray <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">)</span><span class="token builtin">int64</span> <span class="token punctuation">{</span>
+	SmallArraySize <span class="token operator">:=</span> <span class="token function">len</span><span class="token punctuation">(</span>bigArray<span class="token punctuation">)</span><span class="token operator">/</span><span class="token number">100</span><span class="token punctuation">;</span>
+	sum<span class="token operator">:=</span><span class="token function">int64</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+	chanGroupSize <span class="token operator">:=</span> <span class="token function">len</span><span class="token punctuation">(</span>bigArray<span class="token punctuation">)</span><span class="token operator">/</span>SmallArraySize<span class="token punctuation">;</span>
+	sumChan <span class="token operator">:=</span> <span class="token function">make</span><span class="token punctuation">(</span><span class="token keyword">chan</span> <span class="token builtin">int64</span><span class="token punctuation">,</span>chanGroupSize<span class="token operator">+</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+	waitGroup <span class="token operator">:=</span> <span class="token function">new</span><span class="token punctuation">(</span>sync<span class="token punctuation">.</span>WaitGroup<span class="token punctuation">)</span><span class="token punctuation">;</span>
+	<span class="token keyword">for</span> i<span class="token operator">:=</span><span class="token number">0</span><span class="token punctuation">;</span>i<span class="token operator">&lt;</span>chanGroupSize<span class="token punctuation">;</span>i<span class="token operator">++</span><span class="token punctuation">{</span>
+		waitGroup<span class="token punctuation">.</span><span class="token function">Add</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+		<span class="token keyword">go</span> <span class="token function">sumRoutine</span><span class="token punctuation">(</span>bigArray<span class="token punctuation">[</span>i<span class="token operator">*</span>SmallArraySize<span class="token punctuation">:</span><span class="token punctuation">(</span>i<span class="token operator">+</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token operator">*</span>SmallArraySize<span class="token punctuation">]</span><span class="token punctuation">,</span> sumChan<span class="token punctuation">,</span> waitGroup<span class="token punctuation">)</span>
+	<span class="token punctuation">}</span>
+	waitGroup<span class="token punctuation">.</span><span class="token function">Wait</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+	<span class="token keyword">for</span> i<span class="token operator">:=</span><span class="token number">0</span><span class="token punctuation">;</span>i<span class="token operator">&lt;</span>chanGroupSize<span class="token punctuation">;</span>i<span class="token operator">++</span> <span class="token punctuation">{</span>
+		sum<span class="token operator">+=</span> <span class="token operator">&lt;-</span> sumChan<span class="token punctuation">;</span>
+	<span class="token punctuation">}</span>
+	<span class="token keyword">return</span> sum<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">func</span> <span class="token function">sumRoutine</span><span class="token punctuation">(</span>smallArray <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">,</span>ch <span class="token keyword">chan</span> <span class="token builtin">int64</span><span class="token punctuation">,</span>wg <span class="token operator">*</span>sync<span class="token punctuation">.</span>WaitGroup<span class="token punctuation">)</span><span class="token punctuation">{</span>
+	<span class="token keyword">defer</span> wg<span class="token punctuation">.</span><span class="token function">Done</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+	sum <span class="token operator">:=</span><span class="token function">int64</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+	<span class="token keyword">for</span> <span class="token boolean">_</span><span class="token punctuation">,</span>value <span class="token operator">:=</span> <span class="token keyword">range</span><span class="token punctuation">(</span>smallArray<span class="token punctuation">)</span><span class="token punctuation">{</span>
+		sum <span class="token operator">+=</span><span class="token function">int64</span><span class="token punctuation">(</span>value<span class="token punctuation">)</span><span class="token punctuation">;</span>
+	<span class="token punctuation">}</span>
+	ch <span class="token operator">&lt;-</span> sum<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre><h1>进行测试</h1><p>首先我在自己的笔记本上跑了一下，效果似乎不是特别明显，当数据规模比较小时，使用<code>go协程</code>产生的开销相比多线程带来的性能提升会比较大。</p><p><img src="/assets/goroutine-env.21737bb0.png" alt="env-mbp"></p><pre><code>数据规模 sum1函数耗时(ns) sum2函数耗时(ns)
+1000	1000	257000
+2000	2000	196000
+4000	3000	123000
+8000	19000	566000
+16000	24000	574000
+32000	21000	106000
+64000	46000	101000
+128000	92000	117000
+256000	161000	164000
+512000	710000	354000
+1024000	633000	380000
+2048000	1855000	746000
+4096000	3779000	1430000
+8192000	9285000	7126000
+16384000	17107000	7522000
+32768000	37100000	16824000
+65536000	71186000	28741000
+131072000	153552000	55689000
+262144000	349672000	125364000
+524288000	3370025000	221678000
+</code></pre><p><img src="/assets/goroutine-bench1.f36832fc.png" alt="bench1"></p><hr><p>后面我使用了一台 8 核 16GB 内存的云服务器进行测试，效果就比较明显了。sum2 函数的耗时明显降低。</p><pre><code>processor	: 6
+vendor_id	: GenuineIntel
+cpu family	: 6
+model		: 85
+model name	: Intel(R) Xeon(R) Platinum 8255C CPU @ 2.50GHz
+stepping	: 5
+microcode	: 0x1
+cpu MHz		: 2494.140
+cache size	: 36608 KB
+physical id	: 0
+siblings	: 8
+core id		: 6
+cpu cores	: 8
+apicid		: 6
+initial apicid	: 6
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 13
+wp		: yes
+</code></pre><pre><code>数据规模 sum1函数耗时(ns) sum2函数耗时(ns)
+1000	975	184791
+2000	1744	136564
+4000	2452	77209
+8000	4462	148065
+16000	13041	151411
+32000	17729	99903
+64000	34824	88240
+128000	72507	88009
+256000	153425	118217
+512000	307149	128954
+1024000	716739	218762
+2048000	1498043	340398
+4096000	3121459	741179
+8192000	6512778	1440240
+16384000	12999638	2841228
+32768000	25421817	5573615
+65536000	52787702	11216755
+131072000	102977136	22564239
+262144000	212568740	48269912
+524288000	408104714	90059294
+</code></pre><p><img src="/assets/goroutine-bench2.f798aaa5.png" alt="bench2"></p><h1>分析</h1><p>在求和数组规模数据规模比较大，运行的机器核心数比较多的时候，使用<code>go协程</code>是可以提升数组求和的效率的。<code>go协程</code>和系统的进程并不是一一对应的，创建一个<code>go协程</code>本身的开销也比创建一个线程小。对大数组求和只是一种场景，也有很多其他类似的场景可以利用<code>go协程</code>进行优化。</p></div><!--]--><div class="rounded bg-gray mt-10 p-1 text-white italic indent-md text-lg"> CC BY-SA 3.0协议 。转载请注明出处! </div><!--]--></div></div><!--]--></div></div>
+    
+  
+
+</body></html>
