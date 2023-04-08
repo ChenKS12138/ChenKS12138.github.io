@@ -1,0 +1,1 @@
+import{d as e,u as t,e as o,o as _,M as s}from"./app.6ad4236d.js";const a={class:"hint color-text-comm dark:text-white"},c=e({__name:"404",setup(n){return t({title:"NotFound"}),(d,r)=>(_(),o("div",a,"404. Not Found"))}});const u=s(c,[["__scopeId","data-v-3682ac88"]]);export{u as default};

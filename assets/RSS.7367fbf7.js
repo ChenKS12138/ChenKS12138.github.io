@@ -1,1 +1,0 @@
-import{d as e,u as t,e as o,o as _,L as s}from"./app.dc88e73f.js";const c={class:"hint color-text-comm dark:text-white"},a=e({__name:"RSS",setup(n){return t({title:"NotFound"}),(d,r)=>(_(),o("div",c,"RSS Not Ready!"))}});const i=s(a,[["__scopeId","data-v-c0d0511e"]]);export{i as default};
