@@ -72,7 +72,8 @@ _.get(object, "a.b.c", "default");
 // => 'default'
 ```
 
-我也贡献了一道题目，[type-challenge 题目地址](https://github.com/type-challenges/type-challenges/blob/main/questions/7260-hard-object-key-paths/README.md)
+
+我也贡献了一道题目，[type-challenge 题目地址](https://github.com/type-challenges/type-challenges/blob/main/questions/07258-hard-object-key-paths/README.md)
 
 ```typescript
 type T1 = ObjectKeyPaths<{ name: string; age: number }>; // expected to be 'name' | 'age'
@@ -87,6 +88,6 @@ type T3 = ObjectKeyPaths<{ books: [{ name: string; price: number }] }>; // expec
 
 ![1.png](./1.png)
 
-https://github.com/type-challenges/type-challenges/issues/7256
+https://github.com/type-challenges/type-challenges/issues/7258
 
 提交 Issue 创建题目后，我也评论贴了自己的解法。同时也发现了社区中的其他有意思的解法，比如做尾递归优化等。更发现了这里例子 Anders Hejlsberg 在 TSConf 2021 上演示过。
