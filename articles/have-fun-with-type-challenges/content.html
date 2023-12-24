@@ -11,9 +11,9 @@
       }
       gtag("js", new Date());
     </script>
-    <script type="module" crossorigin="" src="/assets/app.bcebc84f.js"></script>
-    <link rel="stylesheet" href="/assets/index.7901d2da.css">
-  <link rel="modulepreload" crossorigin="" href="/assets/content.dd47c19d.js"></head>
+    <script type="module" crossorigin="" src="/assets/app.f9f8d20c.js"></script>
+    <link rel="stylesheet" href="/assets/index.18aa5f7c.css">
+  <link rel="modulepreload" crossorigin="" href="/assets/content.7c5bbd05.js"></head>
 
   <body>
     <div id="app" data-server-rendered="true"><div class="w-full items-center justify-center m-0 p-0"><!--[--><header class="w-full fixed z-99" style="--37938739:url(&quot;/bg1.png&quot;);" data-v-35def80b=""><div class="header-navigation text--layout flex items-center justify-center" style="height:64px;background-color:transparent;" data-v-35def80b=""><div class="flex justify-between items-center w-3xl <md:w-full" data-v-35def80b=""><div data-v-35def80b=""><a href="/" class="text--link" data-v-35def80b="">ChenKS</a></div><div class="flex text-sm font-400 items-center" data-v-35def80b=""><!--[--><a href="/" class="text--link" data-v-35def80b="">首页</a><a href="/article-list" class="text--link" data-v-35def80b="">文章</a><a href="/about" class="text--link" data-v-35def80b="">关于</a><!--]--><button class="cursor-pointer text-white bg-transparent py-0.75 px-2.5 text-sm" data-v-35def80b=""><span class="inline-block align-middle dark:i-carbon-moon i-carbon-sun"></span></button></div></div></div></header><div class="flex flex-col" style="min-height:100vh;--37938739:url(&quot;/bg1.png&quot;);" data-v-35def80b=""><div class="w-full header-cover-bg min-h-lg" data-v-35def80b=""></div><div class="content-container-wrapper dark:bg-dark" data-v-35def80b=""><div class="content-container" data-v-35def80b=""><!--[--><div class="h-55 -mt-55 flex flex-col items-center text-white"><div class="font-bold text-3xl">使用TypeScript做类型体操-ObjectKeyPaths</div><div class="text-lg mt-2">2022-12-24</div><div class="mt-2 italic">#JavaScript</div></div><!--[--><div class="markdown-body"><h1>前置知识&amp;TypeScript 类型系统</h1><p><code>TypeScript</code>可以基本被简单地理解为<code>JavaScript</code>+<code>类型注解</code>（因为 TypeScript 不会在运行时做约束，因此我更愿意称它为是一种注解）。JavaScript 是一门灵活的动态类型编程语言，正所谓，“动态类型一时爽，代码重构火葬场”，JavaScript 代码中的类型信息只能通过注释（一般是 JSDoc，但是场景也比较局限）记录，起不到约束作用。同时，也导致了代码中充斥着运行时的类型检查。而 TypeScript 的出现很好的解决了这几个问题，通过编译时检查（称之为转译会更合适一些），确保类型被正确使用。</p><p>使用 JavaScript 实现余额展示。</p><pre class="language-javascript"><code class="language-javascript"><span class="token comment">/**
