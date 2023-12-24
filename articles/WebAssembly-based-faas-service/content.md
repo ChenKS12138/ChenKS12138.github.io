@@ -2,8 +2,7 @@
 title: 使用WebAssembly构建FaaS服务
 date: 2022-06-03T23:54:37.000Z
 tags:
-  - WebAssembly
-  - 随笔
+  - Web
 coverImage: ./5.png
 ---
 

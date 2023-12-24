@@ -2,8 +2,6 @@
 title: 毕业照小程序开发复盘
 date: 2020-06-09T17:00:28.000Z
 tags:
-  - Taro
-  - JavaScript
   - 小程序
 coverImage: ./31591692795.jpg
 ---

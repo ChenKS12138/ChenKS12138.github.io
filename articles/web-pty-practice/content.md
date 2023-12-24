@@ -2,7 +2,7 @@
 title: 动手写一个web pty
 date: 2021-11-12T18:02:39.000Z
 tags:
-  - 随笔
+  - Web
 coverImage: ./1.png
 ---
 

@@ -2,7 +2,7 @@
 title: 修复vitest错误栈指向错误文件
 date: 2023-04-08T06:58:32.604Z
 tags:
-  - 随笔
+  - Web
 coverImage: ./2.png
 
 ---

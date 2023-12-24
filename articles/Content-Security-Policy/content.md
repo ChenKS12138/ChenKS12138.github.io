@@ -2,7 +2,7 @@
 title: Content-Security-Policy
 date: 2021-03-15T23:00:05.000Z
 tags:
-  - 随笔
+  - Web
 coverImage: ./csp_implement_zhihu.png
 ---
 

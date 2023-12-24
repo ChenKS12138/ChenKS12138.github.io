@@ -2,7 +2,7 @@
 title: 跨域那些事
 date: 2019-07-22T23:32:45.000Z
 tags:
-  - request
+  - Web
 coverImage: ./cross_site4.jpg
 ---
 

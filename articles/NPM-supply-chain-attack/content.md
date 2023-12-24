@@ -2,8 +2,7 @@
 title: NPM上的软件供应链攻击
 date: 2021-09-07T20:45:11.000Z
 tags:
-  - 随笔
-  - NPM
+  - 信息安全
 coverImage: ./5.png
 ---
 

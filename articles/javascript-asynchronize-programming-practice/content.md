@@ -3,7 +3,6 @@ title: 对JavaScript的异步机制的理解
 date: 2020-09-08T10:34:35.000Z
 tags:
   - JavaScript
-  - 随笔
 coverImage: ./runtime.jpeg
 ---
 
@@ -64,8 +63,8 @@ async function func3() {
 
 ```javascript
 // util.js
-const sleep = seconds =>
-  new Promise(resolve => {
+const sleep = (seconds) =>
+  new Promise((resolve) => {
     setTimeout(() => {
       resolve();
     }, seconds * 1000);
@@ -78,26 +77,28 @@ function CallDto(fn, args) {
 
 const call = (fn, ...args) => new CallDto(fn, args);
 
-const asyncWrapper = generatorFunc => async (...args) => {
-  /**
-   * @type {Generator}
-   */
-  const generator = generatorFunc(...args);
-  let done = false;
-  let iteratorArgs = args;
-  while (!done) {
-    const iteratorResult = generator.next(iteratorArgs);
-    done = iteratorResult.done;
-    if (iteratorResult.value instanceof Promise) {
-      iteratorArgs = await iteratorResult.value;
-    } else if (iteratorResult.value instanceof CallDto) {
-      const { fn, args } = iteratorResult.value;
-      iteratorArgs = await fn(args);
-    } else {
-      iteratorArgs = iteratorResult.value;
+const asyncWrapper =
+  (generatorFunc) =>
+  async (...args) => {
+    /**
+     * @type {Generator}
+     */
+    const generator = generatorFunc(...args);
+    let done = false;
+    let iteratorArgs = args;
+    while (!done) {
+      const iteratorResult = generator.next(iteratorArgs);
+      done = iteratorResult.done;
+      if (iteratorResult.value instanceof Promise) {
+        iteratorArgs = await iteratorResult.value;
+      } else if (iteratorResult.value instanceof CallDto) {
+        const { fn, args } = iteratorResult.value;
+        iteratorArgs = await fn(args);
+      } else {
+        iteratorArgs = iteratorResult.value;
+      }
     }
-  }
-};
+  };
 
 module.exports = {
   sleep,

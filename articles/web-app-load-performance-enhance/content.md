@@ -2,7 +2,7 @@
 title: web应用加载优化相关
 date: 2020-10-10T16:50:47.000Z
 tags:
-  - 随笔
+  - Web
 coverImage: ./collect-homework-first-version.png
 ---
 

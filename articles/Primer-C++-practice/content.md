@@ -2,7 +2,7 @@
 title: Primer C++ 练习
 date: 2021-11-14T16:32:24.000Z
 tags:
-  - 随笔
+  - 学习笔记
 coverImage: ''
 ---
 

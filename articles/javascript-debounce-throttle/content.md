@@ -60,7 +60,7 @@ export default function DebounceConstructor(fn, interval = 0) {
 // answer.vue
 import DebounceConstructor from "debounce.js";
 const { Debounce: handleTyping, Clear: handleExecute } = DebounceConstructor(
-  val => {
+  (val) => {
     submit(val);
     console.log(val);
   },

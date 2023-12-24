@@ -2,8 +2,8 @@
 title: 使用Stream编写Electron应用
 date: 2021-05-04T17:36:32.000Z
 tags:
-  - 随笔
-coverImage: ''
+  - JavaScript
+coverImage: ""
 ---
 
 # Stream 的概念

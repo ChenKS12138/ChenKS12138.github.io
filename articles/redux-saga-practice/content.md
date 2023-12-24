@@ -3,7 +3,6 @@ title: redux-saga初试
 date: 2020-06-13T22:45:12.000Z
 tags:
   - JavaScript
-  - 随笔
 coverImage: ./redux-saga.png
 ---
 
@@ -52,7 +51,7 @@ ES2017 的`async`,`await`给我们提供了一种同步的写法来编写异步�
 /**
  * @param {number} second
  */
-const sleep = second =>
+const sleep = (second) =>
   new Promise((resolve, reject) => {
     if (second < 0) {
       reject("second less than 0");
@@ -66,7 +65,7 @@ const sleep = second =>
 /**
  * @param {GeneratorFunction} generatorFunc
  */
-const asyncWrapper = generatorFunc => {
+const asyncWrapper = (generatorFunc) => {
   const iterator = generatorFunc();
   /**
    * @param {Iterator} iterator
@@ -79,8 +78,8 @@ const asyncWrapper = generatorFunc => {
       handleIterate(iterator, iterator.next());
     } else if (current.value instanceof Promise) {
       current.value.then(
-        result => handleIterate(iterator, iterator.next(result)),
-        reason => handleIterate(iterator, iterator.throw(reason))
+        (result) => handleIterate(iterator, iterator.next(result)),
+        (reason) => handleIterate(iterator, iterator.throw(reason))
       );
     }
   };
@@ -117,13 +116,15 @@ redux-saga 使得副作用更容易被管理。对于一些异步函数的调用
 
 ```javascript
 function createThunkMiddleware(extraArgument) {
-  return ({ dispatch, getState }) => next => action => {
-    if (typeof action === "function") {
-      return action(dispatch, getState, extraArgument);
-    }
+  return ({ dispatch, getState }) =>
+    (next) =>
+    (action) => {
+      if (typeof action === "function") {
+        return action(dispatch, getState, extraArgument);
+      }
 
-    return next(action);
-  };
+      return next(action);
+    };
 }
 ```
 

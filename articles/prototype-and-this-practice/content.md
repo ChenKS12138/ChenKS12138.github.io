@@ -2,7 +2,7 @@
 title: 原型链和this指向问题
 date: 2020-07-11T20:18:04.000Z
 tags:
-  - javascript
+  - JavaScript
 coverImage: ./prototype-chain1.png
 ---
 

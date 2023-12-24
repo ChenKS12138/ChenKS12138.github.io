@@ -3,7 +3,7 @@ import articles from "virtual:resolve-md";
 import dayjs from "dayjs";
 
 useHead({
-    title: 'ArticleList'
+    title: '文章'
 })
 
 const allTags = Array.from(

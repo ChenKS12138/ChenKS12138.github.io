@@ -2,20 +2,15 @@
 title: 栈溢出利用
 date: 2020-09-16T15:59:59.000Z
 tags:
-  - 随笔
+  - 信息安全
 coverImage: ./gdb-debug.png
 ---
 
 # 概述
-
 ![stack-frames](./stack-frame.jpg)
 
-软件漏洞分析课程的一次作业，利用了栈内存的缓冲区溢出，覆盖了返回地址，从而达到劫持控制流的目的。如果希望能具体了解一下图中 c 函数调用的实现，可以看一下 B 站上陈渝教授的这个视频。
-
-<iframe style="margin-left: 50%;transform: translateX(-50%);width: 50vw;height: 40vw;" src="//player.bilibili.com/player.html?aid=77228694&bvid=BV1mJ411X73U&cid=132102373&page=5" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true"> </iframe>
-
+软件漏洞分析课程的一次作业，利用了栈内存的缓冲区溢出，覆盖了返回地址，从而达到劫持控制流的目的。
 # EXP1
-
 ```c
 #include <stdio.h>
 #include <string.h>
@@ -39,7 +34,6 @@ void main(int argc, char *argv[])
 ```
 
 使用`gdb`进行调试，`strcpy`函数可以被利用引起缓冲区溢出，目前的问题时需要多长的字符串，以及需要将`function1`栈帧的返回地址覆盖为什么
-
 环境
 
 > ubuntu 16.04

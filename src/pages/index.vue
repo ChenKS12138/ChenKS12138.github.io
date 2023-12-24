@@ -7,19 +7,19 @@ const go = (urlPath: string) => router.push(urlPath);
 
 
 useHead({
-    title: 'Home'
+    title: '首页'
 })
 
 </script>
 <template>
-    <div v-for="(article,idx) in articles" :key="article.path" class="article-item flex-col md:(flex-row)"
+    <div v-for="(article, idx) in articles" :key="article.path" class="article-item flex-col md:(flex-row)"
         @click="go(article.path)">
         <div class="md:(pr-4 w-4\/5)">
-            <div class="article-item-title">{{article.data.title}}</div>
-            <div class="article-item-brief">{{article.brief}}</div>
+            <div class="article-item-title">{{ article.data.title }}</div>
+            <div class="article-item-brief">{{ article.brief }}</div>
             <div class="article-item-meta">
-                <span class="mr-6 ">{{article.data.date}}</span>
-                <span class="italic">{{(article.data.tags).join(", ") }}</span>
+                <span class="mr-6 ">{{ article.data.date }}</span>
+                <span class="italic">{{ (article.data.tags).join(", ") }}</span>
             </div>
         </div>
         <div class="h-40 " v-if="article.data.coverImage">
@@ -61,7 +61,7 @@ html.dark .article-item:not(:last-child) {
 
 
 .article-item-title {
-    @apply font-700 text-2xl mb-2;
+    @apply color-black text-2xl mb-2;
 }
 
 .article-item-brief {

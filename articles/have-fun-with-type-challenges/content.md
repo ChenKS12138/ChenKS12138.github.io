@@ -2,7 +2,7 @@
 title: 使用TypeScript做类型体操-ObjectKeyPaths
 date: 2022-12-24T00:42:10.000Z
 tags:
-  - TypeScript
+  - JavaScript
 coverImage: ./1.png
 ---
 
@@ -71,7 +71,6 @@ _.get(object, "a[0].b.c");
 _.get(object, "a.b.c", "default");
 // => 'default'
 ```
-
 
 我也贡献了一道题目，[type-challenge 题目地址](https://github.com/type-challenges/type-challenges/blob/main/questions/07258-hard-object-key-paths/README.md)
 

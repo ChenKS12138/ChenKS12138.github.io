@@ -13,20 +13,20 @@ const navigationColor = useImageColor(bgSrc);
 const links = [
     {
         to: '/',
-        label: 'Home'
+        label: '首页'
     },
     {
         to: '/article-list',
-        label: 'Articles'
+        label: '文章'
     },
     {
         to: '/about',
-        label: 'About'
+        label: '关于'
     },
-    {
-        to: '/RSS',
-        label: 'RSS'
-    }
+    // {
+    //     to: '/RSS',
+    //     label: 'RSS'
+    // }
 ]
 
 </script>
@@ -34,23 +34,25 @@ const links = [
 <template>
     <header class="w-full fixed z-99">
         <div class="header-navigation  text--layout flex items-center justify-center"
-            :style="{ height: isCollapsed ? '50px' : '64px', backgroundColor: isCollapsed?  navigationColor: 'transparent' }">
+            :style="{ height: isCollapsed ? '50px' : '64px', backgroundColor: isCollapsed ? navigationColor : 'transparent' }">
             <div class="flex justify-between items-center w-3xl <md:(w-full)">
                 <div>
                     <router-link class="text--link" to="/">ChenKS</router-link>
                 </div>
                 <div class="flex text-sm font-400 items-center">
-                    <router-link class="text--link" v-for="(item) in links" :key="item.to" :to="item.to">{{item.label}}
+                    <router-link class="text--link" v-for="(item) in links" :key="item.to" :to="item.to">{{ item.label }}
                     </router-link>
                     <DarkMode />
                 </div>
             </div>
         </div>
     </header>
-    <div class="w-full header-cover-bg min-h-lg"></div>
-    <div class="content-container-wrapper dark:bg-dark">
-        <div class="content-container">
-            <router-view></router-view>
+    <div class="flex flex-col" style="min-height: 100vh;">
+        <div class="w-full header-cover-bg min-h-lg"></div>
+        <div class="content-container-wrapper dark:bg-dark">
+            <div class="content-container">
+                <router-view></router-view>
+            </div>
         </div>
     </div>
 </template>
@@ -93,7 +95,7 @@ const links = [
 }
 
 .content-container-wrapper {
-    @apply <lg: text-sm;
+    @apply <lg: text-sm flex-1;
     background-color: rgb(235, 235, 235);
 }
 

@@ -2,7 +2,7 @@
 title: 《the linux programming interface》练习
 date: 2021-09-28T15:58:01.000Z
 tags:
-  - 随笔
+  - 学习笔记
 coverImage: ./the-linux-programming-interface.png
 ---
 

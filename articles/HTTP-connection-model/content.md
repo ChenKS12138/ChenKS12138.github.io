@@ -2,8 +2,7 @@
 title: HTTP连接模型
 date: 2020-10-23T15:25:13.000Z
 tags:
-  - 随笔
-  - 计算机网络
+  - Web
 coverImage: ./http-connection1.png
 ---
 

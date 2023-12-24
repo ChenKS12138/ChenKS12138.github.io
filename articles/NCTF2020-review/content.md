@@ -2,8 +2,7 @@
 title: NCTF2020复盘
 date: 2020-11-23T18:36:19.000Z
 tags:
-  - 随笔
-  - 安全
+  - 信息安全
 coverImage: ./profile.png
 ---
 

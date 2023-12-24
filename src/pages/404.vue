@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 useHead({
-    title: 'NotFound'
+    title: '404'
 })
 </script>
 <template>
