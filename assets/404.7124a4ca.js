@@ -1,0 +1,1 @@
+import{d as e,u as t,e as _,o,I as s}from"./app.bcebc84f.js";const a={class:"hint color-text-comm dark:text-white"},c=e({__name:"404",setup(n){return t({title:"404"}),(d,r)=>(o(),_("div",a,"404. Not Found"))}});const i=s(c,[["__scopeId","data-v-6471a801"]]);export{i as default};
