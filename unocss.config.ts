@@ -25,7 +25,10 @@ export default defineConfig({
       'color-text-comm', { color: 'rgb(60, 72, 88)' },
     ],
     [
-      'color-bg-dark', { 'background-color': 'rgb(13,17,23)' },
+      'color-text-gray', { color: '#adadad' },
+    ],
+    [
+      'color-bg-dark', { 'background-color': 'rgb(44,47,50)' },
     ],
     [
       'color-border-gray', { 'border-color': 'rgba(0,0,0,0.5)' },

@@ -61,17 +61,17 @@ html.dark .article-item:not(:last-child) {
 
 
 .article-item-title {
-    @apply color-black text-2xl mb-2;
+    @apply color-black text-2xl mb-2 dark:color-white;
 }
 
 .article-item-brief {
-    @apply leading-6;
+    @apply leading-6 dark:color-text-gray;
     word-wrap: break-word;
     word-break: break-all;
 }
 
 .article-item-meta {
-    @apply: mt-2;
+    @apply: mt-2 dark:color-text-gray;
 }
 
 .text--link {
