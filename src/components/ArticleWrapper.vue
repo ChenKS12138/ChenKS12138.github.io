@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import dayjs from 'dayjs'
 import Giscus from '@giscus/vue';
+import { useMyDark } from '~/composables/dark';
 
 const { frontmatter } = defineProps<{
     frontmatter: {
@@ -21,9 +22,17 @@ useHead({
     ]
 })
 
-const isDark = useDark()
+const [isDark, _] = useMyDark();
+const discusTheme = computed(() => isDark.value ? 'dark' : 'light');
 
-const discusTheme = isDark.value ? 'dark' : 'light';
+const showGiscus = ref(true);
+watch(isDark, () => {
+    showGiscus.value = false;
+    nextTick(() => {
+        showGiscus.value = true;
+    })
+});
+
 
 </script>
 
@@ -34,9 +43,10 @@ const discusTheme = isDark.value ? 'dark' : 'light';
         <div class="mt-2 italic">{{ (frontmatter.tags || []).map(x => `#${x}`).join(' ') }}</div>
     </div>
     <slot></slot>
-    <Giscus id="comments" repo="ChenKS12138/ChenKS12138.github.io" repoId="MDEwOlJlcG9zaXRvcnkyNzA4Njc3ODM="
-        category="Announcements" categoryId="DIC_kwDOECUdR84Cd10_" mapping="og:title" reactionsEnabled="1" emitMetadata="0"
-        inputPosition="bottom" :theme="discusTheme" lang="zh-CN" loading="lazy" />
+    <Giscus v-if="showGiscus" ref="giscusRef" id="comments" repo="ChenKS12138/ChenKS12138.github.io"
+        repoId="MDEwOlJlcG9zaXRvcnkyNzA4Njc3ODM=" category="Announcements" categoryId="DIC_kwDOECUdR84Cd10_"
+        mapping="og:title" reactionsEnabled="1" emitMetadata="0" inputPosition="bottom" :theme="discusTheme" lang="zh-CN"
+        loading="lazy" />
     <!-- <div class="rounded bg-gray mt-10 p-1 text-white italic indent-md text-lg">
         CC BY-SA 3.0协议 。转载请注明出处!
     </div> -->
