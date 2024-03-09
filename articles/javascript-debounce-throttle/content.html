@@ -11,9 +11,9 @@
       }
       gtag("js", new Date());
     </script>
-    <script type="module" crossorigin="" src="/assets/app.f9f8d20c.js"></script>
+    <script type="module" crossorigin="" src="/assets/app.91cb0f07.js"></script>
     <link rel="stylesheet" href="/assets/index.18aa5f7c.css">
-  <link rel="modulepreload" crossorigin="" href="/assets/content.89adbda0.js"></head>
+  <link rel="modulepreload" crossorigin="" href="/assets/content.a3fe7f96.js"><meta property="og:title" content="JS中的函数节流与函数防抖"><meta name="head:count" content="1"></head>
 
   <body>
     <div id="app" data-server-rendered="true"><div class="w-full items-center justify-center m-0 p-0"><!--[--><header class="w-full fixed z-99" style="--37938739:url(&quot;/bg1.png&quot;);" data-v-35def80b=""><div class="header-navigation text--layout flex items-center justify-center" style="height:64px;background-color:transparent;" data-v-35def80b=""><div class="flex justify-between items-center w-3xl <md:w-full" data-v-35def80b=""><div data-v-35def80b=""><a href="/" class="text--link" data-v-35def80b="">ChenKS</a></div><div class="flex text-sm font-400 items-center" data-v-35def80b=""><!--[--><a href="/" class="text--link" data-v-35def80b="">首页</a><a href="/article-list" class="text--link" data-v-35def80b="">文章</a><a href="/about" class="text--link" data-v-35def80b="">关于</a><!--]--><button class="cursor-pointer text-white bg-transparent py-0.75 px-2.5 text-sm" data-v-35def80b=""><span class="inline-block align-middle dark:i-carbon-moon i-carbon-sun"></span></button></div></div></div></header><div class="flex flex-col" style="min-height:100vh;--37938739:url(&quot;/bg1.png&quot;);" data-v-35def80b=""><div class="w-full header-cover-bg min-h-lg" data-v-35def80b=""></div><div class="content-container-wrapper dark:bg-dark" data-v-35def80b=""><div class="content-container" data-v-35def80b=""><!--[--><div class="h-55 -mt-55 flex flex-col items-center text-white"><div class="font-bold text-3xl">JS中的函数节流与函数防抖</div><div class="text-lg mt-2">2019-08-10</div><div class="mt-2 italic">#JavaScript</div></div><!--[--><div class="markdown-body"><h1>什么是函数节流和函数防抖</h1><p>这两者都是 JavaScript 中的一些优化方法。顾名思义，节流与防抖都是通过一定的方法，较少函数的调用频率，来达到优化的目的。</p><h2>函数防抖 (Debounce)</h2><p>主要是实现，当一定的事件间隔内连续多次触发指定的事件后，事件处理函数不会立即执行。仅在最后一次触发的若干毫秒后执行事件处理函数。这避免了事件处理函数的多次执行。</p><h2>函数节流 (Throttle)</h2><p>主要是实现，当指定事件被多次触发后，保证事件处理函数的执行的时间间隔是一样的，都是间隔若个毫秒。就像它的名字一样，是一个水流量很小的水龙头，但是它的流量是稳定的，即时间处理函数的被调用情况从时间上来看是均匀的。</p><h2>应用场景</h2><p><img src="/assets/debounce1.107d5968.jpg" alt="新生杯"></p><p>诶，这是在 2019 校科协新生杯的前端项目 <a href="https://github.com/ChenKS12138/sast_fresh_cup_frontend">仓库地址</a> 里使用到的。先来说说这个项目吧，这是个前后端分离的项目，接口是我设计的，我们所要讨论的问题是出现在了答题页。答题页需要将题目从服务器端获取，并将选手填写的答案传送到服务器端。题目获取方面，其实更准确地说是，是一些比赛的基本信息方面，包括题目，公告，截至时间等，我就加了一个接口对这些信息求哈希，客户端轮询这个接口。 <s>用 websocket 可能会更好</s> ，一旦有变化，再请求其他相关的接口。因此题目是一次性获取的，并且可能会比赛中途更新。而在提交答案方面，我没有采用一次性提交的方式。主要是怕哪个大佬学弟自己把 localStorage 清除了。但是这就有了一个问题，无论是使用<code>setInterval</code> 定时将答案发送到给服务器，还是只给文字输入框加一个监听输入的处理函数，效率都不高。因此使用在这种情况下使用节流和防抖就很有用了。</p><pre class="language-javascript"><code class="language-javascript"><span class="token comment">// debounce.js</span>
@@ -48,7 +48,7 @@
   <span class="token punctuation">}</span><span class="token punctuation">,</span>
   <span class="token number">800</span>
 <span class="token punctuation">)</span><span class="token punctuation">;</span>
-</code></pre><p>这样就如最上面那张图片看到的那样，遇到一系列的输入时，每次输入框的值发生改变时，都会调用<code>handleTyping</code>，只有在停止输入若干毫秒后才会执行事件处理函数。</p><h2>另一种处理方式</h2><p>上面的方案是采用了防抖的方法。其实也可以采用节流的方式。这个可以仔细研究一下。</p><h2>类似的场景</h2><p><img src="/assets/debounce2.b4b073b7.jpg" alt="搜索引擎"></p><p>需要使用到节流和防抖的类似的场景还有很多。像我们在搜索引擎输入关键字，底下会有提示框，这也是个应用场景。</p></div><!--]--><!--]--></div></div></div><!--]--></div></div>
+</code></pre><p>这样就如最上面那张图片看到的那样，遇到一系列的输入时，每次输入框的值发生改变时，都会调用<code>handleTyping</code>，只有在停止输入若干毫秒后才会执行事件处理函数。</p><h2>另一种处理方式</h2><p>上面的方案是采用了防抖的方法。其实也可以采用节流的方式。这个可以仔细研究一下。</p><h2>类似的场景</h2><p><img src="/assets/debounce2.b4b073b7.jpg" alt="搜索引擎"></p><p>需要使用到节流和防抖的类似的场景还有很多。像我们在搜索引擎输入关键字，底下会有提示框，这也是个应用场景。</p></div><!--]--><!----><!--]--></div></div></div><!--]--></div></div>
     
   
 
