@@ -8,6 +8,7 @@
     "preview": "vite preview --port 3333"
   },
   "dependencies": {
+    "@giscus/vue": "^3.0.0",
     "@vueuse/core": "^9.3.0",
     "vue": "^3.2.37",
     "vue-router": "^4.1.3"
