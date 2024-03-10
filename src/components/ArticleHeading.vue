@@ -40,11 +40,11 @@ ol.article-heading li {
     text-indent: -1em;
     margin-left: 1em;
     line-height: 1.8rem;
-
 }
 
 .article-heading-title {
     cursor: pointer;
+    @apply dark:color-gray;
 }
 
 .article-heading-title:hover {
