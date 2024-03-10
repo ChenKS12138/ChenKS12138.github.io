@@ -98,4 +98,8 @@ const groupedArticles = computed(() => Array.from(
 .article-link {
     @apply cursor-pointer decoration-none leading-8 color-text-comm color-text-comm dark: (text-white);
 }
+
+.article-link:hover {
+    text-decoration: underline dashed;
+}
 </style>
