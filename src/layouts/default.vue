@@ -4,7 +4,7 @@ import { useImageColor } from '~/composables/color';
 
 const router = useRouter();
 
-const bgSrc = ref<string>(router.currentRoute.value.meta.coverImage as string || '/bg1.png')
+const bgSrc = ref<string>(router.currentRoute.value.meta.coverImage as string || '/bg.jpg')
 const cssBgSrc = ref(`url("${bgSrc.value}")`);
 const { y } = useWindowScroll();
 const isCollapsed = computed(() => y.value > 30);
@@ -48,7 +48,7 @@ const links = [
         </div>
     </header>
     <div class="flex flex-col" style="min-height: 100vh;">
-        <div class="w-full header-cover-bg min-h-lg"></div>
+        <div class="w-full header-cover-bg min-h-sm"></div>
         <div class="content-container-wrapper dark:bg-dark">
             <div class="content-container">
                 <router-view></router-view>
