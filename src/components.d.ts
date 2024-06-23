@@ -12,5 +12,6 @@ declare module '@vue/runtime-core' {
     DarkMode: typeof import('./components/DarkMode.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    ShadowBox: typeof import('./components/ShadowBox.vue')['default']
   }
 }

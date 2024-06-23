@@ -19,19 +19,21 @@ const config = {
 </script>
 
 <template>
-  <div class="about-container">
-    <img class="avatar mb-2" :src="config.avatar" alt="avatar">
-    <div class="text-3xl mb-2">{{ config.name }}</div>
-    <div class="leading-loose italic" v-for="item in config.intro" :key="item">{{ item }}</div>
-  </div>
-  <div class="about-icon-container mt-2">
-    <a class="block" target="_blank" href="https://github.com/ChenKS12138">
-      <div class="i-carbon-logo-github text-2xl bg-dark dark:bg-white" />
-    </a>
-    <a class="block" target="_blank" href="https://twitter.com/ChenKS12138">
-      <div class="i-carbon-logo-twitter text-2xl bg-dark dark:bg-white" />
-    </a>
-  </div>
+  <shadow-box>
+    <div class="about-container">
+      <img class="avatar mb-2" :src="config.avatar" alt="avatar">
+      <div class="text-3xl mb-2">{{ config.name }}</div>
+      <div class="leading-loose italic" v-for="item in config.intro" :key="item">{{ item }}</div>
+    </div>
+    <div class="about-icon-container mt-2">
+      <a class="block" target="_blank" href="https://github.com/ChenKS12138">
+        <div class="i-carbon-logo-github text-2xl bg-dark dark:bg-white" />
+      </a>
+      <a class="block" target="_blank" href="https://twitter.com/ChenKS12138">
+        <div class="i-carbon-logo-twitter text-2xl bg-dark dark:bg-white" />
+      </a>
+    </div>
+  </shadow-box>
 </template>
 
 <style scoped>

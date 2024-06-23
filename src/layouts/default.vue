@@ -23,10 +23,6 @@ const links = [
         to: '/about',
         label: '关于'
     },
-    // {
-    //     to: '/RSS',
-    //     label: 'RSS'
-    // }
 ]
 
 </script>
@@ -50,9 +46,7 @@ const links = [
     <div class="flex flex-col" style="min-height: 100vh;">
         <div class="w-full header-cover-bg min-h-sm"></div>
         <div class="content-container-wrapper dark:bg-dark">
-            <div class="content-container">
-                <router-view></router-view>
-            </div>
+            <router-view />
         </div>
     </div>
 </template>
@@ -97,15 +91,5 @@ const links = [
 .content-container-wrapper {
     @apply <lg: text-sm flex-1;
     background-color: rgb(235, 235, 235);
-}
-
-.content-container {
-    @apply min-h-2xl p-5 relative max-w-4/5 bg-white <lg: (p-2) lg: w-4xl color-text-comm dark:(color-bg-dark text-white);
-    top: -80px;
-    z-index: 4;
-    margin: 0 auto;
-    border-radius: 8px;
-    box-shadow: 0 12px 15px 0 rgba(0, 0, 0, 0.24),
-        0 17px 50px 0 rgba(0, 0, 0, 0.19);
 }
 </style>

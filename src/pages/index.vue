@@ -12,23 +12,25 @@ useHead({
 
 </script>
 <template>
-    <div v-for="(article, idx) in articles" :key="article.path" class="article-item flex-col md:(flex-row)"
-        @click="go(article.path)">
-        <div class="md:(pr-4 w-4\/5)">
-            <div class="article-item-title">{{ article.data.title }}</div>
-            <div class="article-item-brief">{{ article.brief }}</div>
-            <div class="article-item-meta">
-                <span class="mr-6 ">{{ article.data.date }}</span>
-                <span class="italic">{{ (article.data.tags).join(", ") }}</span>
+    <shadow-box>
+        <div v-for="(article, idx) in articles" :key="article.path" class="article-item flex-col md:(flex-row)"
+            @click="go(article.path)">
+            <div class="md:(pr-4 w-4\/5)">
+                <div class="article-item-title">{{ article.data.title }}</div>
+                <div class="article-item-brief">{{ article.brief }}</div>
+                <div class="article-item-meta">
+                    <span class="mr-6 ">{{ article.data.date }}</span>
+                    <span class="italic">{{ (article.data.tags).join(", ") }}</span>
+                </div>
+            </div>
+            <div class="h-40 " v-if="article.data.coverImage">
+                <img :src="article.data.coverImage" class="article-item-image" alt="">
             </div>
         </div>
-        <div class="h-40 " v-if="article.data.coverImage">
-            <img :src="article.data.coverImage" class="article-item-image" alt="">
-        </div>
-    </div>
-    <router-link class="text--link" to="/article-list">
-        <div class="dark:text-white">查看全部</div>
-    </router-link>
+        <router-link class="text--link" to="/article-list">
+            <div class="dark:text-white">查看全部</div>
+        </router-link>
+    </shadow-box>
 </template>
 
 
@@ -43,7 +45,7 @@ useHead({
         0 17px 50px 0 rgba(0, 0, 0, 0.19) !important;
 
     @media screen and (max-width: 770px) {
-        width: 100%;
+        max-width: 100%;
     }
 }
 

@@ -44,30 +44,32 @@ const groupedArticles = computed(() => Array.from(
 </script>
 
 <template>
-    <div class="tag-container">
-        <div class="tag-item" :data-selected="selectedTag === ''" @click="selectedTag = ''">
-            ALL
-        </div>
-        <div class="tag-item" :data-selected="selectedTag === tagItem ? 'true' : ''" v-for="tagItem in allTags"
-            @click="selectedTag = tagItem">
-            {{ tagItem }}
-        </div>
-    </div>
-    <div class="articles-container">
-        <div>Total: {{ articles.length }}</div>
-        <div class="articles-divider border-t dark:border-white"></div>
-        <div class="mt-2" v-for="[year, yearArticles] in groupedArticles" :key="year">
-            <div class="text-xl">{{ year }}</div>
-            <div class="ml-5 mt-2 mb-8">
-                <router-link class="article-link" v-for="article in yearArticles" :to="article.path">
-                    <div class="flex justify-between my-3 dark:text-white">
-                        <div>{{ article.title }}</div>
-                        <div>{{ article.monthAndDay }}</div>
-                    </div>
-                </router-link>
+    <shadow-box>
+        <div class="tag-container">
+            <div class="tag-item" :data-selected="selectedTag === ''" @click="selectedTag = ''">
+                ALL
+            </div>
+            <div class="tag-item" :data-selected="selectedTag === tagItem ? 'true' : ''" v-for="tagItem in allTags"
+                @click="selectedTag = tagItem">
+                {{ tagItem }}
             </div>
         </div>
-    </div>
+        <div class="articles-container">
+            <div>Total: {{ articles.length }}</div>
+            <div class="articles-divider border-t dark:border-white"></div>
+            <div class="mt-2" v-for="[year, yearArticles] in groupedArticles" :key="year">
+                <div class="text-xl">{{ year }}</div>
+                <div class="ml-5 mt-2 mb-8">
+                    <router-link class="article-link" v-for="article in yearArticles" :to="article.path">
+                        <div class="flex justify-between my-3 dark:text-white">
+                            <div>{{ article.title }}</div>
+                            <div>{{ article.monthAndDay }}</div>
+                        </div>
+                    </router-link>
+                </div>
+            </div>
+        </div>
+    </shadow-box>
 </template>
 
 <style scoped>
